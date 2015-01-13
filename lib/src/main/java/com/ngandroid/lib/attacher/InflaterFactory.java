@@ -49,6 +49,9 @@ public class InflaterFactory implements LayoutInflater.Factory2, LayoutInflater.
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public View onCreateView(View view, String s, Context context, AttributeSet attributeSet) {
         parseAttributes(context, attributeSet);
+        if(mFactory2 == null){
+            return null;
+        }
         return mFactory2.onCreateView(view,s,context, attributeSet);
     }
 

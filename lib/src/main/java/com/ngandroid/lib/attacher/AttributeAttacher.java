@@ -46,6 +46,9 @@ public class AttributeAttacher {
     }
 
     private void apply(View v){
+        System.out.println("/////////////?????????????////////////");
+        System.out.println(attrArray.size());
+        System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
         for(int index = 0; index < attrArray.size(); index++){
             int id = attrArray.keyAt(index);
             TypedArray array = attrArray.get(id);
@@ -54,6 +57,11 @@ public class AttributeAttacher {
                 switch (attr) {
                     case R.styleable.ngAndroid_ngModel:
                         TypedValue vl = new TypedValue();
+                        System.out.println("/////////////////////////////////////");
+                        System.out.println(attr);
+                        System.out.println(R.styleable.ngAndroid_ngModel);
+                        System.out.println(array);
+                        System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
                         array.getValue(R.styleable.ngAndroid_ngModel, vl);
                         String value= vl.string.toString();
                         if (value != null) {
