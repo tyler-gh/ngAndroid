@@ -76,6 +76,7 @@ public class AttributeAttacher {
                                     Field f = model.getClass().getDeclaredField(modelName);
                                     builder = new BindingHandlerBuilder(f.getType(), model);
                                     builders.put(modelName, builder);
+
                                 }
                             } catch (NoSuchFieldException e) {
                                 // TODO rename error

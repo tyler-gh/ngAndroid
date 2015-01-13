@@ -5,6 +5,9 @@ import android.os.Build;
 import android.util.ArrayMap;
 import android.widget.TextView;
 
+import com.ngandroid.lib.utils.TypeUtils;
+
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +23,7 @@ public class BindingHandlerBuilder {
     private final Map<String, Object> mFieldMap;
     private final Object mModel;
     private final MethodInvoker mInvocationHandler;
+    private final Method[] mModelMethods;
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public BindingHandlerBuilder(Class clzz, Object model) {
@@ -33,6 +37,7 @@ public class BindingHandlerBuilder {
             mFieldMap = new HashMap<>();
         }
         mInvocationHandler = new MethodInvoker(mMethodMap, mFieldMap);
+        mModelMethods = mClass.getDeclaredMethods();
     }
 
     public Object create(){
@@ -41,14 +46,20 @@ public class BindingHandlerBuilder {
 
     public void addTextViewBind(String fieldName, final TextView textView){
         final String fieldNamelower = fieldName.toLowerCase();
-        mFieldMap.put(fieldNamelower, textView.getText().toString().toLowerCase());
-
-        final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(fieldNamelower, mInvocationHandler, mModel);
+        String defaultText =  textView.getText().toString();
+        mFieldMap.put(fieldNamelower, defaultText);
+        int methodType = TypeUtils.STRING;
+        for(Method m : mModelMethods){
+            if(m.getName().toLowerCase().equals("set" + fieldNamelower)){
+                methodType = TypeUtils.getType(m.getParameterTypes()[0]);
+            }
+        }
+        final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(fieldNamelower, mInvocationHandler, mModel, methodType);
         textView.addTextChangedListener(setTextWhenChangedListener);
         BindingMethod method = new BindingMethod(){
             @Override
             public Object invoke(String fieldName, Object... args) {
-                String value = (String) args[0];
+                String value = String.valueOf(args[0]);
                 if(!value.equals(textView.getText().toString())) {
                     textView.removeTextChangedListener(setTextWhenChangedListener);
                     textView.setText(value);

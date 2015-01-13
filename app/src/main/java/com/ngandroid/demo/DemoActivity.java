@@ -30,7 +30,7 @@ public class DemoActivity extends Activity {
         findViewById(R.id.really2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((TextView) view).setText(input.getTest());
+                ((TextView) view).setText(String.valueOf(input.getTest()));
             }
         });
     }

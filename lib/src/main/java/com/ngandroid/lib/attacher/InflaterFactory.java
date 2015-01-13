@@ -43,6 +43,9 @@ public class InflaterFactory implements LayoutInflater.Factory2, LayoutInflater.
         if(mFactory != null){
             return mFactory.onCreateView(s, context, attributeSet);
         }
+        if(mFactory2 == null){
+            return null;
+        }
         return mFactory2.onCreateView(s, context, attributeSet);
     }
 
