@@ -1,17 +1,17 @@
 # ngAndroid
 
-ngAndroid brings some of the angular attributes to android xml.
+ngAndroid brings some of the angular directives to android xml attributes.
 
-Currently supported angular attributes
+Currently supported angular directives
 ```
 ngModel
 ```
 
 --------
 
-ngModel
+<h3>ngModel</h3>
 
-```
+```java
 // create model
 
 public interface Input {
@@ -20,8 +20,9 @@ public interface Input {
     public String getTest();
     public void setTest(String input);
 }
-
-// add xml attributes
+```
+```xml
+<!-- add xml attributes -->
 
 <EditText
     android:id="@+id/editText"
@@ -35,8 +36,8 @@ public interface Input {
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     ngAndroid:ngModel="input.input"/>
-    
-
+```
+```java
 // create a field with your model (no need to instantiate it)
 private Input input;
 
@@ -54,3 +55,9 @@ private Input input;
 ```
 
 With those lines of code, your view is now bound to your data model and vice versa.
+
+![Alt text](/../pictures/images/screencast.gif?raw=true "ngAndroid at work")
+
+--------
+
+ngAndroid is still in extreme alpha stages. pre v 0.1
