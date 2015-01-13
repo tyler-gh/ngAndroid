@@ -9,7 +9,7 @@ ngModel
 
 --------
 
-ngModel
+# ngModel
 
 ```
 // create model
@@ -54,3 +54,8 @@ private Input input;
 ```
 
 With those lines of code, your view is now bound to your data model and vice versa.
+
+
+--------
+
+ngAndroid is still in extreme alpha stages. pre v 0.1
