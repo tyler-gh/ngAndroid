@@ -56,6 +56,7 @@ private Input input;
 
 With those lines of code, your view is now bound to your data model and vice versa.
 
+![Alt text](/../pictures/images/screencast.gif?raw=true "ngAndroid at work")
 
 --------
 
