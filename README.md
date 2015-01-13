@@ -1,8 +1,8 @@
 # ngAndroid
 
-ngAndroid brings some of the angular attributes to android xml.
+ngAndroid brings some of the angular directives to android xml attributes.
 
-Currently supported angular attributes
+Currently supported angular directives
 ```
 ngModel
 ```
