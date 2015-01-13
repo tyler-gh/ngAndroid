@@ -17,6 +17,10 @@ public class DemoActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         NgAndroid.setContentView(this, R.layout.activity_demo);
+
+        input.setInput("Hello world");
+
+
     }
 
 
