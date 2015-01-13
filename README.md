@@ -9,9 +9,9 @@ ngModel
 
 --------
 
-# ngModel
+<h3>ngModel</h3>
 
-```
+```java
 // create model
 
 public interface Input {
@@ -20,8 +20,9 @@ public interface Input {
     public String getTest();
     public void setTest(String input);
 }
-
-// add xml attributes
+```
+```xml
+<!-- add xml attributes -->
 
 <EditText
     android:id="@+id/editText"
@@ -35,8 +36,8 @@ public interface Input {
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     ngAndroid:ngModel="input.input"/>
-    
-
+```
+```java
 // create a field with your model (no need to instantiate it)
 private Input input;
 
