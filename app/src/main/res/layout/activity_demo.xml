@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="20dp"
+    android:padding="20dp"
     tools:ignore="MissingPrefix">
 
     <EditText
@@ -17,14 +17,38 @@
         android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Not Set"
         ngAndroid:ngModel="input.input"/>
 
-    <!--<Button-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@+id/editText"-->
-        <!--android:layout_marginTop="20dp"-->
-        <!--android:text="show model value"/>-->
+    <TextView
+        android:id="@+id/really"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editText"
+        android:layout_marginTop="20dp"
+        android:text="Touch me"/>
+
+    <EditText
+        android:id="@+id/editText2"
+        ngAndroid:ngModel="input.test"
+        android:layout_width="wrap_content"
+        android:layout_below="@+id/really"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/editText2"
+        ngAndroid:ngModel="input.test"/>
+
+    <TextView
+        android:id="@+id/really2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editText2"
+        android:layout_marginTop="20dp"
+        android:text="Hmm"/>
 
 </RelativeLayout>

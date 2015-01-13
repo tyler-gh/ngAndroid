@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.ngandroid.demo.models.Input;
 import com.ngandroid.lib.NgAndroid;
@@ -20,7 +22,19 @@ public class DemoActivity extends ActionBarActivity {
 
         input.setInput("Hello world");
 
+        findViewById(R.id.really).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((TextView) view).setText(input.getInput());
+            }
+        });
 
+        findViewById(R.id.really2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((TextView) view).setText(input.getTest());
+            }
+        });
     }
 
 

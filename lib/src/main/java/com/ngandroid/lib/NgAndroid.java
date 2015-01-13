@@ -6,13 +6,11 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.util.ArrayMap;
-import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.ngandroid.lib.ngbind.BindingHandlerBuilder;
@@ -45,52 +43,15 @@ public class NgAndroid {
         }
 
         this.mInflater =(LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final LayoutInflater.Factory factory = mInflater.getFactory();
-        if(factory == null && Build.VERSION.SDK_INT >= 11){
-            final LayoutInflater.Factory2 factory2 = mInflater.getFactory2();
-            mInflater.setFactory2(new LayoutInflater.Factory2() {
-                @Override
-                public View onCreateView(View view, String s, Context context, AttributeSet attributeSet) {
-                    return factory2.onCreateView(view,s,context, attributeSet);
-                }
 
-                @Override
-                public View onCreateView(String s, Context context, AttributeSet attributeSet) {
-                    return factory2.onCreateView(s, context, attributeSet);
-                }
-            });
-        }else if(factory != null){
-            try {
-                Field field = LayoutInflater.class.getDeclaredField("mFactorySet");
-                field.setAccessible(true);
-                field.setBoolean(mInflater, false);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                // TODO throw error
-            }
-            mInflater.setFactory(new LayoutInflater.Factory() {
-                @Override
-                public View onCreateView(String s, Context context, AttributeSet attributeSet) {
-                    View v = factory.onCreateView(s, context, attributeSet);
-                    String idValue = attributeSet.getAttributeValue("http://schemas.android.com/apk/res/android", "id");
-                    if(idValue != null) {
-                        TypedArray array = context.obtainStyledAttributes(attributeSet, R.styleable.ngAndroid);
-                        if(array.getIndexCount() > 0) {
-                            int id = Integer.parseInt(idValue.replace("@", ""));
-                            attrArray.put(id, array);
-                        }
-                    }
-                    return v;
-                }
-            });
-        }else{
-            // TODO throw error
-        }
+
     }
 
     private void apply(View v){
         for(int index = 0; index < attrArray.size(); index++){
             int id = attrArray.keyAt(index);
             TypedArray array = attrArray.get(id);
+            System.out.println(array);
             for(int i = 0 ; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
                 switch (attr) {
@@ -120,8 +81,6 @@ public class NgAndroid {
 
                             if (TextView.class.isAssignableFrom(bindView.getClass())) {
                                 builder.addTextViewBind(fieldName, (TextView) bindView);
-                            } else if (EditText.class.isAssignableFrom(bindView.getClass())) {
-                                builder.addEditTextBind(fieldName, (EditText) bindView);
                             }
                         }
                         break;

@@ -6,4 +6,6 @@ package com.ngandroid.demo.models;
 public interface Input {
     public String getInput();
     public void setInput(String input);
+    public String getTest();
+    public void setTest(String input);
 }

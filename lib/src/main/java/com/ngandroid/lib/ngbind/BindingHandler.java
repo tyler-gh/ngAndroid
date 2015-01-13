@@ -8,9 +8,9 @@ import java.lang.reflect.Method;
  */
 public class BindingHandler implements InvocationHandler {
 
-    private final Invoker invocationHandler;
+    private final MethodInvoker invocationHandler;
 
-    public BindingHandler(Invoker invocationHandler) {
+    public BindingHandler(MethodInvoker invocationHandler) {
         this.invocationHandler = invocationHandler;
     }
 
