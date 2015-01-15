@@ -26,6 +26,33 @@ public class TypeUtils {
         return OBJECT;
     }
 
+    public static Object fromStringEmptyStringIfEmpty(int type, String value) throws Exception {
+        if(!value.trim().isEmpty()) {
+            switch (type) {
+                case INTEGER:
+                    return Integer.parseInt(value);
+                case LONG:
+                    return Long.parseLong(value);
+                case DOUBLE:
+                    return Double.parseDouble(value);
+                case FLOAT:
+                    return Float.parseFloat(value);
+                case SHORT:
+                    return Short.parseShort(value);
+                case BYTE:
+                    return Byte.parseByte(value);
+                case BOOLEAN:
+                    return Boolean.parseBoolean(value);
+                case STRING:
+                case OBJECT:
+                    // TODO what to do here?
+                default:
+                    return value;
+            }
+        }
+        return value;
+    }
+
     public static Object fromString(int type, String value) throws Exception {
         if(!value.trim().isEmpty()) {
             switch (type) {

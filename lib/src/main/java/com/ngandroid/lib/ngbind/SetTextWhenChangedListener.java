@@ -30,10 +30,11 @@ class SetTextWhenChangedListener implements TextWatcher {
         String str;
         try {
             str = editable.toString();
-            value = TypeUtils.fromString(mMethodType, str);
+            value = TypeUtils.fromStringEmptyStringIfEmpty(mMethodType, str);
         } catch (Throwable e) {
-            // TODO handle error
+            // TODO handle error | this replace does not actually work
             editable.replace(0, editable.length(), mValidText);
+            e.printStackTrace();
             return;
         }
         mValidText = str;
