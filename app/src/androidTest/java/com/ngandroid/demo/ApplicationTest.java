@@ -78,8 +78,52 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         System.out.println(token.getScript());
         assertTrue(token.getScript().equals("parameter2"));
 
+        tokenizer = new Tokenizer(" modelName.boolValue ? functionName(parameter , parameter2  ) : modelName.stringValue");
+        tokenqueue = tokenizer.getTokens();
+
+        assertTrue(tokenqueue.size() == 9);
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.MODEL_NAME);
+        assertTrue(token.getScript().equals("modelName"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.MODEL_FIELD);
+        assertTrue(token.getScript().equals("boolValue"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.TERNARY_QUESTION_MARK);
+        assertTrue(token.getScript().equals("?"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.FUNCTION_NAME);
+        assertTrue(token.getScript().equals("functionName"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.FUNCTION_PARAMETER);
+        assertTrue(token.getScript().equals("parameter"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.FUNCTION_PARAMETER);
+        assertTrue(token.getScript().equals("parameter2"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.TERNARY_COLON);
+        assertTrue(token.getScript().equals(":"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.MODEL_NAME);
+        assertTrue(token.getScript().equals("modelName"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.MODEL_FIELD);
+        assertTrue(token.getScript().equals("stringValue"));
 
 
+        tokenizer = new Tokenizer("model-thing");
+        try {
+            tokenizer.getTokens();
+            assertTrue(false);
+        }catch(Exception e){}
 
     }
 }

@@ -32,7 +32,7 @@ public class Tokenizer {
         MODEL_NAME,
         MODEL_FIELD,
         FUNCTION_NAME,
-        FUNCTION_PARAMETER
+        FUNCTION_PARAMETER, TERNARY_QUESTION_MARK, TERNARY_COLON,
     }
 
     private enum State {
@@ -43,9 +43,8 @@ public class Tokenizer {
         MODEL_FIELD_END,
         OPEN_PARENTHESIS,
         CLOSE_PARENTHESIS,
-        WHITESPACE,
         END,
-        COMMA, PERIOD
+        COMMA, QUESTION_MARK, COLON, PERIOD
     }
 
     private int index, readIndex;
@@ -80,11 +79,22 @@ public class Tokenizer {
             case BEGIN:
             case CHAR_SEQUENCE:
                 result = getNextState();
-                if(peek() == '.'){
-                    emit(TokenType.MODEL_NAME);
-                }else if(peek() == '('){
-                    emit(TokenType.FUNCTION_NAME);
+                switch(peek()){
+                    case '.':
+                        emit(TokenType.MODEL_NAME);
+                        break;
+                    case '(':
+                        emit(TokenType.FUNCTION_NAME);
+                        break;
                 }
+                break;
+            case QUESTION_MARK:
+                emit(TokenType.TERNARY_QUESTION_MARK);
+                result = getNextState();
+                break;
+            case COLON:
+                emit(TokenType.TERNARY_COLON);
+                result = getNextState();
                 break;
             case PERIOD:
                 result = State.MODEL_FIELD;
@@ -92,7 +102,7 @@ public class Tokenizer {
                 break;
             case MODEL_FIELD: {
                 State current = getNextState();
-                if(!Character.isLetterOrDigit(peek())){
+                if(!isCharSequence(peek())){
                     emit(TokenType.MODEL_FIELD);
                     result = current;
                 }else{
@@ -105,7 +115,7 @@ public class Tokenizer {
                 if(peek() == ')' || peek() == ','){
                     emit(TokenType.FUNCTION_PARAMETER);
                 }
-                if (current == State.CHAR_SEQUENCE || current == State.WHITESPACE) {
+                if (current == State.CHAR_SEQUENCE) {
                     result = State.FUNCTION_PARAMETER;
                 } else{
                     result = current;
@@ -121,9 +131,6 @@ public class Tokenizer {
                 result = getNextState();
                 discard();
                 break;
-            case WHITESPACE:
-                result = getNextState();
-                break;
             case END:
                 result = State.END;
                 break;
@@ -134,6 +141,10 @@ public class Tokenizer {
         return result;
     }
 
+    private boolean isCharSequence(char c){
+        return Character.isWhitespace(c) || Character.isLetterOrDigit(c);
+    }
+
     private State getNextState() {
         try {
             if (index == script.length()) {
@@ -142,10 +153,7 @@ public class Tokenizer {
 
             char currentCharacter = script.charAt(index);
 
-            if (Character.isWhitespace(currentCharacter)) {
-                return State.WHITESPACE;
-            }
-            if (Character.isLetterOrDigit(currentCharacter)) {
+            if (isCharSequence(currentCharacter)) {
                 return State.CHAR_SEQUENCE;
             }
 
@@ -158,6 +166,10 @@ public class Tokenizer {
                     return State.OPEN_PARENTHESIS;
                 case ')':
                     return State.CLOSE_PARENTHESIS;
+                case '?':
+                    return State.QUESTION_MARK;
+                case ':':
+                    return State.COLON;
             }
             // TODO throw error
             throw new RuntimeException();
