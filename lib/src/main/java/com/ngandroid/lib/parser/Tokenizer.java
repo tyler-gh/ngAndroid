@@ -19,6 +19,11 @@ public class Tokenizer {
             this.script = script;
         }
 
+        @Override
+        public String toString() {
+            return tokenType.toString() + "::" + script;
+        }
+
         public TokenType getTokenType() {
             return tokenType;
         }
@@ -32,7 +37,10 @@ public class Tokenizer {
         MODEL_NAME,
         MODEL_FIELD,
         FUNCTION_NAME,
-        FUNCTION_PARAMETER, TERNARY_QUESTION_MARK, TERNARY_COLON,
+        FUNCTION_PARAMETER,
+        TERNARY_QUESTION_MARK,
+        TERNARY_COLON,
+        EOF
     }
 
     private enum State {
@@ -71,6 +79,7 @@ public class Tokenizer {
         while (state != State.END) {
             state = nextState(state);
         }
+        tokens.add(new Token(TokenType.EOF, null));
     }
 
     private State nextState(State state) {
@@ -141,6 +150,7 @@ public class Tokenizer {
         return result;
     }
 
+    // TODO there are several problems with allowing whitespace in a char sequence
     private boolean isCharSequence(char c){
         return Character.isWhitespace(c) || Character.isLetterOrDigit(c);
     }
