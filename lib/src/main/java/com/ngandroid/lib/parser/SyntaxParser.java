@@ -41,7 +41,6 @@ public class SyntaxParser {
 
     private void popToken() {
         Tokenizer.Token token = mTokens.poll();
-        System.out.println(token);
         mConsumer.OnValidToken(token);
         switch (token.getTokenType()){
             case MODEL_NAME:
@@ -50,7 +49,7 @@ public class SyntaxParser {
             case FUNCTION_NAME:
                 parseFunction();
                 break;
-            case FUNCTION_PARAMETER:
+            case COMMA:
                 continueFunction();
                 break;
             case TERNARY_COLON:
@@ -59,6 +58,9 @@ public class SyntaxParser {
                 break;
             case MODEL_FIELD:
                 afterModel();
+                break;
+            case CLOSE_PARENTHESIS:
+                functionClose();
                 break;
         }
     }
@@ -84,20 +86,34 @@ public class SyntaxParser {
     }
 
     private void parseModel(){
+        emit(Tokenizer.TokenType.PERIOD);
         emit(Tokenizer.TokenType.MODEL_FIELD);
     }
 
     private void parseFunction(){
-        emit(Tokenizer.TokenType.FUNCTION_PARAMETER);
+        emit(Tokenizer.TokenType.OPEN_PARENTHESIS);
+        continueFunction();
     }
 
-    private void continueFunction(){
+    private void functionClose(){
         if(!
             (
-                offerPop(Tokenizer.TokenType.FUNCTION_PARAMETER) ||
                 offerPop(Tokenizer.TokenType.TERNARY_COLON) ||
                 offerPop(Tokenizer.TokenType.TERNARY_QUESTION_MARK) ||
                 offerPop(Tokenizer.TokenType.EOF)
+            )
+        ){
+            // TODO error
+            throw new RuntimeException();
+        }
+    }
+
+    private void continueFunction(){
+        emit(Tokenizer.TokenType.FUNCTION_PARAMETER);
+        if(!
+            (
+                offerPop(Tokenizer.TokenType.COMMA) ||
+                offerPop(Tokenizer.TokenType.CLOSE_PARENTHESIS)
             )
         ){
             // TODO error

@@ -40,6 +40,17 @@ public class Tokenizer {
         FUNCTION_PARAMETER,
         TERNARY_QUESTION_MARK,
         TERNARY_COLON,
+        OPEN_PARENTHESIS,
+        CLOSE_PARENTHESIS,
+        COMMA,
+        ADDITION,
+        KNOT,
+        SUBTRACTION,
+        EQUALS,
+        KNOT_EQUALS,
+        MULTIPLICATION,
+        DIVISION,
+        PERIOD,
         EOF
     }
 
@@ -52,7 +63,10 @@ public class Tokenizer {
         OPEN_PARENTHESIS,
         CLOSE_PARENTHESIS,
         END,
-        COMMA, QUESTION_MARK, COLON, PERIOD
+        COMMA,
+        QUESTION_MARK,
+        COLON,
+        PERIOD
     }
 
     private int index, readIndex;
@@ -107,7 +121,7 @@ public class Tokenizer {
                 break;
             case PERIOD:
                 result = State.MODEL_FIELD;
-                discard();
+                emit(TokenType.PERIOD);
                 break;
             case MODEL_FIELD: {
                 State current = getNextState();
@@ -132,13 +146,16 @@ public class Tokenizer {
                 break;
             }
             case COMMA:
+                result = State.FUNCTION_PARAMETER;
+                emit(TokenType.COMMA);
+                break;
             case OPEN_PARENTHESIS:
                 result = State.FUNCTION_PARAMETER;
-                discard();
+                emit(TokenType.OPEN_PARENTHESIS);
                 break;
             case CLOSE_PARENTHESIS:
                 result = getNextState();
-                discard();
+                emit(TokenType.CLOSE_PARENTHESIS);
                 break;
             case END:
                 result = State.END;
@@ -156,49 +173,41 @@ public class Tokenizer {
     }
 
     private State getNextState() {
-        try {
-            if (index == script.length()) {
-                return State.END;
-            }
-
-            char currentCharacter = script.charAt(index);
-
-            if (isCharSequence(currentCharacter)) {
-                return State.CHAR_SEQUENCE;
-            }
-
-            switch (currentCharacter) {
-                case ',':
-                    return State.COMMA;
-                case '.':
-                    return State.PERIOD;
-                case '(':
-                    return State.OPEN_PARENTHESIS;
-                case ')':
-                    return State.CLOSE_PARENTHESIS;
-                case '?':
-                    return State.QUESTION_MARK;
-                case ':':
-                    return State.COLON;
-            }
-            // TODO throw error
-            throw new RuntimeException();
-        }finally {
-            index++;
+        if (index == script.length()) {
+            return State.END;
         }
+
+        char currentCharacter = script.charAt(index++);
+
+        if (isCharSequence(currentCharacter)) {
+            return State.CHAR_SEQUENCE;
+        }
+
+        switch (currentCharacter) {
+            case ',':
+                return State.COMMA;
+            case '.':
+                return State.PERIOD;
+            case '(':
+                return State.OPEN_PARENTHESIS;
+            case ')':
+                return State.CLOSE_PARENTHESIS;
+            case '?':
+                return State.QUESTION_MARK;
+            case ':':
+                return State.COLON;
+        }
+        // TODO throw error
+        throw new RuntimeException();
     }
 
     private char peek(){
        return index < script.length() ? script.charAt(index) : 0;
     }
 
-    private void discard(){
-        readIndex = index;
-    }
-
     private void emit(TokenType tokenType) {
         Token token = new Token(tokenType, script.substring(readIndex, index).trim());
-        discard();
+        readIndex = index;
         tokens.add(token);
     }
 

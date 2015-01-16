@@ -31,61 +31,79 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         Tokenizer tokenizer = new Tokenizer("testName.testField");
         Queue<Tokenizer.Token> tokenqueue = tokenizer.getTokens();
 
-        assertTrue(tokenqueue.size() == 3);
+        assertTrue(tokenqueue.size() == 4);
         Tokenizer.Token token = tokenqueue.poll();
-        System.out.println(token.getTokenType());
         assertTrue(token.getTokenType() == Tokenizer.TokenType.MODEL_NAME);
-        System.out.println(token.getScript());
         assertTrue(token.getScript().equals("testName"));
 
         token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.PERIOD);
+        assertTrue(token.getScript().equals("."));
+
+        token = tokenqueue.poll();
         assertTrue(token.getTokenType() == Tokenizer.TokenType.MODEL_FIELD);
-        System.out.println(token.getScript());
         assertTrue(token.getScript().equals("testField"));
 
 
         tokenizer = new Tokenizer("functionName(parameter)");
         tokenqueue = tokenizer.getTokens();
 
-        assertTrue(tokenqueue.size() == 3);
+        assertTrue(tokenqueue.size() == 5);
         token = tokenqueue.poll();
-        System.out.println(token.getTokenType());
         assertTrue(token.getTokenType() == Tokenizer.TokenType.FUNCTION_NAME);
-        System.out.println(token.getScript());
         assertTrue(token.getScript().equals("functionName"));
 
         token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.OPEN_PARENTHESIS);
+        assertTrue(token.getScript().equals("("));
+
+        token = tokenqueue.poll();
         assertTrue(token.getTokenType() == Tokenizer.TokenType.FUNCTION_PARAMETER);
-        System.out.println(token.getScript());
         assertTrue(token.getScript().equals("parameter"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.CLOSE_PARENTHESIS);
+        assertTrue(token.getScript().equals(")"));
 
         tokenizer = new Tokenizer("functionName(parameter , parameter2  )");
         tokenqueue = tokenizer.getTokens();
 
-        assertTrue(tokenqueue.size() == 4);
+        assertTrue(tokenqueue.size() == 7);
         token = tokenqueue.poll();
-        System.out.println(token.getTokenType());
         assertTrue(token.getTokenType() == Tokenizer.TokenType.FUNCTION_NAME);
-        System.out.println(token.getScript());
         assertTrue(token.getScript().equals("functionName"));
 
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == Tokenizer.TokenType.FUNCTION_PARAMETER);
-        System.out.println(token.getScript());
-        assertTrue(token.getScript().equals("parameter"));
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.OPEN_PARENTHESIS);
+        assertTrue(token.getScript().equals("("));
 
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == Tokenizer.TokenType.FUNCTION_PARAMETER);
-        System.out.println(token.getScript());
+        assertTrue(token.getScript().equals("parameter"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.COMMA);
+        assertTrue(token.getScript().equals(","));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.FUNCTION_PARAMETER);
         assertTrue(token.getScript().equals("parameter2"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.CLOSE_PARENTHESIS);
+        assertTrue(token.getScript().equals(")"));
 
         tokenizer = new Tokenizer(" modelName.boolValue ? functionName(parameter , parameter2  ) : modelName.stringValue");
         tokenqueue = tokenizer.getTokens();
 
-        assertTrue(tokenqueue.size() == 10);
+        assertTrue(tokenqueue.size() == 15);
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == Tokenizer.TokenType.MODEL_NAME);
         assertTrue(token.getScript().equals("modelName"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.PERIOD);
+        assertTrue(token.getScript().equals("."));
 
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == Tokenizer.TokenType.MODEL_FIELD);
@@ -100,12 +118,24 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals("functionName"));
 
         token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.OPEN_PARENTHESIS);
+        assertTrue(token.getScript().equals("("));
+
+        token = tokenqueue.poll();
         assertTrue(token.getTokenType() == Tokenizer.TokenType.FUNCTION_PARAMETER);
         assertTrue(token.getScript().equals("parameter"));
 
         token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.COMMA);
+        assertTrue(token.getScript().equals(","));
+
+        token = tokenqueue.poll();
         assertTrue(token.getTokenType() == Tokenizer.TokenType.FUNCTION_PARAMETER);
         assertTrue(token.getScript().equals("parameter2"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.CLOSE_PARENTHESIS);
+        assertTrue(token.getScript().equals(")"));
 
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == Tokenizer.TokenType.TERNARY_COLON);
@@ -116,6 +146,10 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals("modelName"));
 
         token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == Tokenizer.TokenType.PERIOD);
+        assertTrue(token.getScript().equals("."));
+
+        token = tokenqueue.poll();
         assertTrue(token.getTokenType() == Tokenizer.TokenType.MODEL_FIELD);
         assertTrue(token.getScript().equals("stringValue"));
 
@@ -124,7 +158,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         try {
             tokenizer.getTokens();
             assertTrue(false);
-        }catch(Exception e){}
+        }catch(Exception ignored){}
     }
 
     public void testSyntaxParser(){
@@ -138,10 +172,18 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
                         assertEquals(token.getScript(), "functionName");
                         break;
                     case 1:
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.OPEN_PARENTHESIS);
+                        assertEquals(token.getScript(), "(");
+                        break;
+                    case 2:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.FUNCTION_PARAMETER);
                         assertEquals(token.getScript(), "parameter");
                         break;
-                    case 2:
+                    case 3:
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.CLOSE_PARENTHESIS);
+                        assertEquals(token.getScript(), ")");
+                        break;
+                    case 4:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.EOF);
                         break;
                     default:
@@ -162,14 +204,26 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
                         assertEquals(token.getScript(), "functionName");
                         break;
                     case 1:
-                        assertEquals(token.getTokenType(), Tokenizer.TokenType.FUNCTION_PARAMETER);
-                        assertEquals(token.getScript(), "parameter");
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.OPEN_PARENTHESIS);
+                        assertEquals(token.getScript(), "(");
                         break;
                     case 2:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.FUNCTION_PARAMETER);
-                        assertEquals(token.getScript(), "parameter2");
+                        assertEquals(token.getScript(), "parameter");
                         break;
                     case 3:
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.COMMA);
+                        assertEquals(token.getScript(), ",");
+                        break;
+                    case 4:
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.FUNCTION_PARAMETER);
+                        assertEquals(token.getScript(), "parameter2");
+                        break;
+                    case 5:
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.CLOSE_PARENTHESIS);
+                        assertEquals(token.getScript(), ")");
+                        break;
+                    case 6:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.EOF);
                         break;
                     default:
@@ -191,38 +245,58 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
                         assertEquals(token.getScript(), "modelName");
                         break;
                     case 1:
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.PERIOD);
+                        assertEquals(token.getScript(), ".");
+                        break;
+                    case 2:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.MODEL_FIELD);
                         assertEquals(token.getScript(), "boolValue");
                         break;
-                    case 2:
+                    case 3:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.TERNARY_QUESTION_MARK);
                         assertEquals(token.getScript(), "?");
                         break;
-                    case 3:
+                    case 4:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.FUNCTION_NAME);
                         assertEquals(token.getScript(), "functionName");
                         break;
-                    case 4:
+                    case 5:
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.OPEN_PARENTHESIS);
+                        assertEquals(token.getScript(), "(");
+                        break;
+                    case 6:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.FUNCTION_PARAMETER);
                         assertEquals(token.getScript(), "parameter");
                         break;
-                    case 5:
+                    case 7:
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.COMMA);
+                        assertEquals(token.getScript(), ",");
+                        break;
+                    case 8:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.FUNCTION_PARAMETER);
                         assertEquals(token.getScript(), "parameter2");
                         break;
-                    case 6:
+                    case 9:
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.CLOSE_PARENTHESIS);
+                        assertEquals(token.getScript(), ")");
+                        break;
+                    case 10:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.TERNARY_COLON);
                         assertEquals(token.getScript(), ":");
                         break;
-                    case 7:
+                    case 11:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.MODEL_NAME);
                         assertEquals(token.getScript(), "modelName");
                         break;
-                    case 8:
+                    case 12:
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.PERIOD);
+                        assertEquals(token.getScript(), ".");
+                        break;
+                    case 13:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.MODEL_FIELD);
                         assertEquals(token.getScript(), "stringValue");
                         break;
-                    case 9:
+                    case 14:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.EOF);
                         break;
                     default:
@@ -244,10 +318,14 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
                         assertEquals(token.getScript(), "testName");
                         break;
                     case 1:
+                        assertEquals(token.getTokenType(), Tokenizer.TokenType.PERIOD);
+                        assertEquals(token.getScript(), ".");
+                        break;
+                    case 2:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.MODEL_FIELD);
                         assertEquals(token.getScript(), "testField");
                         break;
-                    case 2:
+                    case 3:
                         assertEquals(token.getTokenType(), Tokenizer.TokenType.EOF);
                         break;
                     default:
@@ -257,5 +335,42 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
             }
         });
         parser.parseScript();
+
+        SyntaxParser.TokenConsumer emptyConsumer = new SyntaxParser.TokenConsumer(){ @Override public void OnValidToken(Tokenizer.Token token) {}};
+
+        parser = new SyntaxParser("testName..testField", emptyConsumer);
+        try{
+            parser.parseScript();
+            assertTrue(false);
+        }catch(Exception ignored){}
+
+        parser = new SyntaxParser("testName.testField)", emptyConsumer);
+        try{
+            parser.parseScript();
+            assertTrue(false);
+        }catch(Exception ignored){}
+
+        parser = new SyntaxParser("testName(testField)(name)", emptyConsumer);
+        try{
+            parser.parseScript();
+            assertTrue(false);
+        }catch(Exception ignored){}
+
+        try{
+            new SyntaxParser("testName(-testField)", emptyConsumer);
+            assertTrue(false);
+        }catch(Exception ignored){}
+
+        parser = new SyntaxParser(".stuffHere", emptyConsumer);
+        try{
+            parser.parseScript();
+            assertTrue(false);
+        }catch(Exception ignored){}
+
+        parser = new SyntaxParser("(stuffHere)", emptyConsumer);
+        try{
+            parser.parseScript();
+            assertTrue(false);
+        }catch(Exception ignored){}
     }
 }
