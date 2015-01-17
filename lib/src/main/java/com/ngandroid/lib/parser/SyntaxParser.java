@@ -5,10 +5,10 @@ import java.util.Queue;
 public class SyntaxParser {
 
     public interface TokenConsumer {
-        public void OnValidToken(Tokenizer.Token token);
+        public void OnValidToken(Token token);
     }
 
-    private final Queue<Tokenizer.Token> mTokens;
+    private final Queue<Token> mTokens;
     private final TokenConsumer mConsumer;
 
     public SyntaxParser(String script, TokenConsumer consumer){
@@ -20,9 +20,9 @@ public class SyntaxParser {
     public void parseScript(){
         if(!
             (
-                offerPop(Tokenizer.TokenType.MODEL_NAME) ||
-                offerPop(Tokenizer.TokenType.FUNCTION_NAME) ||
-                offerPop(Tokenizer.TokenType.EOF)
+                offerPop(TokenType.MODEL_NAME) ||
+                offerPop(TokenType.FUNCTION_NAME) ||
+                offerPop(TokenType.EOF)
             )
         ){
             // TODO error
@@ -30,7 +30,7 @@ public class SyntaxParser {
         }
     }
     
-    private boolean offerPop(Tokenizer.TokenType tokenType){
+    private boolean offerPop(TokenType tokenType){
         System.out.println("offered " + tokenType);
         if(mTokens.peek().getTokenType() != tokenType){
             return false;
@@ -40,7 +40,7 @@ public class SyntaxParser {
     }
 
     private void popToken() {
-        Tokenizer.Token token = mTokens.poll();
+        Token token = mTokens.poll();
         mConsumer.OnValidToken(token);
         switch (token.getTokenType()){
             case MODEL_NAME:
@@ -65,9 +65,9 @@ public class SyntaxParser {
         }
     }
 
-    private void emit(Tokenizer.TokenType tokenType){
+    private void emit(TokenType tokenType){
         if(mTokens.peek().getTokenType() != tokenType){
-            throw new RuntimeException();
+            throw new RuntimeException(mTokens.peek().getTokenType() + " != " + tokenType);
         }
         popToken();
     }
@@ -75,9 +75,9 @@ public class SyntaxParser {
     private void afterModel(){
         if(!
             (
-                offerPop(Tokenizer.TokenType.TERNARY_COLON) ||
-                offerPop(Tokenizer.TokenType.TERNARY_QUESTION_MARK) ||
-                offerPop(Tokenizer.TokenType.EOF)
+                offerPop(TokenType.TERNARY_COLON) ||
+                offerPop(TokenType.TERNARY_QUESTION_MARK) ||
+                offerPop(TokenType.EOF)
             )
         ){
             // TODO error
@@ -86,21 +86,21 @@ public class SyntaxParser {
     }
 
     private void parseModel(){
-        emit(Tokenizer.TokenType.PERIOD);
-        emit(Tokenizer.TokenType.MODEL_FIELD);
+        emit(TokenType.PERIOD);
+        emit(TokenType.MODEL_FIELD);
     }
 
     private void parseFunction(){
-        emit(Tokenizer.TokenType.OPEN_PARENTHESIS);
+        emit(TokenType.OPEN_PARENTHESIS);
         continueFunction();
     }
 
     private void functionClose(){
         if(!
             (
-                offerPop(Tokenizer.TokenType.TERNARY_COLON) ||
-                offerPop(Tokenizer.TokenType.TERNARY_QUESTION_MARK) ||
-                offerPop(Tokenizer.TokenType.EOF)
+                offerPop(TokenType.TERNARY_COLON) ||
+                offerPop(TokenType.TERNARY_QUESTION_MARK) ||
+                offerPop(TokenType.EOF)
             )
         ){
             // TODO error
@@ -109,11 +109,11 @@ public class SyntaxParser {
     }
 
     private void continueFunction(){
-        emit(Tokenizer.TokenType.FUNCTION_PARAMETER);
+        emit(TokenType.FUNCTION_PARAMETER);
         if(!
             (
-                offerPop(Tokenizer.TokenType.COMMA) ||
-                offerPop(Tokenizer.TokenType.CLOSE_PARENTHESIS)
+                offerPop(TokenType.COMMA) ||
+                offerPop(TokenType.CLOSE_PARENTHESIS)
             )
         ){
             // TODO error
@@ -124,8 +124,8 @@ public class SyntaxParser {
     private void parseTernary(){
         if(!
             (
-                offerPop(Tokenizer.TokenType.MODEL_NAME) ||
-                offerPop(Tokenizer.TokenType.FUNCTION_NAME)
+                offerPop(TokenType.MODEL_NAME) ||
+                offerPop(TokenType.FUNCTION_NAME)
             )
         ){
             // TODO error

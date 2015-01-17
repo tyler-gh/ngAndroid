@@ -8,52 +8,6 @@ import java.util.Queue;
  */
 public class Tokenizer {
 
-    // supported syntax model.field   function(parameter)
-
-    public static final class Token {
-        private final TokenType tokenType;
-        private final String script;
-
-        private Token(TokenType tokenType, String script) {
-            this.tokenType = tokenType;
-            this.script = script;
-        }
-
-        @Override
-        public String toString() {
-            return tokenType.toString() + "::" + script;
-        }
-
-        public TokenType getTokenType() {
-            return tokenType;
-        }
-
-        public String getScript() {
-            return script;
-        }
-    }
-
-    public enum TokenType {
-        MODEL_NAME,
-        MODEL_FIELD,
-        FUNCTION_NAME,
-        FUNCTION_PARAMETER,
-        TERNARY_QUESTION_MARK,
-        TERNARY_COLON,
-        OPEN_PARENTHESIS,
-        CLOSE_PARENTHESIS,
-        COMMA,
-        ADDITION,
-        KNOT,
-        SUBTRACTION,
-        EQUALS,
-        KNOT_EQUALS,
-        MULTIPLICATION,
-        DIVISION,
-        PERIOD,
-        EOF
-    }
-
     private enum State {
         BEGIN,
         CHAR_SEQUENCE,
@@ -66,15 +20,20 @@ public class Tokenizer {
         COMMA,
         QUESTION_MARK,
         COLON,
-        PERIOD
+        PERIOD,
+        NOT_EQUALS,
+        EQUALS_EQUALS,
+        OPERATOR,
+        DIGIT
     }
 
     private int index, readIndex;
     private String script;
     private Queue<Token> tokens;
+    private char currentCharacter = 0;
 
     public Tokenizer(String script){
-        this.script = script;
+        this.script = script.replaceAll("\\s","");
     }
 
     public Queue<Token> getTokens(){
@@ -93,6 +52,10 @@ public class Tokenizer {
         while (state != State.END) {
             state = nextState(state);
         }
+        if(readIndex != index){
+            emit(TokenType.RUBBISH);
+        }
+
         tokens.add(new Token(TokenType.EOF, null));
     }
 
@@ -112,10 +75,12 @@ public class Tokenizer {
                 }
                 break;
             case QUESTION_MARK:
+                //*
                 emit(TokenType.TERNARY_QUESTION_MARK);
                 result = getNextState();
                 break;
             case COLON:
+                //*
                 emit(TokenType.TERNARY_COLON);
                 result = getNextState();
                 break;
@@ -125,7 +90,7 @@ public class Tokenizer {
                 break;
             case MODEL_FIELD: {
                 State current = getNextState();
-                if(!isCharSequence(peek())){
+                if(!Character.isLetter(peek())){
                     emit(TokenType.MODEL_FIELD);
                     result = current;
                 }else{
@@ -146,19 +111,67 @@ public class Tokenizer {
                 break;
             }
             case COMMA:
-                result = State.FUNCTION_PARAMETER;
                 emit(TokenType.COMMA);
+                result = State.FUNCTION_PARAMETER;
                 break;
             case OPEN_PARENTHESIS:
                 result = State.FUNCTION_PARAMETER;
                 emit(TokenType.OPEN_PARENTHESIS);
                 break;
             case CLOSE_PARENTHESIS:
-                result = getNextState();
+                //*
                 emit(TokenType.CLOSE_PARENTHESIS);
+                result = getNextState();
                 break;
             case END:
                 result = State.END;
+                break;
+            case NOT_EQUALS:
+                //*
+                result = getNextState();
+                emit(TokenType.KNOT_EQUALS);
+                break;
+            case OPERATOR:
+                if(currentCharacter == '!'){
+                    if(peek() == '=')
+                        return State.NOT_EQUALS;
+                    else {
+                        emit(TokenType.KNOT);
+                    }
+                }else {
+                    switch (currentCharacter) {
+                        case '*':
+                            emit(TokenType.MULTIPLICATION);
+                            break;
+                        case '+':
+                            emit(TokenType.ADDITION);
+                            break;
+                        case '=':
+                            if(getNextState() != State.OPERATOR || currentCharacter != '='){
+                                // TODO error
+                                throw new RuntimeException("There is no assignment operator in ngAndroid, use == to denote an equality check.");
+                            }
+                            return State.EQUALS_EQUALS;
+                        case '-':
+                            emit(TokenType.SUBTRACTION);
+                            break;
+                        case '/':
+                            emit(TokenType.DIVISION);
+                            break;
+                    }
+                }
+                result = getNextState();
+                break;
+            case DIGIT:
+                //*
+                if(!Character.isDigit(peek())){
+                    emit(TokenType.NUMBER_CONSTANT);
+                }
+                result = getNextState();
+                break;
+            case EQUALS_EQUALS:
+                emit(TokenType.EQUALS_EQUALS);
+                result = getNextState();
                 break;
             default:
                 // TODO error
@@ -167,19 +180,19 @@ public class Tokenizer {
         return result;
     }
 
-    // TODO there are several problems with allowing whitespace in a char sequence
-    private boolean isCharSequence(char c){
-        return Character.isWhitespace(c) || Character.isLetterOrDigit(c);
-    }
-
     private State getNextState() {
         if (index == script.length()) {
             return State.END;
         }
 
-        char currentCharacter = script.charAt(index++);
+        currentCharacter = script.charAt(index++);
 
-        if (isCharSequence(currentCharacter)) {
+        if(Character.isDigit(currentCharacter)){
+            System.out.println(currentCharacter + " is a digit");
+            return State.DIGIT;
+        }
+
+        if (Character.isLetter(currentCharacter)) {
             return State.CHAR_SEQUENCE;
         }
 
@@ -196,6 +209,13 @@ public class Tokenizer {
                 return State.QUESTION_MARK;
             case ':':
                 return State.COLON;
+            case '!':
+            case '*':
+            case '+':
+            case '=':
+            case '-':
+            case '/':
+                return State.OPERATOR;
         }
         // TODO throw error
         throw new RuntimeException();
@@ -206,9 +226,12 @@ public class Tokenizer {
     }
 
     private void emit(TokenType tokenType) {
-        Token token = new Token(tokenType, script.substring(readIndex, index).trim());
+        Token token = new Token(tokenType, script.substring(readIndex, index));
         readIndex = index;
         tokens.add(token);
     }
+
+
+    // * order is important
 
 }
