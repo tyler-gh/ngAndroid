@@ -1,4 +1,4 @@
-package com.ngandroid.lib.ngbind;
+package com.ngandroid.lib.ng;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -6,11 +6,11 @@ import java.lang.reflect.Method;
 /**
  * Created by davityle on 1/12/15.
  */
-public class BindingHandler implements InvocationHandler {
+public class Model implements InvocationHandler {
 
     private final MethodInvoker invocationHandler;
 
-    public BindingHandler(MethodInvoker invocationHandler) {
+    public Model(MethodInvoker invocationHandler) {
         this.invocationHandler = invocationHandler;
     }
 

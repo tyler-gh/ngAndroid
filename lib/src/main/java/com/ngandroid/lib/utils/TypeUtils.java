@@ -72,7 +72,7 @@ public class TypeUtils {
                     return Boolean.parseBoolean(value);
                 case STRING:
                 case OBJECT:
-                    // TODO what to do here?
+                    // TODO what to do here with object?
                 default:
                     return value;
             }
@@ -94,7 +94,7 @@ public class TypeUtils {
                     return false;
                 case STRING:
                 case OBJECT:
-                    // TODO what to do here?
+                    // TODO what to do here with object?
                 default:
                     return value;
             }

@@ -5,19 +5,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
-import android.util.ArrayMap;
 import android.util.SparseArray;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.ngandroid.lib.R;
-import com.ngandroid.lib.ngbind.BindingHandlerBuilder;
+import com.ngandroid.lib.interpreter.SyntaxParser;
+import com.ngandroid.lib.interpreter.Token;
+import com.ngandroid.lib.ng.ModelBuilder;
+import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.ngmodel.NgModel;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,86 +26,48 @@ import java.util.Map;
 public class AttributeAttacher {
 
     private final LayoutInflater mInflater;
-    private final Object model;
-    private final SparseArray<TypedArray> attrArray;
-    private final Map<String, BindingHandlerBuilder> builders;
+    private final Object mModel;
+    private final SparseArray<TypedArray> mAttrArray;
+    private final ModelBuilderMap mBuilders;
 
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public AttributeAttacher(final Context context, Object model) {
-        this.model = model;
-        this.attrArray = new SparseArray<>();
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            this.builders = new ArrayMap<>();
-        }else {
-            this.builders = new HashMap<>();
-        }
-
+        this.mModel = model;
+        this.mAttrArray = new SparseArray<>();
+        this.mBuilders = new ModelBuilderMap(mModel);
         this.mInflater =(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        InflaterFactory.setFactory(mInflater, attrArray);
+        InflaterFactory.setFactory(mInflater, mAttrArray);
     }
 
     private void apply(View v){
-        System.out.println("/////////////?????????????////////////");
-        System.out.println(attrArray.size());
-        System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
-        for(int index = 0; index < attrArray.size(); index++){
-            int id = attrArray.keyAt(index);
-            TypedArray array = attrArray.get(id);
+        for(int index = 0; index < mAttrArray.size(); index++){
+            int id = mAttrArray.keyAt(index);
+            TypedArray array = mAttrArray.get(id);
             for(int i = 0 ; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
                 switch (attr) {
                     case R.styleable.ngAndroid_ngModel:
-                        TypedValue vl = new TypedValue();
-                        System.out.println("/////////////////////////////////////");
-                        System.out.println(attr);
-                        System.out.println(R.styleable.ngAndroid_ngModel);
-                        System.out.println(array);
-                        System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
-                        array.getValue(R.styleable.ngAndroid_ngModel, vl);
-                        String value= vl.string.toString();
-                        if (value != null) {
-                            int indexOfPeriod = value.indexOf('.');
-                            String modelName = value.substring(0, indexOfPeriod);
-                            final String fieldName = value.substring(indexOfPeriod + 1);
-
-                            BindingHandlerBuilder builder = builders.get(modelName);
-
-                            try {
-                                if(builder == null){
-                                    Field f = model.getClass().getDeclaredField(modelName);
-                                    builder = new BindingHandlerBuilder(f.getType(), model);
-                                    builders.put(modelName, builder);
-
-                                }
-                            } catch (NoSuchFieldException e) {
-                                // TODO rename error
-                                throw new RuntimeException("There is not a model in " + model.getClass().getSimpleName() + " called " + modelName);
-                            }
-
-                            View bindView = v.findViewById(id);
-
-                            if (TextView.class.isAssignableFrom(bindView.getClass())) {
-                                builder.addTextViewBind(fieldName, (TextView) bindView);
-                            }
-                        }
+                        Token[] tokens = new SyntaxParser(array.getString(attr)).parseScript();
+                        NgModel.getInstance().attach(tokens, mBuilders, v.findViewById(id));
                         break;
                 }
-
             }
         }
 
-        for(Map.Entry<String, BindingHandlerBuilder> entry : builders.entrySet()){
-            Object m = entry.getValue().create();
-            String modelName = entry.getKey();
-            try {
-                Field f = model.getClass().getDeclaredField(modelName);
-                f.setAccessible(true);
-                f.set(model, m);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                // TODO rename error
-                throw new RuntimeException("There is not a model in " + model.getClass().getSimpleName() + " called " + modelName);
-            }
+        for(Map.Entry<String, ModelBuilder> entry : mBuilders.entrySet()){
+            attachDynamicField(entry.getValue().create(), entry.getKey());
+        }
+    }
+
+    private void attachDynamicField(Object dynamicField, String modelName){
+        try {
+            Field f = mModel.getClass().getDeclaredField(modelName);
+            f.setAccessible(true);
+            f.set(mModel, dynamicField);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // TODO rename error
+            throw new RuntimeException("There is not a field in " + mModel.getClass().getSimpleName() + " called " + modelName);
         }
     }
 

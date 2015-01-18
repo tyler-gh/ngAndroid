@@ -1,4 +1,4 @@
-package com.ngandroid.lib.ngbind;
+package com.ngandroid.lib.ng;
 
 import java.util.List;
 import java.util.Map;
@@ -7,10 +7,10 @@ import java.util.Map;
  * Created by davityle on 1/12/15.
  */
 public class MethodInvoker {
-    private final Map<String, List<BindingMethod>> methodMap;
+    private final Map<String, List<ModelMethod>> methodMap;
     private final Map<String, Object> fieldMap;
 
-    public MethodInvoker(Map<String, List<BindingMethod>> methodMap, Map<String, Object> fieldMap) {
+    public MethodInvoker(Map<String, List<ModelMethod>> methodMap, Map<String, Object> fieldMap) {
         this.methodMap = methodMap;
         this.fieldMap = fieldMap;
     }
@@ -22,9 +22,9 @@ public class MethodInvoker {
         }else if(methodName.startsWith("set")){
             String fieldName = methodName.substring(3).toLowerCase();
             fieldMap.put(fieldName, objects[0]);
-            List<BindingMethod> setters = methodMap.get(methodName.toLowerCase());
-            for(BindingMethod bindingMethod : setters){
-                bindingMethod.invoke(fieldName, objects);
+            List<ModelMethod> setters = methodMap.get(methodName.toLowerCase());
+            for(ModelMethod modelMethod : setters){
+                modelMethod.invoke(fieldName, objects);
             }
             return null;
         }else{

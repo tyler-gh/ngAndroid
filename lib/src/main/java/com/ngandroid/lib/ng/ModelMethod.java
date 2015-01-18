@@ -1,8 +1,8 @@
-package com.ngandroid.lib.ngbind;
+package com.ngandroid.lib.ng;
 
 /**
  * Created by davityle on 1/12/15.
  */
-interface BindingMethod {
+public interface ModelMethod {
     public Object invoke(String fieldName, Object ... args);
 }

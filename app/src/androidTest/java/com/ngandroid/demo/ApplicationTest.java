@@ -3,10 +3,10 @@ package com.ngandroid.demo;
 import android.app.Application;
 import android.test.ApplicationTestCase;
 
-import com.ngandroid.lib.parser.SyntaxParser;
-import com.ngandroid.lib.parser.Token;
-import com.ngandroid.lib.parser.TokenType;
-import com.ngandroid.lib.parser.Tokenizer;
+import com.ngandroid.lib.interpreter.SyntaxParser;
+import com.ngandroid.lib.interpreter.Token;
+import com.ngandroid.lib.interpreter.TokenType;
+import com.ngandroid.lib.interpreter.Tokenizer;
 
 import java.util.Queue;
 
@@ -41,6 +41,21 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == TokenType.RUBBISH);
         assertTrue(token.getScript().equals("g"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == TokenType.EOF);
+
+        tokenizer = new Tokenizer("g234");
+        tokenqueue = tokenizer.getTokens();
+        assertTrue("tokenqueue.size() == " + tokenqueue.size(), tokenqueue.size() == 3);
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == TokenType.RUBBISH);
+        assertTrue(token.getScript(), token.getScript().equals("g"));
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == TokenType.NUMBER_CONSTANT);
+        assertTrue(token.getScript().equals("234"));
 
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == TokenType.EOF);
@@ -177,9 +192,6 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
         tokenizer = new Tokenizer(" modelName.joe + modelName.frank == 2");
         tokenqueue = tokenizer.getTokens();
-        for(Token t : tokenqueue){
-            System.out.println(t);
-        }
 
         assertEquals(10, tokenqueue.size());
 
@@ -196,7 +208,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals("joe"));
 
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.ADDITION);
+        assertTrue(token.getTokenType() == TokenType.OPERATOR);
         assertTrue(token.getScript().equals("+"));
 
         token = tokenqueue.poll();
@@ -212,7 +224,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals("frank"));
 
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.EQUALS_EQUALS);
+        assertTrue(token.getTokenType() == TokenType.OPERATOR);
         assertTrue(token.getScript().equals("=="));
 
         token = tokenqueue.poll();
@@ -220,8 +232,42 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals("2"));
 
 
+        tokenizer = new Tokenizer(" modelName.joe != 'orange'");
+        tokenqueue = tokenizer.getTokens();
+        assertEquals(6, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == TokenType.MODEL_NAME);
+        assertTrue(token.getScript().equals("modelName"));
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == TokenType.PERIOD);
+        assertTrue(token.getScript().equals("."));
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == TokenType.MODEL_FIELD);
+        assertTrue(token.getScript().equals("joe"));
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == TokenType.OPERATOR);
+        assertTrue(token.getScript().equals("!="));
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == TokenType.STRING);
+        assertTrue(token.getScript().equals("'orange'"));
+
+
+        tokenizer = new Tokenizer("'this is a test string with \"quotes\" in it'");
+        tokenqueue = tokenizer.getTokens();
+        assertEquals(2, tokenqueue.size());
+        token = tokenqueue.poll();
+        assertTrue(token.getTokenType() == TokenType.STRING);
+        System.out.println(token.getScript());
+        assertTrue(token.getScript().equals("'this is a test string with \"quotes\" in it'"));
 
         tokenizer = new Tokenizer("model}thing");
+        try {
+            tokenizer.getTokens();
+            assertTrue(false);
+        }catch(Exception ignored){}
+
+        tokenizer = new Tokenizer("\" this would be a string");
         try {
             tokenizer.getTokens();
             assertTrue(false);
@@ -229,212 +275,240 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public void testSyntaxParser(){
-        SyntaxParser parser = new SyntaxParser("functionName(parameter)", new SyntaxParser.TokenConsumer() {
-            int tokenIndex = 0;
-            @Override
-            public void OnValidToken(Token token) {
-                switch (tokenIndex++){
-                    case 0:
-                        assertEquals(token.getTokenType(), TokenType.FUNCTION_NAME);
-                        assertEquals(token.getScript(), "functionName");
-                        break;
-                    case 1:
-                        assertEquals(token.getTokenType(), TokenType.OPEN_PARENTHESIS);
-                        assertEquals(token.getScript(), "(");
-                        break;
-                    case 2:
-                        assertEquals(token.getTokenType(), TokenType.FUNCTION_PARAMETER);
-                        assertEquals(token.getScript(), "parameter");
-                        break;
-                    case 3:
-                        assertEquals(token.getTokenType(), TokenType.CLOSE_PARENTHESIS);
-                        assertEquals(token.getScript(), ")");
-                        break;
-                    case 4:
-                        assertEquals(token.getTokenType(), TokenType.EOF);
-                        break;
-                    default:
-                        assertTrue(false);
-                        break;
-                }
+        SyntaxParser parser = new SyntaxParser("functionName(parameter)");
+        Token[] tokens = parser.parseScript();
+        int tokenIndex = 0;
+        while(tokenIndex < tokens.length){
+            Token token = tokens[tokenIndex];
+            switch (tokenIndex++){
+                case 0:
+                    assertEquals(token.getTokenType(), TokenType.FUNCTION_NAME);
+                    assertEquals(token.getScript(), "functionName");
+                    break;
+                case 1:
+                    assertEquals(token.getTokenType(), TokenType.OPEN_PARENTHESIS);
+                    assertEquals(token.getScript(), "(");
+                    break;
+                case 2:
+                    assertEquals(token.getTokenType(), TokenType.FUNCTION_PARAMETER);
+                    assertEquals(token.getScript(), "parameter");
+                    break;
+                case 3:
+                    assertEquals(token.getTokenType(), TokenType.CLOSE_PARENTHESIS);
+                    assertEquals(token.getScript(), ")");
+                    break;
+                case 4:
+                    assertEquals(token.getTokenType(), TokenType.EOF);
+                    break;
+                default:
+                    assertTrue(false);
+                    break;
             }
-        });
-        parser.parseScript();
+        }
 
-        parser = new SyntaxParser("functionName(parameter , secondparameter  )", new SyntaxParser.TokenConsumer() {
-            int tokenIndex = 0;
-            @Override
-            public void OnValidToken(Token token) {
-                switch (tokenIndex++){
-                    case 0:
-                        assertEquals(token.getTokenType(), TokenType.FUNCTION_NAME);
-                        assertEquals(token.getScript(), "functionName");
-                        break;
-                    case 1:
-                        assertEquals(token.getTokenType(), TokenType.OPEN_PARENTHESIS);
-                        assertEquals(token.getScript(), "(");
-                        break;
-                    case 2:
-                        assertEquals(token.getTokenType(), TokenType.FUNCTION_PARAMETER);
-                        assertEquals(token.getScript(), "parameter");
-                        break;
-                    case 3:
-                        assertEquals(token.getTokenType(), TokenType.COMMA);
-                        assertEquals(token.getScript(), ",");
-                        break;
-                    case 4:
-                        assertEquals(token.getTokenType(), TokenType.FUNCTION_PARAMETER);
-                        assertEquals(token.getScript(), "secondparameter");
-                        break;
-                    case 5:
-                        assertEquals(token.getTokenType(), TokenType.CLOSE_PARENTHESIS);
-                        assertEquals(token.getScript(), ")");
-                        break;
-                    case 6:
-                        assertEquals(token.getTokenType(), TokenType.EOF);
-                        break;
-                    default:
-                        assertTrue(false);
-                        break;
-                }
+        parser = new SyntaxParser("functionName(parameter , secondparameter  )");
+        tokens = parser.parseScript();
+        tokenIndex = 0;
+        while(tokenIndex < tokens.length){
+            Token token = tokens[tokenIndex];
+            switch (tokenIndex++){
+                case 0:
+                    assertEquals(token.getTokenType(), TokenType.FUNCTION_NAME);
+                    assertEquals(token.getScript(), "functionName");
+                    break;
+                case 1:
+                    assertEquals(token.getTokenType(), TokenType.OPEN_PARENTHESIS);
+                    assertEquals(token.getScript(), "(");
+                    break;
+                case 2:
+                    assertEquals(token.getTokenType(), TokenType.FUNCTION_PARAMETER);
+                    assertEquals(token.getScript(), "parameter");
+                    break;
+                case 3:
+                    assertEquals(token.getTokenType(), TokenType.COMMA);
+                    assertEquals(token.getScript(), ",");
+                    break;
+                case 4:
+                    assertEquals(token.getTokenType(), TokenType.FUNCTION_PARAMETER);
+                    assertEquals(token.getScript(), "secondparameter");
+                    break;
+                case 5:
+                    assertEquals(token.getTokenType(), TokenType.CLOSE_PARENTHESIS);
+                    assertEquals(token.getScript(), ")");
+                    break;
+                case 6:
+                    assertEquals(token.getTokenType(), TokenType.EOF);
+                    break;
+                default:
+                    assertTrue(false);
+                    break;
             }
-        });
-        parser.parseScript();
+        }
 
 
-        parser = new SyntaxParser("modelName.boolValue ? functionName(parameter , secondparameter  ) : modelName.stringValue", new SyntaxParser.TokenConsumer() {
-            int tokenIndex = 0;
-            @Override
-            public void OnValidToken(Token token) {
-                switch (tokenIndex++){
-                    case 0:
-                        assertEquals(token.getTokenType(), TokenType.MODEL_NAME);
-                        assertEquals(token.getScript(), "modelName");
-                        break;
-                    case 1:
-                        assertEquals(token.getTokenType(), TokenType.PERIOD);
-                        assertEquals(token.getScript(), ".");
-                        break;
-                    case 2:
-                        assertEquals(token.getTokenType(), TokenType.MODEL_FIELD);
-                        assertEquals(token.getScript(), "boolValue");
-                        break;
-                    case 3:
-                        assertEquals(token.getTokenType(), TokenType.TERNARY_QUESTION_MARK);
-                        assertEquals(token.getScript(), "?");
-                        break;
-                    case 4:
-                        assertEquals(token.getTokenType(), TokenType.FUNCTION_NAME);
-                        assertEquals(token.getScript(), "functionName");
-                        break;
-                    case 5:
-                        assertEquals(token.getTokenType(), TokenType.OPEN_PARENTHESIS);
-                        assertEquals(token.getScript(), "(");
-                        break;
-                    case 6:
-                        assertEquals(token.getTokenType(), TokenType.FUNCTION_PARAMETER);
-                        assertEquals(token.getScript(), "parameter");
-                        break;
-                    case 7:
-                        assertEquals(token.getTokenType(), TokenType.COMMA);
-                        assertEquals(token.getScript(), ",");
-                        break;
-                    case 8:
-                        assertEquals(token.getTokenType(), TokenType.FUNCTION_PARAMETER);
-                        assertEquals(token.getScript(), "secondparameter");
-                        break;
-                    case 9:
-                        assertEquals(token.getTokenType(), TokenType.CLOSE_PARENTHESIS);
-                        assertEquals(token.getScript(), ")");
-                        break;
-                    case 10:
-                        assertEquals(token.getTokenType(), TokenType.TERNARY_COLON);
-                        assertEquals(token.getScript(), ":");
-                        break;
-                    case 11:
-                        assertEquals(token.getTokenType(), TokenType.MODEL_NAME);
-                        assertEquals(token.getScript(), "modelName");
-                        break;
-                    case 12:
-                        assertEquals(token.getTokenType(), TokenType.PERIOD);
-                        assertEquals(token.getScript(), ".");
-                        break;
-                    case 13:
-                        assertEquals(token.getTokenType(), TokenType.MODEL_FIELD);
-                        assertEquals(token.getScript(), "stringValue");
-                        break;
-                    case 14:
-                        assertEquals(token.getTokenType(), TokenType.EOF);
-                        break;
-                    default:
-                        assertTrue(false);
-                        break;
-                }
+        parser = new SyntaxParser("modelName.boolValue ? functionName(parameter , secondparameter  ) : modelName.stringValue");
+        tokens = parser.parseScript();
+        tokenIndex = 0;
+        while(tokenIndex < tokens.length){
+            Token token = tokens[tokenIndex];
+            switch (tokenIndex++){
+                case 0:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_NAME);
+                    assertEquals(token.getScript(), "modelName");
+                    break;
+                case 1:
+                    assertEquals(token.getTokenType(), TokenType.PERIOD);
+                    assertEquals(token.getScript(), ".");
+                    break;
+                case 2:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_FIELD);
+                    assertEquals(token.getScript(), "boolValue");
+                    break;
+                case 3:
+                    assertEquals(token.getTokenType(), TokenType.TERNARY_QUESTION_MARK);
+                    assertEquals(token.getScript(), "?");
+                    break;
+                case 4:
+                    assertEquals(token.getTokenType(), TokenType.FUNCTION_NAME);
+                    assertEquals(token.getScript(), "functionName");
+                    break;
+                case 5:
+                    assertEquals(token.getTokenType(), TokenType.OPEN_PARENTHESIS);
+                    assertEquals(token.getScript(), "(");
+                    break;
+                case 6:
+                    assertEquals(token.getTokenType(), TokenType.FUNCTION_PARAMETER);
+                    assertEquals(token.getScript(), "parameter");
+                    break;
+                case 7:
+                    assertEquals(token.getTokenType(), TokenType.COMMA);
+                    assertEquals(token.getScript(), ",");
+                    break;
+                case 8:
+                    assertEquals(token.getTokenType(), TokenType.FUNCTION_PARAMETER);
+                    assertEquals(token.getScript(), "secondparameter");
+                    break;
+                case 9:
+                    assertEquals(token.getTokenType(), TokenType.CLOSE_PARENTHESIS);
+                    assertEquals(token.getScript(), ")");
+                    break;
+                case 10:
+                    assertEquals(token.getTokenType(), TokenType.TERNARY_COLON);
+                    assertEquals(token.getScript(), ":");
+                    break;
+                case 11:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_NAME);
+                    assertEquals(token.getScript(), "modelName");
+                    break;
+                case 12:
+                    assertEquals(token.getTokenType(), TokenType.PERIOD);
+                    assertEquals(token.getScript(), ".");
+                    break;
+                case 13:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_FIELD);
+                    assertEquals(token.getScript(), "stringValue");
+                    break;
+                case 14:
+                    assertEquals(token.getTokenType(), TokenType.EOF);
+                    break;
+                default:
+                    assertTrue(false);
+                    break;
             }
-        });
-        parser.parseScript();
+        }
 
-
-        parser = new SyntaxParser("testName.testField", new SyntaxParser.TokenConsumer() {
-            int tokenIndex = 0;
-            @Override
-            public void OnValidToken(Token token) {
-                switch (tokenIndex++){
-                    case 0:
-                        assertEquals(token.getTokenType(), TokenType.MODEL_NAME);
-                        assertEquals(token.getScript(), "testName");
-                        break;
-                    case 1:
-                        assertEquals(token.getTokenType(), TokenType.PERIOD);
-                        assertEquals(token.getScript(), ".");
-                        break;
-                    case 2:
-                        assertEquals(token.getTokenType(), TokenType.MODEL_FIELD);
-                        assertEquals(token.getScript(), "testField");
-                        break;
-                    case 3:
-                        assertEquals(token.getTokenType(), TokenType.EOF);
-                        break;
-                    default:
-                        assertTrue(false);
-                        break;
-                }
+        parser = new SyntaxParser("testName.testField");
+        tokenIndex = 0;
+        tokens = parser.parseScript();
+        while(tokenIndex < tokens.length) {
+            Token token = tokens[tokenIndex];
+            switch (tokenIndex++) {
+                case 0:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_NAME);
+                    assertEquals(token.getScript(), "testName");
+                    break;
+                case 1:
+                    assertEquals(token.getTokenType(), TokenType.PERIOD);
+                    assertEquals(token.getScript(), ".");
+                    break;
+                case 2:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_FIELD);
+                    assertEquals(token.getScript(), "testField");
+                    break;
+                case 3:
+                    assertEquals(token.getTokenType(), TokenType.EOF);
+                    break;
+                default:
+                    assertTrue(false);
+                    break;
             }
-        });
-        parser.parseScript();
+        }
 
-        SyntaxParser.TokenConsumer emptyConsumer = new SyntaxParser.TokenConsumer(){ @Override public void OnValidToken(Token token) {}};
+        parser = new SyntaxParser("modelName.joe != 'orange'");
+        tokens = parser.parseScript();
+        tokenIndex = 0;
+        while(tokenIndex < tokens.length) {
+            Token token = tokens[tokenIndex];
+            switch (tokenIndex++) {
+                case 0:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_NAME);
+                    assertEquals(token.getScript(), "modelName");
+                    break;
+                case 1:
+                    assertEquals(token.getTokenType(), TokenType.PERIOD);
+                    assertEquals(token.getScript(), ".");
+                    break;
+                case 2:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_FIELD);
+                    assertEquals(token.getScript(), "joe");
+                    break;
+                case 3:
+                    assertEquals(token.getTokenType(), TokenType.OPERATOR);
+                    assertEquals(token.getScript(), "!=");
+                    break;
+                case 4:
+                    assertEquals(token.getTokenType(), TokenType.STRING);
+                    assertEquals(token.getScript(), "'orange'");
+                    break;
+                case 5:
+                    assertEquals(token.getTokenType(), TokenType.EOF);
+                    break;
+                default:
+                    assertTrue(false);
+                    break;
+            }
+        }
 
-        parser = new SyntaxParser("testName..testField", emptyConsumer);
+        parser = new SyntaxParser("testName..testField");
         try{
             parser.parseScript();
             assertTrue(false);
         }catch(Exception ignored){}
 
-        parser = new SyntaxParser("testName.testField)", emptyConsumer);
+        parser = new SyntaxParser("testName.testField)");
         try{
             parser.parseScript();
             assertTrue(false);
         }catch(Exception ignored){}
 
-        parser = new SyntaxParser("testName(testField)(name)", emptyConsumer);
+        parser = new SyntaxParser("testName(testField)(name)");
         try{
             parser.parseScript();
             assertTrue(false);
         }catch(Exception ignored){}
 
         try{
-            new SyntaxParser("testName(\\testField)", emptyConsumer);
+            new SyntaxParser("testName(\\testField)");
             assertTrue(false);
         }catch(Exception ignored){}
 
-        parser = new SyntaxParser(".stuffHere", emptyConsumer);
+        parser = new SyntaxParser(".stuffHere");
         try{
             parser.parseScript();
             assertTrue(false);
         }catch(Exception ignored){}
 
-        parser = new SyntaxParser("(stuffHere)", emptyConsumer);
+        parser = new SyntaxParser("(stuffHere)");
         try{
             parser.parseScript();
             assertTrue(false);

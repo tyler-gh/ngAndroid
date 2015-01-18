@@ -1,4 +1,4 @@
-package com.ngandroid.lib.parser;
+package com.ngandroid.lib.interpreter;
 
 /**
 * Created by davityle on 1/15/15.

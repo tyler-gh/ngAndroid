@@ -1,50 +1,46 @@
-package com.ngandroid.lib.ngbind;
+package com.ngandroid.lib.ngmodel;
 
-import android.annotation.TargetApi;
-import android.os.Build;
-import android.util.ArrayMap;
+import android.view.View;
 import android.widget.TextView;
 
+import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.interpreter.Token;
+import com.ngandroid.lib.ng.ModelMethod;
+import com.ngandroid.lib.ng.MethodInvoker;
+import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by davityle on 1/12/15.
+ * Created by davityle on 1/17/15.
  */
-public class BindingHandlerBuilder {
-    private final Class mClass;
-    private final Map<String, List<BindingMethod>> mMethodMap;
-    private final Map<String, Object> mFieldMap;
-    private final Object mModel;
-    private final MethodInvoker mInvocationHandler;
-    private final Method[] mModelMethods;
+public class NgModel {
+    private static NgModel ourInstance = new NgModel();
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    public BindingHandlerBuilder(Class clzz, Object model) {
-        this.mClass = clzz;
-        this.mModel = model;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mMethodMap = new ArrayMap<>();
-            mFieldMap = new ArrayMap<>();
-        } else {
-            mMethodMap = new HashMap<>();
-            mFieldMap = new HashMap<>();
+    public static NgModel getInstance() {
+        return ourInstance;
+    }
+
+    private NgModel() {}
+
+    public void attach(final Token[] tokens, ModelBuilderMap builders, View bindView){
+        if(tokens.length != 4){
+            // TODO handle error
+            throw new RuntimeException("Invalid model syntax");
         }
-        mInvocationHandler = new MethodInvoker(mMethodMap, mFieldMap);
-        mModelMethods = mClass.getDeclaredMethods();
+        String modelName = tokens[0].getScript();
+        String fieldName = tokens[2].getScript();
+        ModelBuilder builder = builders.get(modelName);
+        if (TextView.class.isAssignableFrom(bindView.getClass())) {
+            builder.ngModelBindTextView(fieldName, (TextView) bindView);
+        }
     }
 
-    public Object create(){
-        return Proxy.newProxyInstance(mClass.getClassLoader(), new Class[]{mClass}, new BindingHandler(mInvocationHandler));
-    }
-
-    public void addTextViewBind(String fieldName, final TextView textView){
+    public void bindModelToTextView(String fieldName, final TextView textView, Map<String, Object> mFieldMap, Map<String, List<ModelMethod>> mMethodMap, Method[] mModelMethods, MethodInvoker mInvocationHandler, Object mModel){
         final String fieldNamelower = fieldName.toLowerCase();
         String defaultText =  textView.getText().toString();
         mFieldMap.put(fieldNamelower, defaultText);
@@ -56,7 +52,7 @@ public class BindingHandlerBuilder {
         }
         final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(fieldNamelower, mInvocationHandler, mModel, methodType);
         textView.addTextChangedListener(setTextWhenChangedListener);
-        BindingMethod method = new BindingMethod(){
+        ModelMethod method = new ModelMethod(){
             @Override
             public Object invoke(String fieldName, Object... args) {
                 String value = String.valueOf(args[0]);
@@ -69,11 +65,20 @@ public class BindingHandlerBuilder {
             }
         };
         String methodName = "set" + fieldName.toLowerCase();
-        List<BindingMethod> methods = mMethodMap.get(methodName);
+        List<ModelMethod> methods = mMethodMap.get(methodName);
         if(methods == null){
             methods = new ArrayList<>();
             mMethodMap.put(methodName, methods);
         }
         methods.add(method);
     }
+
+
+
+
+
+
+
+
+
 }
