@@ -7,6 +7,8 @@ import java.util.Map;
  * Created by davityle on 1/12/15.
  */
 public class MethodInvoker {
+    // TODO enforce type checking
+
     private final Map<String, List<ModelMethod>> methodMap;
     private final Map<String, Object> fieldMap;
 

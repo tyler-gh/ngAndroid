@@ -43,7 +43,7 @@ public class ModelBuilder {
         return Proxy.newProxyInstance(mClass.getClassLoader(), new Class[]{mClass}, new Model(mInvocationHandler));
     }
 
-    public void ngModelBindTextView(String fieldName, final TextView textView){
-        NgModel.getInstance().bindModelToTextView(fieldName, textView, mFieldMap, mMethodMap, mModelMethods, mInvocationHandler, mModel);
+    public void ngModelBindTextView(NgModel ngModel, String fieldName, final TextView textView){
+        ngModel.bindModelToTextView(fieldName, textView, mFieldMap, mMethodMap, mModelMethods, mInvocationHandler, mModel);
     }
 }

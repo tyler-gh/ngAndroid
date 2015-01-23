@@ -7,6 +7,7 @@ public class SyntaxParser {
     private final Queue<Token> mTokens;
     private final Token[] mTokenArray;
     private int mTokenArrayIndex;
+    private boolean inFunction;
 
     public SyntaxParser(String script){
         this.mTokens = new Tokenizer(script).getTokens();
@@ -58,7 +59,11 @@ public class SyntaxParser {
             case MODEL_FIELD:
                 afterModel();
                 break;
+            case OPEN_PARENTHESIS:
+                inFunction = true;
+                break;
             case CLOSE_PARENTHESIS:
+                inFunction = false;
                 functionClose();
                 break;
             case OPERATOR:
@@ -89,6 +94,8 @@ public class SyntaxParser {
     }
 
     private void afterModel(){
+        if(inFunction)
+            return;
         if(!
             (
                 offerPop(TokenType.TERNARY_COLON) ||
@@ -128,7 +135,7 @@ public class SyntaxParser {
     private void continueFunction(){
         if(!
             (
-                offerPop(TokenType.FUNCTION_PARAMETER) ||
+                offerPop(TokenType.MODEL_NAME) ||
                 offerPop(TokenType.STRING) ||
                 offerPop(TokenType.NUMBER_CONSTANT)
             )
