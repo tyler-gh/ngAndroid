@@ -3,12 +3,12 @@ package com.ngandroid.lib.ng;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.util.ArrayMap;
-import android.widget.TextView;
 
-import com.ngandroid.lib.ngmodel.NgModel;
+import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +43,31 @@ public class ModelBuilder {
         return Proxy.newProxyInstance(mClass.getClassLoader(), new Class[]{mClass}, new Model(mInvocationHandler));
     }
 
-    public void ngModelBindTextView(NgModel ngModel, String fieldName, final TextView textView){
-        ngModel.bindModelToTextView(fieldName, textView, mFieldMap, mMethodMap, mModelMethods, mInvocationHandler, mModel);
+    public void setField(String fieldNamelower, String defaultText) {
+        mFieldMap.put(fieldNamelower, defaultText);
+    }
+
+    public MethodInvoker getMethodInvoker(){
+        return mInvocationHandler;
+    }
+
+    public int getMethodType(String fieldNamelower) {
+        int methodType = TypeUtils.STRING;
+        for(Method m : mModelMethods){
+            if(m.getName().toLowerCase().equals("set" + fieldNamelower)){
+                methodType = TypeUtils.getType(m.getParameterTypes()[0]);
+                break;
+            }
+        }
+        return methodType;
+    }
+
+    public List<ModelMethod> getMethods(String methodName) {
+        List<ModelMethod> methods = mMethodMap.get(methodName);
+        if(methods == null){
+            methods = new ArrayList<>();
+            mMethodMap.put(methodName, methods);
+        }
+        return  methods;
     }
 }

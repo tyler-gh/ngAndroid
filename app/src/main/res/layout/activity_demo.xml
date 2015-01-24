@@ -25,6 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/editText"
         android:layout_marginTop="20dp"
+        ngAndroid:ngClick="clickReally()"
         android:text="Touch me"/>
 
     <android.widget.EditText

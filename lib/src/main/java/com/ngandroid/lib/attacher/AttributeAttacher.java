@@ -15,6 +15,7 @@ import com.ngandroid.lib.interpreter.SyntaxParser;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.ngClick.NgClick;
 import com.ngandroid.lib.ngmodel.NgModel;
 
 import java.lang.reflect.Field;
@@ -46,11 +47,11 @@ public class AttributeAttacher {
             TypedArray array = mAttrArray.get(id);
             for(int i = 0 ; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
-                switch (attr) {
-                    case R.styleable.ngAndroid_ngModel:
-                        Token[] tokens = new SyntaxParser(array.getString(attr)).parseScript();
-                        NgModel.getInstance().attach(tokens, mBuilders, v.findViewById(id));
-                        break;
+                Token[] tokens = new SyntaxParser(array.getString(attr)).parseScript();
+                if(attr == R.styleable.ngAndroid_ngModel){
+                    NgModel.getInstance().attach(tokens, mModel, mBuilders, v.findViewById(id));
+                }else if (attr == R.styleable.ngAndroid_ngClick){
+                    NgClick.getInstance().attach(tokens, mModel, mBuilders, v.findViewById(id));
                 }
             }
         }

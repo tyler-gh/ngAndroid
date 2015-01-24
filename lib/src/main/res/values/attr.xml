@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ngAndroid">
+        <!--https://docs.angularjs.org/api/ng/directive/ngModel-->
         <attr name="ngModel" format="string"/>
+        <!--https://docs.angularjs.org/api/ng/directive/ngClick-->
+        <attr name="ngClick" format="string"/>
+        <!--https://docs.angularjs.org/api/ng/directive/ngDblclick-->
+        <attr name="ngDblclick" format="string"/>
+        <!--https://docs.angularjs.org/api/ng/directive/ngBlur-->
+        <attr name="ngBlur" format="boolean"/>
+        <!--https://docs.angularjs.org/api/ng/directive/ngChange-->
+        <attr name="ngChange" format="boolean"/>
+        <!--https://docs.angularjs.org/api/ng/directive/ngDisabled-->
+        <attr name="ngDisabled" format="string"/>
+        <!--https://docs.angularjs.org/api/ng/directive/ngFocus-->
+        <attr name="ngFocus" format="string"/>
+        <!--android specific attribute based off of https://docs.angularjs.org/api/ng/directive/ngHide-->
+        <attr name="ngInvisible" format="string"/>
+        <!--android specific attribute based off of https://docs.angularjs.org/api/ng/directive/ngIf-->
+        <attr name="ngGone" format="string"/>
+        <!--identical to ngGone https://docs.angularjs.org/api/ng/directive/ngIf-->
+        <attr name="ngIf" format="string"/>
+        <!--https://docs.angularjs.org/api/ng/directive/ngRepeat-->
+        <attr name="ngRepeat" format="string"/>
+        <!--https://docs.angularjs.org/api/ng/directive/ngSrc-->
+        <attr name="ngSrc" format="string"/>
+        <!--custom android attribute - must be used in correlation with ngModel-->
+        <attr name="ngJsonSrc" format="string"/>
+        <!--https://docs.angularjs.org/api/ng/directive/ngSubmit-->
+        <attr name="ngSubmit" format="string"/>
+        <!--https://docs.angularjs.org/api/ng/directive/ngForm-->
+        <attr name="ngForm" format="string"/>
     </declare-styleable>
 </resources>

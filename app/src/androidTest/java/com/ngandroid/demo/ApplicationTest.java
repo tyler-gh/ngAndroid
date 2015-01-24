@@ -382,6 +382,35 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         }catch(Exception ignored){}
     }
 
+    public void testEmptyFunctionParse(){
+        SyntaxParser parser = new SyntaxParser("functionName()");
+        Token[] tokens = parser.parseScript();
+        int tokenIndex = 0;
+        while(tokenIndex < tokens.length){
+            Token token = tokens[tokenIndex];
+            switch (tokenIndex++){
+                case 0:
+                    assertEquals(token.getTokenType(), TokenType.FUNCTION_NAME);
+                    assertEquals(token.getScript(), "functionName");
+                    break;
+                case 1:
+                    assertEquals(token.getTokenType(), TokenType.OPEN_PARENTHESIS);
+                    assertEquals(token.getScript(), "(");
+                    break;
+                case 2:
+                    assertEquals(token.getTokenType(), TokenType.CLOSE_PARENTHESIS);
+                    assertEquals(token.getScript(), ")");
+                    break;
+                case 3:
+                    assertEquals(token.getTokenType(), TokenType.EOF);
+                    break;
+                default:
+                    assertTrue(false);
+                    break;
+            }
+        }
+    }
+
     public void testSyntaxParser(){
         SyntaxParser parser = new SyntaxParser("functionName(gui.parameter)");
         Token[] tokens = parser.parseScript();

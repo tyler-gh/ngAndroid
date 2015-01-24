@@ -141,7 +141,10 @@ public class SyntaxParser {
             )
         ){
             // TODO error
-            throw new RuntimeException();
+            if(!offerPop(TokenType.CLOSE_PARENTHESIS))
+                throw new RuntimeException();
+            else
+                return;
         }
         if(!
             (

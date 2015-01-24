@@ -11,30 +11,28 @@ import com.ngandroid.lib.NgAndroid;
 
 public class DemoActivity extends Activity {
 
-    public class Model {
-        private Input input;
-    }
-    private Model model = new Model();
+    private Input input;
+
+    private TextView really;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        NgAndroid.setContentView(this, R.layout.activity_demo, model);
+        NgAndroid.setContentView(this, R.layout.activity_demo);
 
-        model.input.setInput("Hello world");
+        input.setInput("Hello world");
 
-        findViewById(R.id.really).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((TextView) view).setText(model.input.getInput());
-            }
-        });
+        really = (TextView) findViewById(R.id.really);
 
         findViewById(R.id.really2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((TextView) view).setText(String.valueOf(model.input.getTest()));
+                ((TextView) view).setText(String.valueOf(input.getTest()));
             }
         });
+    }
+
+    private void clickReally(){
+        really.setText(input.getInput());
     }
 }
