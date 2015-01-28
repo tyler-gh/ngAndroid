@@ -17,7 +17,7 @@ public class MethodInvoker {
         this.fieldMap = fieldMap;
     }
 
-    public Object invoke(Object o, String methodName, Object[] objects) throws Throwable{
+    public Object invoke(String methodName, Object ... objects) throws Throwable{
         if(methodName.startsWith("get")){
             String fieldName = methodName.substring(3).toLowerCase();
             return fieldMap.get(fieldName);

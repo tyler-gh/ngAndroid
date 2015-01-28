@@ -2,8 +2,8 @@ package com.ngandroid.demo;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ngandroid.demo.models.Input;
 import com.ngandroid.lib.NgAndroid;
@@ -13,7 +13,7 @@ public class DemoActivity extends Activity {
 
     private Input input;
 
-    private TextView really;
+    private TextView stringClickEvent, really2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,17 +22,21 @@ public class DemoActivity extends Activity {
 
         input.setInput("Hello world");
 
-        really = (TextView) findViewById(R.id.really);
-
-        findViewById(R.id.really2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((TextView) view).setText(String.valueOf(input.getTest()));
-            }
-        });
+        stringClickEvent = (TextView) findViewById(R.id.stringClickEvent);
+        really2 = (TextView) findViewById(R.id.really2);
     }
 
+    private void multiply(int num1, int num2){
+        Toast.makeText(this, String.valueOf(num1 * num2), Toast.LENGTH_SHORT).show();
+    }
+
+
     private void clickReally(){
-        really.setText(input.getInput());
+        stringClickEvent.setText(input.getInput());
+    }
+
+
+    private void clickWithParameter(int num){
+        really2.setText(String.valueOf(num));
     }
 }

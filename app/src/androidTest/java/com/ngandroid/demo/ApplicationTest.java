@@ -29,37 +29,25 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public void testTokenizerNumbers(){
-
         Tokenizer tokenizer = new Tokenizer("234g");
+        try {
+            tokenizer.getTokens();
+            assertTrue(false);
+        }catch (Throwable ignored){}
+
+        try {
+            tokenizer = new Tokenizer("g234");
+            tokenizer.getTokens();
+            assertTrue(false);
+        }catch (Throwable ignored){}
+
+        tokenizer = new Tokenizer("234.453");
         Queue<Token> tokenqueue = tokenizer.getTokens();
-        assertTrue("tokenqueue.size() == " + tokenqueue.size(), tokenqueue.size() == 3);
+        assertEquals(2, tokenqueue.size());
 
         Token token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.NUMBER_CONSTANT);
-        assertTrue(token.getScript().equals("234"));
-
-        token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.RUBBISH);
-        assertTrue(token.getScript().equals("g"));
-
-        token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.EOF);
-
-        tokenizer = new Tokenizer("g234");
-        tokenqueue = tokenizer.getTokens();
-        assertTrue("tokenqueue.size() == " + tokenqueue.size(), tokenqueue.size() == 3);
-
-        token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.RUBBISH);
-        assertTrue(token.getScript(), token.getScript().equals("g"));
-
-        token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.NUMBER_CONSTANT);
-        assertTrue(token.getScript().equals("234"));
-
-        token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.EOF);
-
+        assertEquals(TokenType.NUMBER_CONSTANT, token.getTokenType());
+        assertEquals("234.453", token.getScript());
     }
 
     public void testTokenizer(){
@@ -154,7 +142,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == TokenType.NUMBER_CONSTANT);
-        assertTrue(token.getScript().equals("12345"));
+        assertEquals(token.getScript(),"12345");
 
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == TokenType.COMMA);
@@ -301,7 +289,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         tokenizer = new Tokenizer(" modelName.joe + modelName.frank == 2");
         tokenqueue = tokenizer.getTokens();
 
-        assertEquals(10, tokenqueue.size());
+        assertEquals(tokenqueue.toString(), 10, tokenqueue.size());
 
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == TokenType.MODEL_NAME);
@@ -409,6 +397,45 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
                     break;
             }
         }
+    }
+
+    public void testFunctionNumberConstant(){
+        try {
+            System.out.println("///////////////////////////////////////////////////////");
+            SyntaxParser parser = new SyntaxParser("multiply(input.test,2)");
+            parser.parseScript();
+        }finally {
+            System.out.println("///////////////////////////////////////////////////////");
+        }
+    }
+
+    public void testFunctionTernaryPeramater(){
+//        SyntaxParser parser = new SyntaxParser("functionName(model.boolValue ? 'this string' : 'bool value was false')");
+//        Token[] tokens = parser.parseScript();
+//        int tokenIndex = 0;
+//        while(tokenIndex < tokens.length){
+//            Token token = tokens[tokenIndex];
+//            switch (tokenIndex++){
+//                case 0:
+//                    assertEquals(token.getTokenType(), TokenType.FUNCTION_NAME);
+//                    assertEquals(token.getScript(), "functionName");
+//                    break;
+//                case 1:
+//                    assertEquals(token.getTokenType(), TokenType.OPEN_PARENTHESIS);
+//                    assertEquals(token.getScript(), "(");
+//                    break;
+//                case 2:
+//                    assertEquals(token.getTokenType(), TokenType.CLOSE_PARENTHESIS);
+//                    assertEquals(token.getScript(), ")");
+//                    break;
+//                case 3:
+//                    assertEquals(token.getTokenType(), TokenType.EOF);
+//                    break;
+//                default:
+//                    assertTrue(false);
+//                    break;
+//            }
+//        }
     }
 
     public void testSyntaxParser(){

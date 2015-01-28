@@ -9,6 +9,7 @@ import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.ModelMethod;
 import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ng.ModelSetter;
 import com.ngandroid.lib.utils.TypeUtils;
 
 import java.util.List;
@@ -34,22 +35,22 @@ public class NgModel implements NgAttribute {
         String modelName = tokens[0].getScript();
         String fieldName = tokens[2].getScript();
         ModelBuilder builder = builders.get(modelName);
-        bindModelView(fieldName, bindView, builder, mModel);
+        bindModelView(fieldName, bindView, builder);
     }
 
-    public void bindModelView(String fieldName, View view, ModelBuilder builder, Object mModel) {
+    public void bindModelView(String fieldName, View view, ModelBuilder builder) {
         if(view instanceof  TextView){
-            bindModelToTextView(fieldName, (TextView)view, builder, mModel);
+            bindModelToTextView(fieldName, (TextView)view, builder);
         }
     }
 
-    public void bindModelToTextView(String fieldName, final TextView textView, ModelBuilder builder, Object mModel){
+    public void bindModelToTextView(String fieldName, final TextView textView, ModelBuilder builder){
         final String fieldNamelower = fieldName.toLowerCase();
         String defaultText =  textView.getText().toString();
         builder.setField(fieldNamelower, defaultText);
 
         int methodType = builder.getMethodType(fieldNamelower);
-        final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(fieldNamelower, builder.getMethodInvoker(), mModel, methodType);
+        final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(new ModelSetter(fieldNamelower, builder.getMethodInvoker()), methodType);
         textView.addTextChangedListener(setTextWhenChangedListener);
         // TODO clean this up
         ModelMethod method = new ModelMethod(){
@@ -64,7 +65,7 @@ public class NgModel implements NgAttribute {
                 return null;
             }
         };
-        String methodName = "set" + fieldName.toLowerCase();
+        String methodName = "set" + fieldNamelower;
         List<ModelMethod> methods = builder.getMethods(methodName);
         methods.add(method);
     }

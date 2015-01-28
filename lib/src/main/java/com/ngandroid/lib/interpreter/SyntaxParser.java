@@ -16,13 +16,13 @@ public class SyntaxParser {
     }
 
     public Token[] parseScript(){
-        if(!
-            (
-                offerPop(TokenType.MODEL_NAME) ||
-                offerPop(TokenType.FUNCTION_NAME) ||
-                offerPop(TokenType.EOF)
-            )
-        ){
+        if (!
+                (
+                    offerPop(TokenType.MODEL_NAME) ||
+                    offerPop(TokenType.FUNCTION_NAME) ||
+                    offerPop(TokenType.EOF)
+                )
+        ) {
             // TODO error
             throw new RuntimeException();
         }
@@ -74,7 +74,8 @@ public class SyntaxParser {
 
     private void emit(TokenType tokenType){
         if(mTokens.peek().getTokenType() != tokenType){
-            throw new RuntimeException(mTokens.peek().getTokenType() + " != " + tokenType);
+            Token token = mTokens.peek();
+            throw new RuntimeException(token.getScript() + " is invalid. " + token.getTokenType() + " != " + tokenType);
         }
         popToken();
     }

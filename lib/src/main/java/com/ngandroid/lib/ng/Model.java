@@ -16,6 +16,6 @@ public class Model implements InvocationHandler {
 
     @Override
     public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
-        return invocationHandler.invoke(o, method.getName(), objects);
+        return invocationHandler.invoke(method.getName(), objects);
     }
 }
