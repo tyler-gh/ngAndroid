@@ -9,5 +9,5 @@ import com.ngandroid.lib.interpreter.Token;
  */
 public interface NgAttribute {
     public void typeCheck(Token[] tokens);
-    public void attach(final Token[] tokens, Object mModel, ModelBuilderMap builders, View bindView);
+    public void attach(final Token[] tokens, Object mModel, ModelBuilderMap builders, View bindView) throws Exception;
 }

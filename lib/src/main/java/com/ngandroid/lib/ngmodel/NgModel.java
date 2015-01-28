@@ -30,7 +30,7 @@ public class NgModel implements NgAttribute {
         TypeUtils.strictTypeCheck(tokens, TokenType.MODEL_NAME, TokenType.PERIOD, TokenType.MODEL_FIELD, TokenType.EOF);
     }
 
-    public void attach(final Token[] tokens, Object mModel, ModelBuilderMap builders, View bindView){
+    public void attach(final Token[] tokens, Object mModel, ModelBuilderMap builders, View bindView) throws Exception {
         typeCheck(tokens);
         String modelName = tokens[0].getScript();
         String fieldName = tokens[2].getScript();
@@ -38,18 +38,18 @@ public class NgModel implements NgAttribute {
         bindModelView(fieldName, bindView, builder);
     }
 
-    public void bindModelView(String fieldName, View view, ModelBuilder builder) {
+    public void bindModelView(String fieldName, View view, ModelBuilder builder) throws Exception {
         if(view instanceof  TextView){
             bindModelToTextView(fieldName, (TextView)view, builder);
         }
     }
 
-    public void bindModelToTextView(String fieldName, final TextView textView, ModelBuilder builder){
+    public void bindModelToTextView(String fieldName, final TextView textView, ModelBuilder builder) throws Exception {
         final String fieldNamelower = fieldName.toLowerCase();
         String defaultText =  textView.getText().toString();
-        builder.setField(fieldNamelower, defaultText);
 
         int methodType = builder.getMethodType(fieldNamelower);
+        builder.setField(fieldNamelower, methodType, TypeUtils.fromString(methodType, defaultText));
         final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(new ModelSetter(fieldNamelower, builder.getMethodInvoker()), methodType);
         textView.addTextChangedListener(setTextWhenChangedListener);
         // TODO clean this up
@@ -59,7 +59,7 @@ public class NgModel implements NgAttribute {
                 String value = String.valueOf(args[0]);
                 if(!value.equals(textView.getText().toString())) {
                     textView.removeTextChangedListener(setTextWhenChangedListener);
-                    textView.setText(value);
+                    textView.setText(value.equals("0") ? "" : value);
                     textView.addTextChangedListener(setTextWhenChangedListener);
                 }
                 return null;

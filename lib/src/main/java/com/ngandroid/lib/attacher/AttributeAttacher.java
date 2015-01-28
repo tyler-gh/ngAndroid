@@ -49,7 +49,11 @@ public class AttributeAttacher {
                 int attr = array.getIndex(i);
                 Token[] tokens = new SyntaxParser(array.getString(attr)).parseScript();
                 if(attr == R.styleable.ngAndroid_ngModel){
-                    NgModel.getInstance().attach(tokens, mModel, mBuilders, v.findViewById(id));
+                    try {
+                        NgModel.getInstance().attach(tokens, mModel, mBuilders, v.findViewById(id));
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }else if (attr == R.styleable.ngAndroid_ngClick){
                     NgClick.getInstance().attach(tokens, mModel, mBuilders, v.findViewById(id));
                 }

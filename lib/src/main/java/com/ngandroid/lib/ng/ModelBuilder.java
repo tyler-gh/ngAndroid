@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.util.ArrayMap;
 
+import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.Method;
@@ -19,7 +20,7 @@ import java.util.Map;
 public class ModelBuilder {
     private final Class mClass;
     private final Map<String, List<ModelMethod>> mMethodMap;
-    private final Map<String, Object> mFieldMap;
+    private final Map<String, Tuple<Integer,Object>> mFieldMap;
     private final Object mModel;
     private final MethodInvoker mInvocationHandler;
     private final Method[] mModelMethods;
@@ -43,8 +44,8 @@ public class ModelBuilder {
         return Proxy.newProxyInstance(mClass.getClassLoader(), new Class[]{mClass}, new Model(mInvocationHandler));
     }
 
-    public void setField(String fieldNamelower, String defaultText) {
-        mFieldMap.put(fieldNamelower, defaultText);
+    public void setField(String fieldNamelower, int type,  Object defaultValue) {
+        mFieldMap.put(fieldNamelower, Tuple.of(type, defaultValue));
     }
 
     public MethodInvoker getMethodInvoker(){
