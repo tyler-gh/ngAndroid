@@ -24,7 +24,11 @@ public class NgAndroid {
         return new AttributeAttacher(activity, activity).inflate(resourceId, viewGroup, attach);
     }
 
-    public static View inflate(Activity activity, Object model, int resourceId, ViewGroup viewGroup, boolean attach){
+    public static View inflate(Activity activity, int resourceId, ViewGroup viewGroup){
+        return new AttributeAttacher(activity, activity).inflate(resourceId, viewGroup, false);
+    }
+
+    public static View inflate(Activity activity, int resourceId, ViewGroup viewGroup, boolean attach, Object model){
         return new AttributeAttacher(activity, model).inflate(resourceId, viewGroup, attach);
     }
 }

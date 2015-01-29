@@ -1,37 +1,35 @@
-package com.ngandroid.lib.parser;
+package com.ngandroid.lib.interpreter;
 
 import java.util.Queue;
 
 public class SyntaxParser {
 
-    public interface TokenConsumer {
-        public void OnValidToken(Token token);
-    }
-
     private final Queue<Token> mTokens;
-    private final TokenConsumer mConsumer;
+    private final Token[] mTokenArray;
+    private int mTokenArrayIndex;
+    private boolean inFunction;
 
-    public SyntaxParser(String script, TokenConsumer consumer){
+    public SyntaxParser(String script){
         this.mTokens = new Tokenizer(script).getTokens();
-        this.mConsumer = consumer;
-        System.out.println(mTokens);
+        this.mTokenArray = new Token[mTokens.size()];
+        this.mTokenArrayIndex = 0;
     }
 
-    public void parseScript(){
-        if(!
-            (
-                offerPop(TokenType.MODEL_NAME) ||
-                offerPop(TokenType.FUNCTION_NAME) ||
-                offerPop(TokenType.EOF)
-            )
-        ){
+    public Token[] parseScript(){
+        if (!
+                (
+                    offerPop(TokenType.MODEL_NAME) ||
+                    offerPop(TokenType.FUNCTION_NAME) ||
+                    offerPop(TokenType.EOF)
+                )
+        ) {
             // TODO error
             throw new RuntimeException();
         }
+        return mTokenArray;
     }
     
     private boolean offerPop(TokenType tokenType){
-        System.out.println("offered " + tokenType);
         if(mTokens.peek().getTokenType() != tokenType){
             return false;
         }
@@ -41,7 +39,7 @@ public class SyntaxParser {
 
     private void popToken() {
         Token token = mTokens.poll();
-        mConsumer.OnValidToken(token);
+        mTokenArray[mTokenArrayIndex++] = token;
         switch (token.getTokenType()){
             case MODEL_NAME:
                 parseModel();
@@ -56,27 +54,54 @@ public class SyntaxParser {
             case TERNARY_QUESTION_MARK:
                 parseTernary();
                 break;
+            case STRING:
+            case NUMBER_CONSTANT:
             case MODEL_FIELD:
                 afterModel();
                 break;
+            case OPEN_PARENTHESIS:
+                inFunction = true;
+                break;
             case CLOSE_PARENTHESIS:
+                inFunction = false;
                 functionClose();
+                break;
+            case OPERATOR:
+                afterOperator();
                 break;
         }
     }
 
     private void emit(TokenType tokenType){
         if(mTokens.peek().getTokenType() != tokenType){
-            throw new RuntimeException(mTokens.peek().getTokenType() + " != " + tokenType);
+            Token token = mTokens.peek();
+            throw new RuntimeException(token.getScript() + " is invalid. " + token.getTokenType() + " != " + tokenType);
         }
         popToken();
     }
 
+    private void afterOperator(){
+        if(!
+            (
+                offerPop(TokenType.FUNCTION_NAME) ||
+                offerPop(TokenType.MODEL_NAME) ||
+                offerPop(TokenType.STRING) ||
+                offerPop(TokenType.NUMBER_CONSTANT)
+            )
+        ){
+            // TODO error
+            throw new RuntimeException();
+        }
+    }
+
     private void afterModel(){
+        if(inFunction)
+            return;
         if(!
             (
                 offerPop(TokenType.TERNARY_COLON) ||
                 offerPop(TokenType.TERNARY_QUESTION_MARK) ||
+                offerPop(TokenType.OPERATOR) ||
                 offerPop(TokenType.EOF)
             )
         ){
@@ -109,7 +134,19 @@ public class SyntaxParser {
     }
 
     private void continueFunction(){
-        emit(TokenType.FUNCTION_PARAMETER);
+        if(!
+            (
+                offerPop(TokenType.MODEL_NAME) ||
+                offerPop(TokenType.STRING) ||
+                offerPop(TokenType.NUMBER_CONSTANT)
+            )
+        ){
+            // TODO error
+            if(!offerPop(TokenType.CLOSE_PARENTHESIS))
+                throw new RuntimeException();
+            else
+                return;
+        }
         if(!
             (
                 offerPop(TokenType.COMMA) ||

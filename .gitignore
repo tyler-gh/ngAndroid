@@ -4,3 +4,10 @@
 /.idea/libraries
 .DS_Store
 /build
+
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
