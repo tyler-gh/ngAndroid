@@ -5,6 +5,23 @@ ngAndroid brings some of the angular directives to android xml attributes.
 Currently supported angular directives
 ```
 ngModel
+ngClick
+```
+Directives that are on the road map
+```
+ngDblclick
+ngBlur
+ngChange
+ngDisabled
+ngFocus
+ngInvisible
+ngGone
+ngIf
+ngRepeat
+ngSrc
+ngJsonSrc
+ngSubmit
+ngForm
 ```
 
 --------
@@ -59,4 +76,26 @@ With those lines of code, your view is now bound to your data model and vice ver
 
 --------
 
+<h3>ngClick</h3>
+
+```xml
+<Button
+    android:id="@+id/multiplyButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/really2"
+    android:layout_marginTop="20dp"
+    ngAndroid:ngClick="multiply(input.test,2)"
+    android:text="Multiply"/>
+```
+```java
+private void multiply(int num1, int num2){
+    Toast.makeText(this, String.valueOf(num1 * num2), Toast.LENGTH_SHORT).show();
+}
+```
+
+
+
+
+--------
 ngAndroid is still in extreme alpha stages. pre v 0.1
