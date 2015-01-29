@@ -1,3 +1,19 @@
+/*
+ * Copyright 2015 Tyler Davis
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package com.ngandroid.lib.ng;
 
 import com.ngandroid.lib.utils.Tuple;
@@ -10,7 +26,6 @@ import java.util.Map;
  * Created by davityle on 1/12/15.
  */
 public class MethodInvoker {
-    // TODO enforce type checking
 
     private final Map<String, List<ModelMethod>> methodMap;
     private final Map<String, Tuple<Integer,Object>> fieldMap;
@@ -22,7 +37,7 @@ public class MethodInvoker {
 
     public Object invoke(String methodName, Object ... objects) throws Throwable{
         String fieldName = methodName.substring(3).toLowerCase();
-        Tuple<Integer, Object> value= fieldMap.get(fieldName);
+        Tuple<Integer, Object> value = fieldMap.get(fieldName);
         if(value == null)
             return null;
         if(methodName.startsWith("get")){
@@ -30,9 +45,7 @@ public class MethodInvoker {
         }else if(methodName.startsWith("set")){
             Object obj = objects[0];
             if(obj == TypeUtils.EMPTY){
-                System.out.println("equals empty");
                 obj = TypeUtils.getEmptyValue(value.getFirst());
-                System.out.println(obj.getClass().getSimpleName());
             }
             value.setSecond(obj);
             List<ModelMethod> setters = methodMap.get(methodName.toLowerCase());
@@ -40,9 +53,8 @@ public class MethodInvoker {
                 modelMethod.invoke(fieldName, obj);
             }
             return null;
-        }else{
-            // TODO throw error
-            return null;
         }
+        // TODO throw error
+        return null;
     }
 }
