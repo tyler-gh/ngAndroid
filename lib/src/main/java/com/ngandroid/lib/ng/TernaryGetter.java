@@ -17,8 +17,21 @@
 package com.ngandroid.lib.ng;
 
 /**
- * Created by davityle on 1/24/15.
+ * Created by tyler on 2/2/15.
  */
-public interface Getter<T> {
-    public T get() throws Throwable;
+public class TernaryGetter<T> implements Getter {
+
+    private final Getter<Boolean> booleanGetter;
+    private final Getter<T> valTrue, valFalse;
+
+    public TernaryGetter(Getter<Boolean> booleanGetter, Getter<T> valTrue, Getter<T> valFalse) {
+        this.booleanGetter = booleanGetter;
+        this.valTrue = valTrue;
+        this.valFalse = valFalse;
+    }
+
+    @Override
+    public T get() throws Throwable {
+        return booleanGetter.get() ? valTrue.get() : valFalse.get();
+    }
 }

@@ -19,15 +19,15 @@ package com.ngandroid.lib.ng;
 /**
  * Created by davityle on 1/24/15.
  */
-public class StaticGetter implements Getter{
-    private final Object object;
+public class StaticGetter<T> implements Getter<T>{
+    private final T object;
 
-    public StaticGetter(Object object) {
+    public StaticGetter(T object) {
         this.object = object;
     }
 
     @Override
-    public Object get() throws Throwable {
+    public T get() throws Throwable {
         return object;
     }
 }

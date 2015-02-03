@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngClick;
+package com.ngandroid.lib.ngattributes.ngclick;
 
 import android.view.View;
 
@@ -26,6 +26,7 @@ import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.ModelGetter;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.StaticGetter;
+import com.ngandroid.lib.ngattributes.nglongclick.LongClickInvoker;
 import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.Method;
@@ -52,16 +53,27 @@ public class NgClick implements NgAttribute {
 
     @Override
     public void attach(Token[] tokens, final Object mModel, ModelBuilderMap builders, View bindView) {
-        typeCheck(tokens);
+        attach(tokens, mModel, builders, bindView, false);
+    }
 
-        String functionName = tokens[0].getScript();
+    public ClickInvoker getInvoker(Token[] tokens, final Object mModel, ModelBuilderMap builders, int functionNameIndex, int parametersEndPadding){
+        String functionName = tokens[functionNameIndex].getScript();
         Method method = findMethod(functionName, mModel.getClass());
         if(method == null){
             // TODO error
             throw new RuntimeException(new NoSuchMethodException("There is no method " + functionName + " found in " + mModel.getClass().getSimpleName()));
         }
-        Getter[] parameters = createParameters(2, 2, tokens, builders);
-        bindView.setOnClickListener(new ClickInvoker(method, mModel, parameters));
+        Getter[] parameters = createParameters(functionNameIndex+2, parametersEndPadding, tokens, builders);
+        return new ClickInvoker(method, mModel, parameters);
+    }
+
+    public void attach(Token[] tokens, final Object mModel, ModelBuilderMap builders, View bindView, boolean isLongClick){
+        typeCheck(tokens);
+        ClickInvoker invoker = getInvoker(tokens, mModel, builders, 0, 2);
+        if(!isLongClick)
+            bindView.setOnClickListener(invoker);
+        else
+            bindView.setOnLongClickListener(new LongClickInvoker(invoker));
     }
 
     private Method findMethod(String functionName, Class<?> clss){

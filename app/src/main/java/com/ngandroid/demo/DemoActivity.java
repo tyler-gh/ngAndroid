@@ -39,4 +39,8 @@ public class DemoActivity extends Activity {
     private void clickWithParameter(int num){
         really2.setText(String.valueOf(num));
     }
+
+    private void onChange(){
+        Toast.makeText(this, "Text Changed", Toast.LENGTH_SHORT).show();
+    }
 }

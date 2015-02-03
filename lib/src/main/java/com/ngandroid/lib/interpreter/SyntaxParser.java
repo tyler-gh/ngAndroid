@@ -34,6 +34,7 @@ public class SyntaxParser {
     public Token[] parseScript(){
         if (!
                 (
+                    offerPop(TokenType.KNOT) ||
                     offerPop(TokenType.MODEL_NAME) ||
                     offerPop(TokenType.FUNCTION_NAME) ||
                     offerPop(TokenType.EOF)
@@ -82,6 +83,9 @@ public class SyntaxParser {
                 inFunction = false;
                 functionClose();
                 break;
+            case KNOT:
+                afterKnot();
+                break;
             case OPERATOR:
                 afterOperator();
                 break;
@@ -94,6 +98,18 @@ public class SyntaxParser {
             throw new RuntimeException(token.getScript() + " is invalid. " + token.getTokenType() + " != " + tokenType);
         }
         popToken();
+    }
+
+    private void afterKnot(){
+        if(!
+            (
+                offerPop(TokenType.FUNCTION_NAME) ||
+                offerPop(TokenType.MODEL_NAME)
+            )
+        ){
+            // TODO error
+            throw new RuntimeException();
+        }
     }
 
     private void afterOperator(){
@@ -111,18 +127,22 @@ public class SyntaxParser {
     }
 
     private void afterModel(){
-        if(inFunction)
-            return;
-        if(!
-            (
-                offerPop(TokenType.TERNARY_COLON) ||
-                offerPop(TokenType.TERNARY_QUESTION_MARK) ||
-                offerPop(TokenType.OPERATOR) ||
-                offerPop(TokenType.EOF)
-            )
-        ){
-            // TODO error
-            throw new RuntimeException();
+        if(inFunction){
+            offerPop(TokenType.TERNARY_COLON);
+            offerPop(TokenType.TERNARY_QUESTION_MARK);
+            offerPop(TokenType.OPERATOR);
+        }else {
+            if (!
+                (
+                    offerPop(TokenType.TERNARY_COLON) ||
+                    offerPop(TokenType.TERNARY_QUESTION_MARK) ||
+                    offerPop(TokenType.OPERATOR) ||
+                    offerPop(TokenType.EOF)
+                )
+            ) {
+                // TODO error
+                throw new RuntimeException();
+            }
         }
     }
 
@@ -178,7 +198,9 @@ public class SyntaxParser {
         if(!
             (
                 offerPop(TokenType.MODEL_NAME) ||
-                offerPop(TokenType.FUNCTION_NAME)
+                offerPop(TokenType.FUNCTION_NAME) ||
+                offerPop(TokenType.NUMBER_CONSTANT) ||
+                offerPop(TokenType.STRING)
             )
         ){
             // TODO error

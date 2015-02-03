@@ -19,7 +19,7 @@ package com.ngandroid.lib.ng;
 /**
  * Created by davityle on 1/24/15.
  */
-public class ModelGetter implements Getter {
+public class ModelGetter<T> implements Getter<T> {
 
     private final String mFieldName;
     private final MethodInvoker mMethodInvoker;
@@ -29,7 +29,7 @@ public class ModelGetter implements Getter {
         this.mMethodInvoker = mMethodInvoker;
     }
 
-    public Object get() throws Throwable {
-        return mMethodInvoker.invoke("get" + mFieldName);
+    public T get() throws Throwable {
+        return (T) mMethodInvoker.invoke("get" + mFieldName);
     }
 }

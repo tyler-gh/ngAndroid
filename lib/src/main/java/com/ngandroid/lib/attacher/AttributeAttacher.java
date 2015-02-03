@@ -32,8 +32,11 @@ import com.ngandroid.lib.interpreter.SyntaxParser;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
-import com.ngandroid.lib.ngClick.NgClick;
-import com.ngandroid.lib.ngmodel.NgModel;
+import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ngattributes.ngchange.NgChange;
+import com.ngandroid.lib.ngattributes.ngclick.NgClick;
+import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
+import com.ngandroid.lib.ngattributes.ngmodel.NgModel;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -65,14 +68,23 @@ public class AttributeAttacher {
             for(int i = 0 ; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
                 Token[] tokens = new SyntaxParser(array.getString(attr)).parseScript();
-                if(attr == R.styleable.ngAndroid_ngModel){
-                    try {
-                        NgModel.getInstance().attach(tokens, mModel, mBuilders, v.findViewById(id));
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
+                NgAttribute attribute;
+
+                    if(attr == R.styleable.ngAndroid_ngModel){
+                        attribute = NgModel.getInstance();
+                    }else if (attr == R.styleable.ngAndroid_ngClick){
+                        attribute = NgClick.getInstance();
+                    } else if(attr == R.styleable.ngAndroid_ngLongClick){
+                        attribute = NgLongClick.getInstance();
+                    } else if(attr == R.styleable.ngAndroid_ngChange){
+                        attribute = NgChange.getInstance();
+                    }else {
+                        throw new UnsupportedOperationException("Attribute not currently implemented");
                     }
-                }else if (attr == R.styleable.ngAndroid_ngClick){
-                    NgClick.getInstance().attach(tokens, mModel, mBuilders, v.findViewById(id));
+                try {
+                    attribute.attach(tokens, mModel, mBuilders, v.findViewById(id));
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
                 }
             }
         }

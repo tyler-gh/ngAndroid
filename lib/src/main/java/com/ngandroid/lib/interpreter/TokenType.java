@@ -32,7 +32,7 @@ public enum TokenType {
     OPERATOR,
     NUMBER_CONSTANT,
     RUBBISH,
-    EOF, STRING;
+    EOF, STRING, KNOT;
 
     public enum Operator {
         ADDITION,
