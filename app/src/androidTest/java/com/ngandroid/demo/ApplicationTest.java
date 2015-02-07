@@ -3,11 +3,18 @@ package com.ngandroid.demo;
 import android.app.Application;
 import android.test.ApplicationTestCase;
 
+import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.SyntaxParser;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.interpreter.Tokenizer;
+import com.ngandroid.lib.ng.BinaryOperatorGetter;
+import com.ngandroid.lib.ng.Getter;
+import com.ngandroid.lib.ng.ModelBuilder;
+import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.ng.TernaryGetter;
 
+import java.lang.reflect.Field;
 import java.util.Queue;
 
 /**
@@ -304,7 +311,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals("joe"));
 
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.OPERATOR);
+        assertTrue(token.getTokenType() == TokenType.BINARY_OPERATOR);
         assertTrue(token.getScript().equals("+"));
 
         token = tokenqueue.poll();
@@ -320,7 +327,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals("frank"));
 
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.OPERATOR);
+        assertTrue(token.getTokenType() == TokenType.BINARY_OPERATOR);
         assertTrue(token.getScript().equals("=="));
 
         token = tokenqueue.poll();
@@ -342,7 +349,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getTokenType() == TokenType.MODEL_FIELD);
         assertTrue(token.getScript().equals("joe"));
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.OPERATOR);
+        assertTrue(token.getTokenType() == TokenType.BINARY_OPERATOR);
         assertTrue(token.getScript().equals("!="));
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == TokenType.STRING);
@@ -457,7 +464,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
                     assertEquals(token.getScript(), "a");
                     break;
                 case 3:
-                    assertEquals(token.getTokenType(), TokenType.OPERATOR);
+                    assertEquals(token.getTokenType(), TokenType.BINARY_OPERATOR);
                     assertEquals(token.getScript(), "+");
                     break;
                 case 4:
@@ -762,7 +769,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
                     assertEquals(token.getScript(), "joe");
                     break;
                 case 3:
-                    assertEquals(token.getTokenType(), TokenType.OPERATOR);
+                    assertEquals(token.getTokenType(), TokenType.BINARY_OPERATOR);
                     assertEquals(token.getScript(), "!=");
                     break;
                 case 4:
@@ -813,4 +820,41 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
             assertTrue(false);
         }catch(Exception ignored){}
     }
+
+
+    public static interface TestModel{
+        public String getJoe();
+        public void setJoe(String joe);
+    }
+
+    public static class TestContainer{
+        private TestModel modelName;
+    }
+
+    public void testExpressionBuilder() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("modelName.joe != 'orange'");
+        TestContainer tc = new TestContainer();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        ModelBuilder build =  map.get("modelName");
+        build.createField("joe");
+        try {
+            Field m = TestContainer.class.getDeclaredField("modelName");
+            m.setAccessible(true);
+            m.set(tc, map.get("modelName").create());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        Getter<Boolean> getter = builder.build(tc, map);
+        System.out.println(getter.getClass().getSimpleName());
+        assertTrue(getter instanceof BinaryOperatorGetter);
+        tc.modelName.setJoe("Joe");
+        System.out.println(tc.modelName.getJoe());
+        assertTrue(getter.get());
+        tc.modelName.setJoe("orange");
+        assertFalse(getter.get());
+
+    }
+
+
+
 }

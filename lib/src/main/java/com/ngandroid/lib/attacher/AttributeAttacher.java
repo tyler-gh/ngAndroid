@@ -69,18 +69,17 @@ public class AttributeAttacher {
                 int attr = array.getIndex(i);
                 Token[] tokens = new SyntaxParser(array.getString(attr)).parseScript();
                 NgAttribute attribute;
-
-                    if(attr == R.styleable.ngAndroid_ngModel){
-                        attribute = NgModel.getInstance();
-                    }else if (attr == R.styleable.ngAndroid_ngClick){
-                        attribute = NgClick.getInstance();
-                    } else if(attr == R.styleable.ngAndroid_ngLongClick){
-                        attribute = NgLongClick.getInstance();
-                    } else if(attr == R.styleable.ngAndroid_ngChange){
-                        attribute = NgChange.getInstance();
-                    }else {
-                        throw new UnsupportedOperationException("Attribute not currently implemented");
-                    }
+                if(attr == R.styleable.ngAndroid_ngModel){
+                    attribute = NgModel.getInstance();
+                }else if (attr == R.styleable.ngAndroid_ngClick){
+                    attribute = NgClick.getInstance();
+                } else if(attr == R.styleable.ngAndroid_ngLongClick){
+                    attribute = NgLongClick.getInstance();
+                } else if(attr == R.styleable.ngAndroid_ngChange){
+                    attribute = NgChange.getInstance();
+                }else {
+                    throw new UnsupportedOperationException("Attribute not currently implemented");
+                }
                 try {
                     attribute.attach(tokens, mModel, mBuilders, v.findViewById(id));
                 } catch (Throwable e) {

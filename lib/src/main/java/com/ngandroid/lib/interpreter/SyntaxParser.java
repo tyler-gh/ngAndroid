@@ -86,7 +86,7 @@ public class SyntaxParser {
             case KNOT:
                 afterKnot();
                 break;
-            case OPERATOR:
+            case BINARY_OPERATOR:
                 afterOperator();
                 break;
         }
@@ -130,13 +130,13 @@ public class SyntaxParser {
         if(inFunction){
             offerPop(TokenType.TERNARY_COLON);
             offerPop(TokenType.TERNARY_QUESTION_MARK);
-            offerPop(TokenType.OPERATOR);
+            offerPop(TokenType.BINARY_OPERATOR);
         }else {
             if (!
                 (
                     offerPop(TokenType.TERNARY_COLON) ||
                     offerPop(TokenType.TERNARY_QUESTION_MARK) ||
-                    offerPop(TokenType.OPERATOR) ||
+                    offerPop(TokenType.BINARY_OPERATOR) ||
                     offerPop(TokenType.EOF)
                 )
             ) {

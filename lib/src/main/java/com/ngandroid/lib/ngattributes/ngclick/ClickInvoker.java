@@ -19,6 +19,7 @@ package com.ngandroid.lib.ngattributes.ngclick;
 import android.view.View;
 
 import com.ngandroid.lib.ng.Getter;
+import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,12 +32,14 @@ public class ClickInvoker implements View.OnClickListener, Getter {
     private final Method mMethod;
     private final Object mModel;
     private final Getter[] mGetters;
+    private final int type;
 
     public ClickInvoker(Method method, Object model, Getter... getters) {
         this.mMethod = method;
         this.mModel = model;
         this.mGetters = getters;
         mMethod.setAccessible(true);
+        type = TypeUtils.getType(method.getReturnType());
     }
 
     @Override
@@ -62,5 +65,14 @@ public class ClickInvoker implements View.OnClickListener, Getter {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public int getType() {
+        return type;
+    }
+
+    public int getReturnType(){
+        return type;
     }
 }

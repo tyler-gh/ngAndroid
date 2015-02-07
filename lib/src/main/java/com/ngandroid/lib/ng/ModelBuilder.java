@@ -68,6 +68,13 @@ public class ModelBuilder {
         return mInvocationHandler;
     }
 
+    public void createField(String fieldName){
+        final String fieldNamelower = fieldName.toLowerCase();
+        int methodType = getMethodType(fieldNamelower);
+        setField(fieldNamelower, methodType, TypeUtils.getEmptyValue(methodType));
+        mMethodMap.put("set" + fieldNamelower, new ArrayList<ModelMethod>());
+    }
+
     public int getMethodType(String fieldNamelower) {
         int methodType = TypeUtils.STRING;
         for(Method m : mModelMethods){

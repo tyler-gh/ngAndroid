@@ -21,4 +21,5 @@ package com.ngandroid.lib.ng;
  */
 public interface Getter<T> {
     public T get() throws Throwable;
+    public int getType();
 }

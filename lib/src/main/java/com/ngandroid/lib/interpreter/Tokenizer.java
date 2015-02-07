@@ -186,7 +186,7 @@ public class Tokenizer {
             case KNOT_EQUALS:
             case EQUALS:
             case OPERATOR:
-                emit(TokenType.OPERATOR);
+                emit(TokenType.BINARY_OPERATOR);
                 result = getNextState();
                 break;
             default:

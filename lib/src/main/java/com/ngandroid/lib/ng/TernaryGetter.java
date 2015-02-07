@@ -34,4 +34,9 @@ public class TernaryGetter<T> implements Getter {
     public T get() throws Throwable {
         return booleanGetter.get() ? valTrue.get() : valFalse.get();
     }
+
+    @Override
+    public int getType() {
+        return valTrue.getType();
+    }
 }

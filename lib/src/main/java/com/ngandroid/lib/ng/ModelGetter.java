@@ -32,4 +32,8 @@ public class ModelGetter<T> implements Getter<T> {
     public T get() throws Throwable {
         return (T) mMethodInvoker.invoke("get" + mFieldName);
     }
+
+    public int getType(){
+        return mMethodInvoker.getType(mFieldName);
+    }
 }

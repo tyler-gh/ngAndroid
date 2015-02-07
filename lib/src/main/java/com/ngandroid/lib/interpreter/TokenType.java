@@ -29,19 +29,39 @@ public enum TokenType {
     CLOSE_PARENTHESIS,
     COMMA,
     PERIOD,
-    OPERATOR,
+    BINARY_OPERATOR,
     NUMBER_CONSTANT,
     RUBBISH,
-    EOF, STRING, KNOT;
+    EOF,
+    STRING,
+    KNOT;
 
-    public enum Operator {
+    public enum BinaryOperator {
         ADDITION,
-        KNOT,
         SUBTRACTION,
         KNOT_EQUALS,
         MULTIPLICATION,
         DIVISION,
-        EQUALS_EQUALS
+        EQUALS_EQUALS;
+
+        public static BinaryOperator getOperator(String op){
+            switch(op){
+                case "+":
+                    return ADDITION;
+                case "-":
+                    return SUBTRACTION;
+                case "/":
+                    return DIVISION;
+                case "*":
+                    return MULTIPLICATION;
+                case "==":
+                    return EQUALS_EQUALS;
+                case "!=":
+                    return KNOT_EQUALS;
+                default:
+                    throw new RuntimeException("Unrecognized operator");
+            }
+        }
     }
 }
 

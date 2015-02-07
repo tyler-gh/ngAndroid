@@ -18,6 +18,7 @@ package com.ngandroid.lib.ngattributes.ngclick;
 
 import android.view.View;
 
+import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.ng.Getter;
@@ -63,7 +64,7 @@ public class NgClick implements NgAttribute {
             // TODO error
             throw new RuntimeException(new NoSuchMethodException("There is no method " + functionName + " found in " + mModel.getClass().getSimpleName()));
         }
-        Getter[] parameters = createParameters(functionNameIndex+2, parametersEndPadding, tokens, builders);
+        Getter[] parameters =  createParameters(functionNameIndex+2, parametersEndPadding, tokens, builders);
         return new ClickInvoker(method, mModel, parameters);
     }
 
@@ -96,7 +97,7 @@ public class NgClick implements NgAttribute {
             switch(token.getTokenType()){
                 case NUMBER_CONSTANT: {
                     // TODO add support for floats, doubles, and longs
-                    getters.add(new StaticGetter(Integer.parseInt(token.getScript())));
+                    getters.add(new StaticGetter(Integer.parseInt(token.getScript()), TypeUtils.INTEGER));
                     index++;
                     break;
                 }
@@ -109,7 +110,7 @@ public class NgClick implements NgAttribute {
                     break;
                 }
                 case STRING: {
-                    getters.add(new StaticGetter(token.getScript()));
+                    getters.add(new StaticGetter(token.getScript(), TypeUtils.STRING));
                     index++;
                     break;
                 }

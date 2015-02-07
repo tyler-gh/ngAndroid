@@ -16,6 +16,7 @@
 
 package com.ngandroid.lib.interpreter;
 
+import com.ngandroid.lib.ng.BinaryOperatorGetter;
 import com.ngandroid.lib.ng.Getter;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
@@ -23,9 +24,13 @@ import com.ngandroid.lib.ng.ModelGetter;
 import com.ngandroid.lib.ng.StaticGetter;
 import com.ngandroid.lib.ng.TernaryGetter;
 import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
+import com.ngandroid.lib.utils.Tuple;
+import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by tyler on 2/2/15.
@@ -34,14 +39,21 @@ public class ExpressionBuilder<T> {
 
     private final Token[] tokens;
 
+    public ExpressionBuilder(String expression){
+        this(new SyntaxParser(expression).parseScript());
+    }
+
+
     public ExpressionBuilder(Token[] tokens) {
         this.tokens = tokens;
     }
 
-    public Expression<T> build(Object mModel,ModelBuilderMap builders){
-        Getter[] getters = createGetters(0, tokens.length - 2, mModel, tokens, builders, Integer.MAX_VALUE);
-
-        return null;
+    public Getter<T> build(Object mModel,ModelBuilderMap builders){
+        Getter[] getters = createGetters(0, 1, mModel, tokens, builders, Integer.MAX_VALUE).getFirst();
+        if(getters.length != 1){
+            throw new RuntimeException("Each expression can only return one value");
+        }
+        return (Getter<T>) getters[0];
     }
 
 
@@ -72,9 +84,8 @@ public class ExpressionBuilder<T> {
         throw new RuntimeException("Ternary is not formed properly");
     }
 
-    private Getter[] createGetters(int startIndex, int endPadding, Object mModel, Token[] tokens, ModelBuilderMap builders, int limit){
-        ArrayList<Getter> getters = new ArrayList<>();
-
+    public Tuple<Getter[], Integer> createGetters(int startIndex, int endPadding, Object mModel, Token[] tokens, ModelBuilderMap builders, int limit){
+        List<Getter> getters = new ArrayList<>();
         int count = 0;
         int index = startIndex;
         while (index < tokens.length - endPadding && count < limit){
@@ -85,14 +96,16 @@ public class ExpressionBuilder<T> {
                     String functionName = token.getScript();
                     Method method = findMethod(functionName, mModel.getClass());
                     int endIndex = findEndOfFunction(tokens, index+2);
-                    Getter[] parameters = createGetters(index+2, endIndex,mModel, tokens, builders, Integer.MAX_VALUE);
+                    Tuple<Getter[], Integer> values = createGetters(index+2, endIndex,mModel, tokens, builders, Integer.MAX_VALUE);
+                    Getter[] parameters = values.getFirst();
+                    index = values.getSecond();
                     getters.add(new ClickInvoker(method, mModel, parameters));
                     break;
                 }
 
                 case NUMBER_CONSTANT: {
                     // TODO add support for floats, doubles, and longs
-                    getters.add(new StaticGetter<>(Integer.parseInt(token.getScript())));
+                    getters.add(new StaticGetter<>(Integer.parseInt(token.getScript()), TypeUtils.INTEGER));
                     index++;
                     break;
                 }
@@ -105,7 +118,7 @@ public class ExpressionBuilder<T> {
                     break;
                 }
                 case STRING: {
-                    getters.add(new StaticGetter<>(token.getScript()));
+                    getters.add(new StaticGetter<>(token.getScript(), TypeUtils.STRING));
                     index++;
                     break;
                 }
@@ -114,23 +127,51 @@ public class ExpressionBuilder<T> {
                     break;
                 }
                 case TERNARY_QUESTION_MARK: {
-                    if(getters.size() == 0){
-                        throw new RuntimeException("Ternary Question mark cannot be the first expression.");
-                    }
-                    Getter<Boolean> getter =  getters.get(getters.size() - 1);
-                    getters.remove(getter);
+                    Getter<Boolean> getter =  getMostRecentGetter(getters, "Ternary Question mark cannot be the first expression.");
                     int ternaryColonIndex = findColon(tokens, index);
-                    Getter trueGetter = createGetters(index + 1, ternaryColonIndex, mModel, tokens, builders, 1)[0];
-                    Getter falseGetter = createGetters(ternaryColonIndex + 1, endPadding, mModel, tokens, builders, 1)[0];
+                    Tuple<Getter[], Integer> values = createGetters(index + 1, ternaryColonIndex, mModel, tokens, builders, 1);
+                    Getter trueGetter = values.getFirst()[0];
+                    values = createGetters(ternaryColonIndex + 1, endPadding, mModel, tokens, builders, 1);
+                    Getter falseGetter = values.getFirst()[0];
+                    index = values.getSecond();
                     getters.add(new TernaryGetter(getter, trueGetter, falseGetter));
                     break;
                 }
+                case BINARY_OPERATOR: {
+                    Getter leftgetter =  getMostRecentGetter(getters, "Binary Operator cannot be the first expression.");
+                    TokenType.BinaryOperator operator = TokenType.BinaryOperator.getOperator(token.getScript());
+                    Tuple<Getter[], Integer> values = createGetters(index + 1, endPadding, mModel, tokens, builders, 1);
+                    Getter rightgetter = values.getFirst()[0];
+                    index = values.getSecond();
+                    int lefttype = leftgetter.getType();
+                    int righttype = rightgetter.getType();
+                    int type;
+                    if(lefttype == TypeUtils.STRING || righttype == TypeUtils.STRING){
+                        type = TypeUtils.STRING;
+                    }else{
+                        if(lefttype != righttype)
+                            throw new RuntimeException("Types must match up");
+                        type = lefttype;
+                    }
+                    getters.add(BinaryOperatorGetter.getOperator(leftgetter, rightgetter, type, operator));
+                    break;
+                }
+
                 default:
                     throw new RuntimeException("Invalid token in function parameter " + token.getTokenType());
             }
         }
 
-        return getters.toArray(new Getter[getters.size()]);
+        return Tuple.of(getters.toArray(new Getter[getters.size()]), index);
+    }
+
+    private Getter getMostRecentGetter(List<Getter> getters, String error){
+        if(getters.size() == 0){
+            throw new RuntimeException(error);
+        }
+        Getter getter =  getters.get(getters.size() - 1);
+        getters.remove(getter);
+        return getter;
     }
 
 }
