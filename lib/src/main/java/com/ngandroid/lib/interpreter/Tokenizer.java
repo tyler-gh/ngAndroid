@@ -207,6 +207,9 @@ public class Tokenizer {
 
             char currentCharacter = script.charAt(index);
 
+            if(state == State.IN_STRING && currentCharacter != '\'')
+                return state;
+
             if (Character.isDigit(currentCharacter)) {
                 switch (state){
                     case IN_NUMBER_CONSTANT:
@@ -276,10 +279,9 @@ public class Tokenizer {
                 case '/':
                     return State.OPERATOR;
             }
-            if(state == State.IN_STRING)
-                return state;
+
             //        TODO throw error
-            throw new RuntimeException("Invalid character : " + currentCharacter);
+            throw new RuntimeException("Invalid character : " + currentCharacter + " in state " + state);
         }finally {
             advance();
         }

@@ -63,13 +63,12 @@ public class NgModel implements NgAttribute {
     public void bindModelToTextView(String fieldName, final TextView textView, ModelBuilder builder) throws Exception {
         final String fieldNamelower = fieldName.toLowerCase();
         String defaultText =  textView.getText().toString();
-
         int methodType = builder.getMethodType(fieldNamelower);
         builder.setField(fieldNamelower, methodType, TypeUtils.fromString(methodType, defaultText));
         final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(new ModelSetter(fieldNamelower, builder.getMethodInvoker()), methodType);
         textView.addTextChangedListener(setTextWhenChangedListener);
         // TODO clean this up
-        ModelMethod method = new ModelMethod(){
+        builder.addSetObserver(fieldNamelower, new ModelMethod(){
             @Override
             public Object invoke(String fieldName, Object... args) {
                 String value = String.valueOf(args[0]);
@@ -80,10 +79,7 @@ public class NgModel implements NgAttribute {
                 }
                 return null;
             }
-        };
-        String methodName = "set" + fieldNamelower;
-        List<ModelMethod> methods = builder.getMethods(methodName);
-        methods.add(method);
+        });
     }
 
 

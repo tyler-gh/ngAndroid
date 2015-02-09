@@ -54,7 +54,19 @@ public class ModelBuilder {
         }
         mInvocationHandler = new MethodInvoker(mMethodMap, mFieldMap);
         mModelMethods = mClass.getDeclaredMethods();
+        createFields();
     }
+
+    private void createFields(){
+        for(Method method : mModelMethods){
+            String name = method.getName().toLowerCase();
+            if(name.startsWith("set")){
+                createField(name.substring(3));
+            }
+        }
+    }
+
+
 
     public Object create(){
         return Proxy.newProxyInstance(mClass.getClassLoader(), new Class[]{mClass}, new Model(mInvocationHandler));
@@ -68,7 +80,7 @@ public class ModelBuilder {
         return mInvocationHandler;
     }
 
-    public void createField(String fieldName){
+    private void createField(String fieldName){
         final String fieldNamelower = fieldName.toLowerCase();
         int methodType = getMethodType(fieldNamelower);
         setField(fieldNamelower, methodType, TypeUtils.getEmptyValue(methodType));
@@ -86,12 +98,16 @@ public class ModelBuilder {
         return methodType;
     }
 
-    public List<ModelMethod> getMethods(String methodName) {
-        List<ModelMethod> methods = mMethodMap.get(methodName);
-        if(methods == null){
-            methods = new ArrayList<>();
-            mMethodMap.put(methodName, methods);
-        }
-        return  methods;
+    public void addSetObserver(String fieldName, ModelMethod method){
+        mMethodMap.get("set" + fieldName).add(method);
     }
+
+//    private List<ModelMethod> getMethods(String methodName) {
+//        List<ModelMethod> methods = mMethodMap.get(methodName);
+//        if(methods == null){
+//            methods = new ArrayList<>();
+//            mMethodMap.put(methodName, methods);
+//        }
+//        return  methods;
+//    }
 }

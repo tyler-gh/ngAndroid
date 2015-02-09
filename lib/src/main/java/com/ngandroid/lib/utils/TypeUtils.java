@@ -45,6 +45,7 @@ public class TypeUtils {
             return BYTE;
         if(boolean.class.equals(clzz) || Boolean.class.equals(clzz))
             return BOOLEAN;
+        System.out.println(clzz.getSimpleName());
         return OBJECT;
     }
 

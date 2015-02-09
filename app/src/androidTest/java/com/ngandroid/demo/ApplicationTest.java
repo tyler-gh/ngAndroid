@@ -10,9 +10,11 @@ import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.interpreter.Tokenizer;
 import com.ngandroid.lib.ng.BinaryOperatorGetter;
 import com.ngandroid.lib.ng.Getter;
+import com.ngandroid.lib.ng.MethodInvoker;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.TernaryGetter;
+import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
 
 import java.lang.reflect.Field;
 import java.util.Queue;
@@ -827,16 +829,28 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         public void setJoe(String joe);
     }
 
-    public static class TestContainer{
+    public class TestContainer{
         private TestModel modelName;
+        private void method(){
+        }
+        private void method(String value){
+            System.out.println(value);
+        }
+        private void method(int value){
+            System.out.println(value);
+        }
+        private String getStringValue(){
+            return "This is a string value ";
+        }
+        private int getIntValue(){
+            return 42;
+        }
     }
 
     public void testExpressionBuilder() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("modelName.joe != 'orange'");
         TestContainer tc = new TestContainer();
         ModelBuilderMap map = new ModelBuilderMap(tc);
-        ModelBuilder build =  map.get("modelName");
-        build.createField("joe");
         try {
             Field m = TestContainer.class.getDeclaredField("modelName");
             m.setAccessible(true);
@@ -852,7 +866,64 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(getter.get());
         tc.modelName.setJoe("orange");
         assertFalse(getter.get());
+    }
 
+
+
+    public void testFunctionExpression() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("method()");
+        TestContainer tc = new TestContainer();
+        Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
+        assertTrue(getter instanceof ClickInvoker);
+        try {
+            getter.get();
+        }catch (Throwable e){
+            assertTrue(false);
+        }
+
+    }
+
+    public void testMethodTypeFinding() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("method('string')");
+        TestContainer tc = new TestContainer();
+        Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
+        assertTrue(getter instanceof ClickInvoker);
+        try {
+            getter.get();
+        }catch (Throwable e){
+            assertTrue(false);
+        }
+
+        builder = new ExpressionBuilder("method(58)");
+        getter = builder.build(tc, new ModelBuilderMap(tc));
+        assertTrue(getter instanceof ClickInvoker);
+        try {
+            getter.get();
+        }catch (Throwable e){
+            assertTrue(false);
+        }
+    }
+
+    public void testMethodInMethod() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("method(getStringValue())");
+        TestContainer tc = new TestContainer();
+        Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
+        assertTrue(getter instanceof ClickInvoker);
+        try {
+            getter.get();
+        }catch (Throwable e){
+            assertTrue(false);
+        }
+
+        builder = new ExpressionBuilder("method('Int value = ' + getIntValue())");
+        tc = new TestContainer();
+        getter = builder.build(tc, new ModelBuilderMap(tc));
+        assertTrue(getter instanceof ClickInvoker);
+        try {
+            getter.get();
+        }catch (Throwable e){
+            assertTrue(false);
+        }
     }
 
 

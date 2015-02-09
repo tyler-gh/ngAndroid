@@ -161,7 +161,10 @@ public class SyntaxParser {
             (
                 offerPop(TokenType.TERNARY_COLON) ||
                 offerPop(TokenType.TERNARY_QUESTION_MARK) ||
-                offerPop(TokenType.EOF)
+                offerPop(TokenType.BINARY_OPERATOR) ||
+                offerPop(TokenType.EOF) ||
+                topIs(TokenType.COMMA) ||
+                topIs(TokenType.CLOSE_PARENTHESIS)
             )
         ){
             // TODO error
@@ -169,12 +172,17 @@ public class SyntaxParser {
         }
     }
 
+    private boolean topIs(TokenType tokenType) {
+        return mTokens.peek().getTokenType() == tokenType;
+    }
+
     private void continueFunction(){
         if(!
             (
                 offerPop(TokenType.MODEL_NAME) ||
                 offerPop(TokenType.STRING) ||
-                offerPop(TokenType.NUMBER_CONSTANT)
+                offerPop(TokenType.NUMBER_CONSTANT) ||
+                offerPop(TokenType.FUNCTION_NAME)
             )
         ){
             // TODO error

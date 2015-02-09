@@ -49,22 +49,32 @@ public class ExpressionBuilder<T> {
     }
 
     public Getter<T> build(Object mModel,ModelBuilderMap builders){
-        Getter[] getters = createGetters(0, 1, mModel, tokens, builders, Integer.MAX_VALUE).getFirst();
+        Getter[] getters = createGetters(0, tokens.length - 1, mModel, tokens, builders).getFirst();
         if(getters.length != 1){
-            throw new RuntimeException("Each expression can only return one value");
+            for(Getter g : getters)
+                System.out.println(g.getClass().getSimpleName());
+            throw new RuntimeException("Each expression can only return one value instead found "+ getters.length);
         }
         return (Getter<T>) getters[0];
     }
 
 
-    private Method findMethod(String functionName, Class<?> clss){
+    private Method findMethod(String functionName, Class<?> clss, int[] types){
         Method[] methods = clss.getDeclaredMethods();
+        outerLoop:
         for(Method m : methods){
             if(m.getName().toLowerCase().equals(functionName.toLowerCase())){
-                return m;
+                Class<?>[] paramTypes = m.getParameterTypes();
+                if(paramTypes.length == types.length) {
+                    for (int index = 0; index < types.length; index++) {
+                        if(TypeUtils.getType(paramTypes[index]) != types[index])
+                            continue outerLoop;
+                    }
+                    return m;
+                }
             }
         }
-        throw new RuntimeException(new NoSuchMethodException("There is no method " + functionName + " found in " + clss.getSimpleName()));
+        throw new RuntimeException(new NoSuchMethodException("There is no method " + functionName + " found in " + clss.getSimpleName()) + " with " + types.length + " matching types");
 
     }
 
@@ -84,21 +94,23 @@ public class ExpressionBuilder<T> {
         throw new RuntimeException("Ternary is not formed properly");
     }
 
-    public Tuple<Getter[], Integer> createGetters(int startIndex, int endPadding, Object mModel, Token[] tokens, ModelBuilderMap builders, int limit){
+    public Tuple<Getter[], Integer> createGetters(int startIndex, int endIndex, Object mModel, Token[] tokens, ModelBuilderMap builders){
         List<Getter> getters = new ArrayList<>();
-        int count = 0;
         int index = startIndex;
-        while (index < tokens.length - endPadding && count < limit){
+        while (index < endIndex){
             Token token = tokens[index];
-            count++;
             switch(token.getTokenType()){
                 case FUNCTION_NAME:{
-                    String functionName = token.getScript();
-                    Method method = findMethod(functionName, mModel.getClass());
-                    int endIndex = findEndOfFunction(tokens, index+2);
-                    Tuple<Getter[], Integer> values = createGetters(index+2, endIndex,mModel, tokens, builders, Integer.MAX_VALUE);
+                    int end = findEndOfFunction(tokens, index+2);
+                    Tuple<Getter[], Integer> values = createGetters(index+2, end,mModel, tokens, builders);
                     Getter[] parameters = values.getFirst();
                     index = values.getSecond();
+                    String functionName = token.getScript();
+                    int[]paramTypes = new int[parameters.length];
+                    for(int i = 0; i < paramTypes.length; i++){
+                        paramTypes[i] = parameters[i].getType();
+                    }
+                    Method method = findMethod(functionName, mModel.getClass(), paramTypes);
                     getters.add(new ClickInvoker(method, mModel, parameters));
                     break;
                 }
@@ -122,6 +134,7 @@ public class ExpressionBuilder<T> {
                     index++;
                     break;
                 }
+                case CLOSE_PARENTHESIS:
                 case COMMA:{
                     index++;
                     break;
@@ -129,9 +142,9 @@ public class ExpressionBuilder<T> {
                 case TERNARY_QUESTION_MARK: {
                     Getter<Boolean> getter =  getMostRecentGetter(getters, "Ternary Question mark cannot be the first expression.");
                     int ternaryColonIndex = findColon(tokens, index);
-                    Tuple<Getter[], Integer> values = createGetters(index + 1, ternaryColonIndex, mModel, tokens, builders, 1);
+                    Tuple<Getter[], Integer> values = createGetters(index + 1, ternaryColonIndex, mModel, tokens, builders);
                     Getter trueGetter = values.getFirst()[0];
-                    values = createGetters(ternaryColonIndex + 1, endPadding, mModel, tokens, builders, 1);
+                    values = createGetters(ternaryColonIndex + 1, endIndex, mModel, tokens, builders);
                     Getter falseGetter = values.getFirst()[0];
                     index = values.getSecond();
                     getters.add(new TernaryGetter(getter, trueGetter, falseGetter));
@@ -140,7 +153,7 @@ public class ExpressionBuilder<T> {
                 case BINARY_OPERATOR: {
                     Getter leftgetter =  getMostRecentGetter(getters, "Binary Operator cannot be the first expression.");
                     TokenType.BinaryOperator operator = TokenType.BinaryOperator.getOperator(token.getScript());
-                    Tuple<Getter[], Integer> values = createGetters(index + 1, endPadding, mModel, tokens, builders, 1);
+                    Tuple<Getter[], Integer> values = createGetters(index + 1, endIndex, mModel, tokens, builders);
                     Getter rightgetter = values.getFirst()[0];
                     index = values.getSecond();
                     int lefttype = leftgetter.getType();
@@ -150,15 +163,16 @@ public class ExpressionBuilder<T> {
                         type = TypeUtils.STRING;
                     }else{
                         if(lefttype != righttype)
-                            throw new RuntimeException("Types must match up");
+                            throw new RuntimeException("Types " + lefttype + " & " + righttype + " cannot be compared");
                         type = lefttype;
                     }
                     getters.add(BinaryOperatorGetter.getOperator(leftgetter, rightgetter, type, operator));
                     break;
                 }
 
+
                 default:
-                    throw new RuntimeException("Invalid token in function parameter " + token.getTokenType());
+                    throw new RuntimeException("Invalid token in expression: " + token.getTokenType());
             }
         }
 
