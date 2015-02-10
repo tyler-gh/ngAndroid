@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ng.getters;
 
 /**
  * Created by davityle on 1/24/15.
  */
-public interface Setter {
-    public void set(Object ... parameters) throws Throwable;
+public interface Getter<T> {
+    public T get() throws Throwable;
+    public int getType();
 }

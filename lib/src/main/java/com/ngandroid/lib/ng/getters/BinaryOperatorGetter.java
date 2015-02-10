@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ng.getters;
 
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.utils.TypeUtils;
@@ -206,5 +206,13 @@ public abstract class BinaryOperatorGetter implements Getter {
                     throw new RuntimeException("You cannot divide an Object");
             }
         }
+    }
+
+    public Getter getLeftSide(){
+        return leftSide;
+    }
+
+    public Getter getRightSide(){
+        return rightSide;
     }
 }

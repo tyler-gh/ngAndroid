@@ -25,10 +25,10 @@ import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.ModelMethod;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.ng.ModelSetter;
+import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.ng.getters.ModelGetter;
+import com.ngandroid.lib.ng.setters.ModelSetter;
 import com.ngandroid.lib.utils.TypeUtils;
-
-import java.util.List;
 
 /**
  * Created by davityle on 1/17/15.
@@ -42,28 +42,29 @@ public class NgModel implements NgAttribute {
 
     private NgModel() {}
 
-    public void typeCheck(Token[] tokens){
+    public void typeCheck(Token[] tokens, Getter getter){
         TypeUtils.strictTypeCheck(tokens, TokenType.MODEL_NAME, TokenType.PERIOD, TokenType.MODEL_FIELD, TokenType.EOF);
     }
 
-    public void attach(final Token[] tokens, Object mModel, ModelBuilderMap builders, View bindView) throws Exception {
-        typeCheck(tokens);
-        String modelName = tokens[0].getScript();
-        String fieldName = tokens[2].getScript();
-        ModelBuilder builder = builders.get(modelName);
-        bindModelView(fieldName, bindView, builder);
+    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View bindView) throws Exception {
+        if(!(getter instanceof ModelGetter)){
+            throw new RuntimeException("You must only use models in ngModel");
+        }
+        ModelGetter modelGetter = (ModelGetter) getter;
+        ModelBuilder modelBuilder = modelBuilderMap.get(modelGetter.getModelName());
+        bindModelView(modelGetter, bindView, modelBuilder);
     }
 
-    public void bindModelView(String fieldName, View view, ModelBuilder builder) throws Exception {
+    public void bindModelView(ModelGetter getter, View view, ModelBuilder builder) throws Exception {
         if(view instanceof  TextView){
-            bindModelToTextView(fieldName, (TextView)view, builder);
+            bindModelToTextView(getter, (TextView)view, builder);
         }
     }
 
-    public void bindModelToTextView(String fieldName, final TextView textView, ModelBuilder builder) throws Exception {
-        final String fieldNamelower = fieldName.toLowerCase();
+    public void bindModelToTextView(ModelGetter getter, final TextView textView, ModelBuilder builder) throws Exception {
+        final String fieldNamelower = getter.getFieldName();
         String defaultText =  textView.getText().toString();
-        int methodType = builder.getMethodType(fieldNamelower);
+        int methodType = getter.getType();
         builder.setField(fieldNamelower, methodType, TypeUtils.fromString(methodType, defaultText));
         final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(new ModelSetter(fieldNamelower, builder.getMethodInvoker()), methodType);
         textView.addTextChangedListener(setTextWhenChangedListener);

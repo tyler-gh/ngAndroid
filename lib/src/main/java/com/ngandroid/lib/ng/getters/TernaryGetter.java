@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ng.getters;
 
 /**
  * Created by tyler on 2/2/15.
@@ -38,5 +38,17 @@ public class TernaryGetter<T> implements Getter {
     @Override
     public int getType() {
         return valTrue.getType();
+    }
+
+    public Getter<Boolean> getBooleanGetter(){
+        return booleanGetter;
+    }
+
+    public Getter getTrueGetter(){
+        return valTrue;
+    }
+
+    public Getter getFalseGetter(){
+        return valFalse;
     }
 }

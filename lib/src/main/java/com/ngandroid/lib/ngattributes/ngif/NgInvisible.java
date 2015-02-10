@@ -14,33 +14,26 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.interpreter;
+package com.ngandroid.lib.ngattributes.ngif;
 
 import android.view.View;
 
-import com.ngandroid.lib.ng.Getter;
-import com.ngandroid.lib.ng.ModelBuilder;
-import com.ngandroid.lib.ng.ModelBuilderMap;
-import com.ngandroid.lib.ng.ModelGetter;
-import com.ngandroid.lib.ng.StaticGetter;
-import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
-import com.ngandroid.lib.ngattributes.nglongclick.LongClickInvoker;
-import com.ngandroid.lib.utils.TypeUtils;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
+import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ng.getters.Getter;
 
 /**
- * Created by tyler on 2/2/15.
+ * Created by tyler on 2/10/15.
  */
-public class Expression<T> {
+public class NgInvisible extends NgIf {
+    private static NgInvisible ngInvisible = new NgInvisible();
+    private NgInvisible(){}
 
-    public T invokeExpression(){
-
-       return null;
+    public static NgInvisible getInstance() {
+        return ngInvisible;
     }
 
-
-
-
+    @Override
+    protected FireCheckObserver getCheckObserver(Getter<Boolean> getter, View view) {
+        return new FireCheckObserver(getter, view, false);
+    }
 }

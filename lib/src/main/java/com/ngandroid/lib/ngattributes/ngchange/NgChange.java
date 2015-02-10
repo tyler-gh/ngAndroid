@@ -27,6 +27,7 @@ import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
 import com.ngandroid.lib.ngattributes.ngclick.NgClick;
 import com.ngandroid.lib.utils.TypeUtils;
@@ -45,15 +46,14 @@ public class NgChange implements NgAttribute {
     private NgChange() {}
 
     @Override
-    public void typeCheck(Token[] tokens) {
+    public void typeCheck(Token[] tokens, Getter getter) {
         TypeUtils.startsWith(tokens, TokenType.FUNCTION_NAME);
         TypeUtils.endsWith(tokens, TokenType.CLOSE_PARENTHESIS);
     }
 
     @Override
-    public void attach(Token[] tokens, Object mModel, ModelBuilderMap builders, View bindView) throws Exception {
-        typeCheck(tokens);
-        final ClickInvoker invoker = NgClick.getInstance().getInvoker(tokens, mModel, builders, 0, 2);
+    public void attach(Getter getter, ModelBuilderMap builders, View bindView) throws Exception {
+        final ClickInvoker invoker = (ClickInvoker) getter;
         if(bindView instanceof CompoundButton){
             RadioButton button = (RadioButton) bindView;
             button.setOnClickListener(invoker);

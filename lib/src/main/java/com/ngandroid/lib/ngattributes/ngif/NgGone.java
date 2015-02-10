@@ -14,12 +14,28 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ngattributes.ngif;
+
+import android.view.View;
+
+import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ng.getters.Getter;
 
 /**
- * Created by davityle on 1/24/15.
+ * Created by tyler on 2/10/15.
  */
-public interface Getter<T> {
-    public T get() throws Throwable;
-    public int getType();
+public class NgGone extends NgIf {
+
+    private static NgGone ngGone = new NgGone();
+
+    private NgGone(){}
+
+    public static NgGone getInstance() {
+        return ngGone;
+    }
+
+    @Override
+    protected FireCheckObserver getCheckObserver(Getter<Boolean> getter, View view) {
+        return new FireCheckObserver(getter, view, true);
+    }
 }

@@ -14,32 +14,24 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ng.setters;
 
-import com.ngandroid.lib.utils.TypeUtils;
+import com.ngandroid.lib.ng.MethodInvoker;
 
 /**
  * Created by davityle on 1/24/15.
  */
-public class StaticGetter<T> implements Getter<T>{
-    private final T object;
-    private final int type;
+public class ModelSetter implements Setter {
 
-    public StaticGetter(T object, int type) {
-        if(type == TypeUtils.STRING){
-            String value = (String) object;
-            this.object = (T) value.substring(1, value.length() - 1);
-        }else
-            this.object = object;
-        this.type = type;
+    private final String mFieldName;
+    private final MethodInvoker mMethodInvoker;
+
+    public ModelSetter(String mFieldName, MethodInvoker mMethodInvoker) {
+        this.mFieldName = mFieldName;
+        this.mMethodInvoker = mMethodInvoker;
     }
 
-    @Override
-    public T get() throws Throwable {
-        return object;
-    }
-
-    public int getType(){
-        return type;
+    public void set(Object ... parameters) throws Throwable {
+        mMethodInvoker.invoke("set" + mFieldName, parameters);
     }
 }

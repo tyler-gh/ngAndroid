@@ -208,6 +208,7 @@ public class SyntaxParser {
                 offerPop(TokenType.MODEL_NAME) ||
                 offerPop(TokenType.FUNCTION_NAME) ||
                 offerPop(TokenType.NUMBER_CONSTANT) ||
+                offerPop(TokenType.KNOT) ||
                 offerPop(TokenType.STRING)
             )
         ){

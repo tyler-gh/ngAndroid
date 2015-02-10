@@ -23,6 +23,7 @@ import android.util.ArrayMap;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -99,15 +100,23 @@ public class ModelBuilder {
     }
 
     public void addSetObserver(String fieldName, ModelMethod method){
-        mMethodMap.get("set" + fieldName).add(method);
+        mMethodMap.get("set" + fieldName.toLowerCase()).add(method);
     }
 
-//    private List<ModelMethod> getMethods(String methodName) {
-//        List<ModelMethod> methods = mMethodMap.get(methodName);
-//        if(methods == null){
-//            methods = new ArrayList<>();
-//            mMethodMap.put(methodName, methods);
-//        }
-//        return  methods;
-//    }
+    public static void buildModel(Object model, ModelBuilderMap map){
+        for(Map.Entry<String, com.ngandroid.lib.ng.ModelBuilder> entry : map.entrySet()){
+            attachDynamicField(entry.getValue().create(), entry.getKey(), model);
+        }
+    }
+
+    private static void attachDynamicField(Object dynamicField, String modelName, Object model){
+        try {
+            Field f = model.getClass().getDeclaredField(modelName);
+            f.setAccessible(true);
+            f.set(model, dynamicField);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // TODO rename error
+            throw new RuntimeException("There is not a field in " + model.getClass().getSimpleName() + " called " + modelName);
+        }
+    }
 }

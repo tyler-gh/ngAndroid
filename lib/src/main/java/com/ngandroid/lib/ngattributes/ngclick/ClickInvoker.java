@@ -18,7 +18,7 @@ package com.ngandroid.lib.ngattributes.ngclick;
 
 import android.view.View;
 
-import com.ngandroid.lib.ng.Getter;
+import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.InvocationTargetException;

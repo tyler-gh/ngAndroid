@@ -16,20 +16,20 @@
 
 package com.ngandroid.lib.interpreter;
 
-import com.ngandroid.lib.ng.BinaryOperatorGetter;
-import com.ngandroid.lib.ng.Getter;
+import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
+import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
-import com.ngandroid.lib.ng.ModelGetter;
-import com.ngandroid.lib.ng.StaticGetter;
-import com.ngandroid.lib.ng.TernaryGetter;
+import com.ngandroid.lib.ng.getters.KnotGetter;
+import com.ngandroid.lib.ng.getters.ModelGetter;
+import com.ngandroid.lib.ng.getters.StaticGetter;
+import com.ngandroid.lib.ng.getters.TernaryGetter;
 import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -114,7 +114,13 @@ public class ExpressionBuilder<T> {
                     getters.add(new ClickInvoker(method, mModel, parameters));
                     break;
                 }
-
+                case KNOT:{
+                    Tuple<Getter[], Integer> value = createGetters(index+1, endIndex,mModel, tokens, builders);
+                    KnotGetter getter = new KnotGetter(value.getFirst()[0]);
+                    index = value.getSecond();
+                    getters.add(getter);
+                    break;
+                }
                 case NUMBER_CONSTANT: {
                     // TODO add support for floats, doubles, and longs
                     getters.add(new StaticGetter<>(Integer.parseInt(token.getScript()), TypeUtils.INTEGER));
@@ -125,7 +131,7 @@ public class ExpressionBuilder<T> {
                     String modelName = token.getScript();
                     String fieldName = tokens[index + 2].getScript();
                     ModelBuilder builder = builders.get(modelName);
-                    getters.add(new ModelGetter(fieldName, builder.getMethodInvoker()));
+                    getters.add(new ModelGetter(fieldName, modelName, builder.getMethodInvoker()));
                     index += 3;
                     break;
                 }

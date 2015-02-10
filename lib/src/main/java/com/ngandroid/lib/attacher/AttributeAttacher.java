@@ -28,13 +28,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ngandroid.lib.R;
+import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.SyntaxParser;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ngattributes.ngchange.NgChange;
 import com.ngandroid.lib.ngattributes.ngclick.NgClick;
+import com.ngandroid.lib.ngattributes.ngif.NgGone;
+import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
 import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
 import com.ngandroid.lib.ngattributes.ngmodel.NgModel;
 
@@ -51,8 +55,6 @@ public class AttributeAttacher {
     private final SparseArray<TypedArray> mAttrArray;
     private final ModelBuilderMap mBuilders;
 
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     public AttributeAttacher(final Context context, Object model) {
         this.mModel = model;
         this.mAttrArray = new SparseArray<>();
@@ -68,6 +70,8 @@ public class AttributeAttacher {
             for(int i = 0 ; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
                 Token[] tokens = new SyntaxParser(array.getString(attr)).parseScript();
+                Getter getter = new ExpressionBuilder(tokens).build(mModel, mBuilders);
+
                 NgAttribute attribute;
                 if(attr == R.styleable.ngAndroid_ngModel){
                     attribute = NgModel.getInstance();
@@ -77,33 +81,23 @@ public class AttributeAttacher {
                     attribute = NgLongClick.getInstance();
                 } else if(attr == R.styleable.ngAndroid_ngChange){
                     attribute = NgChange.getInstance();
+                }else if(attr == R.styleable.ngAndroid_ngGone){
+                    attribute = NgInvisible.getInstance();
+                } else if(attr == R.styleable.ngAndroid_ngInvisible){
+                    attribute = NgGone.getInstance();
                 }else {
                     throw new UnsupportedOperationException("Attribute not currently implemented");
                 }
                 try {
-                    attribute.attach(tokens, mModel, mBuilders, v.findViewById(id));
+                    attribute.typeCheck(tokens, getter);
+                    attribute.attach(getter, mBuilders, v.findViewById(id));
                 } catch (Throwable e) {
                     throw new RuntimeException(e);
                 }
             }
         }
-
-        for(Map.Entry<String, ModelBuilder> entry : mBuilders.entrySet()){
-            attachDynamicField(entry.getValue().create(), entry.getKey());
-        }
+        ModelBuilder.buildModel(mModel, mBuilders);
     }
-
-    private void attachDynamicField(Object dynamicField, String modelName){
-        try {
-            Field f = mModel.getClass().getDeclaredField(modelName);
-            f.setAccessible(true);
-            f.set(mModel, dynamicField);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            // TODO rename error
-            throw new RuntimeException("There is not a field in " + mModel.getClass().getSimpleName() + " called " + modelName);
-        }
-    }
-
     public void setContentView(Activity activity, int resourceId){
         View v = mInflater.inflate(resourceId, null);
         apply(v);
