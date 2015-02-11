@@ -134,7 +134,7 @@
             android:layout_height="1dp"/>
 
 
-        <android.widget.EditText
+        <EditText
             android:id="@+id/ngChangeEditText"
             ngAndroid:ngChange="onChange()"
             android:hint="onChange()"
