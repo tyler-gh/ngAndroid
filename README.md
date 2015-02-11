@@ -2,21 +2,19 @@
 
 ngAndroid brings some of the angular directives to android xml attributes.
 
-Currently supported angular directives
-```
-ngModel
-ngClick
-```
+Currently supported angular directives.
+##### NgModel
+##### NgLongClick
+##### NgClick
+##### NgInvisible
+##### NgGone
+##### NgChange
+##### NgDisabled
+
 Directives that are on the road map
 ```
-ngDblclick
 ngBlur
-ngChange
-ngDisabled
 ngFocus
-ngInvisible
-ngGone
-ngIf
 ngRepeat
 ngSrc
 ngJsonSrc
@@ -26,7 +24,7 @@ ngForm
 
 --------
 
-<h3>ngModel</h3>
+##ngModel
 
 ```java
 // create model
@@ -98,4 +96,4 @@ private void multiply(int num1, int num2){
 
 
 --------
-ngAndroid is still in extreme alpha stages. pre v 0.1
+
