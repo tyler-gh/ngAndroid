@@ -3,7 +3,7 @@
 ngAndroid brings some of the angular directives to android xml attributes.
 
 Currently supported angular directives.
-##### NgModel
+[NgModel](#ngModel)
 ##### NgLongClick
 ##### NgClick
 ##### NgInvisible
