@@ -26,5 +26,5 @@ import com.ngandroid.lib.ng.getters.Getter;
  */
 public interface NgAttribute {
     public void typeCheck(Token[] tokens, Getter getter) throws Exception;
-    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Exception;
+    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Throwable;
 }

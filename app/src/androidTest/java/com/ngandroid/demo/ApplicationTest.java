@@ -15,6 +15,7 @@ import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.getters.KnotGetter;
 import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
+import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
 import com.ngandroid.lib.ngattributes.ngif.NgGone;
 import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
 
@@ -987,6 +988,19 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(View.VISIBLE, v.getVisibility());
         tc.modelName.setIsInvisible(false);
         assertEquals(View.GONE, v.getVisibility());
+    }
+
+    public void testNgDisable() throws Exception {
+        View v = new View(testApplication);
+        TestContainer tc = new TestContainer();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
+        NgDisabled.getInstance().attach(getter, map, v);
+        ModelBuilder.buildModel(tc, map);
+        tc.modelName.setIsInvisible(false);
+        assertTrue(v.isEnabled());
+        tc.modelName.setIsInvisible(true);
+        assertFalse(v.isEnabled());
     }
 
 

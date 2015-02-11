@@ -17,6 +17,7 @@
 package com.ngandroid.lib.ngattributes.ngmodel;
 
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.ngandroid.lib.interpreter.Token;
@@ -46,7 +47,7 @@ public class NgModel implements NgAttribute {
         TypeUtils.strictTypeCheck(tokens, TokenType.MODEL_NAME, TokenType.PERIOD, TokenType.MODEL_FIELD, TokenType.EOF);
     }
 
-    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View bindView) throws Exception {
+    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View bindView) throws Throwable {
         if(!(getter instanceof ModelGetter)){
             throw new RuntimeException("You must only use models in ngModel");
         }
@@ -55,13 +56,70 @@ public class NgModel implements NgAttribute {
         bindModelView(modelGetter, bindView, modelBuilder);
     }
 
-    public void bindModelView(ModelGetter getter, View view, ModelBuilder builder) throws Exception {
-        if(view instanceof  TextView){
+    public void bindModelView(ModelGetter getter, View view, ModelBuilder builder) throws Throwable {
+        if(view instanceof CompoundButton){
+            bindModelToCompoundButton(getter, (CompoundButton) view, builder);
+        }else if(view instanceof  TextView){
             bindModelToTextView(getter, (TextView)view, builder);
         }
     }
+    private void bindModelToCompoundButton(ModelGetter<Boolean> getter, final CompoundButton compoundButton, ModelBuilder builder) throws Throwable {
+        if(getter.getType() != TypeUtils.BOOLEAN){
+            // TODO error
+            throw new RuntimeException("A compound button requires a boolean type model");
+        }
+        boolean isChecked = compoundButton.isChecked();
+        String fieldName = getter.getFieldName().toLowerCase();
+//        builder.setField(fieldName, TypeUtils.BOOLEAN, isChecked);
+        final ModelSetter modelSetter = new ModelSetter(fieldName, builder.getMethodInvoker());
+        modelSetter.set(isChecked);
+        CompundButtonInteracter compundButtonInteracter = new CompundButtonInteracter(modelSetter, compoundButton);
+        compoundButton.setOnCheckedChangeListener(compundButtonInteracter);
+        builder.addSetObserver(fieldName, compundButtonInteracter);
+    }
 
-    public void bindModelToTextView(ModelGetter getter, final TextView textView, ModelBuilder builder) throws Exception {
+    private static final class CompundButtonInteracter implements CompoundButton.OnCheckedChangeListener, ModelMethod {
+        private final ModelSetter modelSetter;
+        private final CompoundButton compoundButton;
+        private boolean isFromSelf;
+
+        private CompundButtonInteracter(ModelSetter modelSetter, CompoundButton compoundButton) {
+            this.modelSetter = modelSetter;
+            this.compoundButton = compoundButton;
+        }
+
+        @Override
+        public Object invoke(String fieldName, Object... args) {
+            try{
+                if(!isFromSelf){
+                    isFromSelf = true;
+                    Boolean b = (Boolean) args[0];
+                    compoundButton.setChecked(b);
+                }
+            }finally {
+                isFromSelf = false;
+            }
+            return null;
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            try {
+                if(!isFromSelf) {
+                    isFromSelf = true;
+                    modelSetter.set(isChecked);
+                }
+            } catch (Throwable throwable) {
+                // TODO - error
+                throwable.printStackTrace();
+            }finally {
+                isFromSelf = false;
+            }
+        }
+    }
+
+
+    private void bindModelToTextView(ModelGetter getter, final TextView textView, ModelBuilder builder) throws Exception {
         final String fieldNamelower = getter.getFieldName();
         String defaultText =  textView.getText().toString();
         int methodType = getter.getType();

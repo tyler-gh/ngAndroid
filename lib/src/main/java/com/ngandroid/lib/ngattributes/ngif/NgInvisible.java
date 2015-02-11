@@ -33,7 +33,7 @@ public class NgInvisible extends NgIf {
     }
 
     @Override
-    protected FireCheckObserver getCheckObserver(Getter<Boolean> getter, View view) {
+    protected FireCheckObserver getModelMethod(Getter<Boolean> getter, View view) {
         return new FireCheckObserver(getter, view, false);
     }
 }

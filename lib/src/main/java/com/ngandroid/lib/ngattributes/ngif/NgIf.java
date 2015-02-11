@@ -21,6 +21,7 @@ import android.view.View;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.ng.ModelMethod;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
 import com.ngandroid.lib.ng.getters.Getter;
@@ -45,7 +46,7 @@ public abstract class NgIf implements NgAttribute {
     public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Exception {
         if(!observeModels(getter, getter, modelBuilderMap, view)){
             // TODO - error
-            throw new Exception("NgIf requires a model to listen to");
+            throw new Exception("NgIf requires a model to observe. Try reformatting your ngif statement to include a model");
         }
     }
 
@@ -56,7 +57,7 @@ public abstract class NgIf implements NgAttribute {
             modelObserved = true;
             ModelGetter modelGetter = (ModelGetter) getter;
             ModelBuilder modelBuilder = modelBuilderMap.get(modelGetter.getModelName());
-            modelBuilder.addSetObserver(modelGetter.getFieldName(), getCheckObserver(topGetter, view));
+            modelBuilder.addSetObserver(modelGetter.getFieldName(), getModelMethod(topGetter, view));
         }else if(getter instanceof KnotGetter){
             modelObserved = observeModels(topGetter, ((KnotGetter)getter).getBooleanGetter(), modelBuilderMap, view);
         }else if(getter instanceof TernaryGetter){
@@ -72,6 +73,6 @@ public abstract class NgIf implements NgAttribute {
         return modelObserved;
     }
 
-    protected abstract FireCheckObserver getCheckObserver(Getter<Boolean> getter, View view);
+    protected abstract ModelMethod getModelMethod(Getter<Boolean> getter, View view);
 
 }

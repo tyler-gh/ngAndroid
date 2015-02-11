@@ -14,28 +14,28 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngif;
+package com.ngandroid.lib.ngattributes.ngform;
 
 import android.view.View;
 
+import com.ngandroid.lib.interpreter.Token;
+import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.Getter;
 
 /**
  * Created by tyler on 2/10/15.
  */
-public class NgGone extends NgIf {
+public class NgForm implements NgAttribute{
 
-    private static NgGone ngGone = new NgGone();
 
-    private NgGone(){}
+    @Override
+    public void typeCheck(Token[] tokens, Getter getter) throws Exception {
 
-    public static NgGone getInstance() {
-        return ngGone;
     }
 
     @Override
-    protected FireCheckObserver getModelMethod(Getter<Boolean> getter, View view) {
-        return new FireCheckObserver(getter, view, true);
+    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Exception {
+
     }
 }

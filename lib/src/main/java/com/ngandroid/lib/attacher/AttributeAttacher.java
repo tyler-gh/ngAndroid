@@ -37,6 +37,7 @@ import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ngattributes.ngchange.NgChange;
 import com.ngandroid.lib.ngattributes.ngclick.NgClick;
+import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
 import com.ngandroid.lib.ngattributes.ngif.NgGone;
 import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
 import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
@@ -77,14 +78,16 @@ public class AttributeAttacher {
                     attribute = NgModel.getInstance();
                 }else if (attr == R.styleable.ngAndroid_ngClick){
                     attribute = NgClick.getInstance();
-                } else if(attr == R.styleable.ngAndroid_ngLongClick){
+                }else if(attr == R.styleable.ngAndroid_ngLongClick){
                     attribute = NgLongClick.getInstance();
-                } else if(attr == R.styleable.ngAndroid_ngChange){
+                }else if(attr == R.styleable.ngAndroid_ngChange){
                     attribute = NgChange.getInstance();
                 }else if(attr == R.styleable.ngAndroid_ngGone){
-                    attribute = NgInvisible.getInstance();
-                } else if(attr == R.styleable.ngAndroid_ngInvisible){
                     attribute = NgGone.getInstance();
+                }else if(attr == R.styleable.ngAndroid_ngInvisible){
+                    attribute = NgInvisible.getInstance();
+                }else if(attr == R.styleable.ngAndroid_ngDisabled){
+                    attribute = NgDisabled.getInstance();
                 }else {
                     throw new UnsupportedOperationException("Attribute not currently implemented");
                 }

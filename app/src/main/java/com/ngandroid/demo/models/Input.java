@@ -8,4 +8,10 @@ public interface Input {
     public void setInput(String input);
     public int getTest();
     public void setTest(int input);
+    public boolean getDisabled();
+    public void setDisabled(boolean disabled);
+    public boolean getGone();
+    public void setGone(boolean disabled);
+    public boolean getInvisible();
+    public void setInvisible(boolean disabled);
 }
