@@ -3,13 +3,14 @@
 ngAndroid brings some of the angular directives to android xml attributes.
 
 Currently supported angular directives.
-[NgModel](#ngModel)
-##### NgLongClick
-##### NgClick
-##### NgInvisible
-##### NgGone
-##### NgChange
-##### NgDisabled
+
+[NgModel](#ngmodel)
+[NgLongClick](#nglongclick)
+[NgClick](#ngclick)
+[NgInvisible](#nginvisible)
+[NgGone](#nggone)
+[NgChange](#ngchange)
+[NgDisabled](#ngdisabled)
 
 Directives that are on the road map
 ```
@@ -74,7 +75,7 @@ With those lines of code, your view is now bound to your data model and vice ver
 
 --------
 
-<h3>ngClick</h3>
+##ngClick
 
 ```xml
 <Button
@@ -92,8 +93,90 @@ private void multiply(int num1, int num2){
 }
 ```
 
+--------
 
+##ngLongClick
+```xml
+<Button
+    android:id="@+id/multiplyButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/really2"
+    android:layout_marginTop="20dp"
+    ngAndroid:ngClick="multiply(input.integer,2)"
+    ngAndroid:ngLongClick="multiply(3,input.integer)"
+    android:text="multiply(input.integer,2) onClick \n multiply(3,input.integer) onLongClick"/>
 
+```
 
 --------
 
+##ngChange
+```xml
+<EditText
+    android:id="@+id/ngChangeEditText"
+    ngAndroid:ngChange="onChange()"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:layout_below="@id/multiplyButton"/>
+```
+```java
+private void onChange(){
+    Toast.makeText(this, "Text Changed", Toast.LENGTH_SHORT).show();
+}
+```
+
+--------
+
+##ngDisabled
+```xml
+<CheckBox
+    android:id="@+id/ngdisabledcheckbox"
+    ngAndroid:ngModel="input.disabled"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+
+<Button
+    android:id="@+id/ineedthisid"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    ngAndroid:ngDisabled="input.disabled"
+    android:text="button"/>
+```
+
+--------
+
+##ngInvisible
+```xml
+<Button
+    android:id="@+id/nginvisible"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    ngAndroid:ngInvisible="input.invisible"
+    android:text="button"/>
+
+<CheckBox
+    android:id="@+id/ngvisiblecb"
+    ngAndroid:ngModel="input.invisible"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+```
+
+--------
+
+##ngGone
+```xml
+<Button
+    android:id="@+id/nggone"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    ngAndroid:ngGone="input.gone"
+    android:text="button"/>
+
+<CheckBox
+    android:id="@+id/nggonedb"
+    ngAndroid:ngModel="input.gone"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+```
