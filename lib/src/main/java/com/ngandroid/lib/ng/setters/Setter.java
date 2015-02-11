@@ -14,17 +14,11 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
-
-import android.view.View;
-
-import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.ng.getters.Getter;
+package com.ngandroid.lib.ng.setters;
 
 /**
- * Created by davityle on 1/23/15.
+ * Created by davityle on 1/24/15.
  */
-public interface NgAttribute {
-    public void typeCheck(Token[] tokens, Getter getter) throws Exception;
-    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Throwable;
+public interface Setter {
+    public void set(Object ... parameters) throws Throwable;
 }

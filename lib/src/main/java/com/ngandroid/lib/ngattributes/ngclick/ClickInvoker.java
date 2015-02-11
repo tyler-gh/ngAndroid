@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngClick;
+package com.ngandroid.lib.ngattributes.ngclick;
 
 import android.view.View;
 
-import com.ngandroid.lib.ng.Getter;
+import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,21 +27,28 @@ import java.lang.reflect.Method;
 /**
 * Created by davityle on 1/24/15.
 */
-class ClickInvoker implements View.OnClickListener {
+public class ClickInvoker implements View.OnClickListener, Getter {
 
     private final Method mMethod;
     private final Object mModel;
     private final Getter[] mGetters;
+    private final int type;
 
-    ClickInvoker(Method method, Object model, Getter... getters) {
+    public ClickInvoker(Method method, Object model, Getter... getters) {
         this.mMethod = method;
         this.mModel = model;
         this.mGetters = getters;
         mMethod.setAccessible(true);
+        type = TypeUtils.getType(method.getReturnType());
     }
 
     @Override
     public void onClick(View view) {
+        get();
+    }
+
+    @Override
+    public Object get() {
         Object[] parameters = new Object[mGetters.length];
         for(int index = 0; index < parameters.length; index++){
             try {
@@ -51,10 +59,20 @@ class ClickInvoker implements View.OnClickListener {
             }
         }
         try {
-            mMethod.invoke(mModel, parameters);
+            return mMethod.invoke(mModel, parameters);
         } catch (IllegalAccessException | InvocationTargetException e) {
             // TODO error
             e.printStackTrace();
         }
+        return null;
+    }
+
+    @Override
+    public int getType() {
+        return type;
+    }
+
+    public int getReturnType(){
+        return type;
     }
 }

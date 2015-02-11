@@ -23,6 +23,7 @@ import android.util.ArrayMap;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -54,7 +55,19 @@ public class ModelBuilder {
         }
         mInvocationHandler = new MethodInvoker(mMethodMap, mFieldMap);
         mModelMethods = mClass.getDeclaredMethods();
+        createFields();
     }
+
+    private void createFields(){
+        for(Method method : mModelMethods){
+            String name = method.getName().toLowerCase();
+            if(name.startsWith("set")){
+                createField(name.substring(3));
+            }
+        }
+    }
+
+
 
     public Object create(){
         return Proxy.newProxyInstance(mClass.getClassLoader(), new Class[]{mClass}, new Model(mInvocationHandler));
@@ -68,6 +81,13 @@ public class ModelBuilder {
         return mInvocationHandler;
     }
 
+    private void createField(String fieldName){
+        final String fieldNamelower = fieldName.toLowerCase();
+        int methodType = getMethodType(fieldNamelower);
+        setField(fieldNamelower, methodType, TypeUtils.getEmptyValue(methodType));
+        mMethodMap.put("set" + fieldNamelower, new ArrayList<ModelMethod>());
+    }
+
     public int getMethodType(String fieldNamelower) {
         int methodType = TypeUtils.STRING;
         for(Method m : mModelMethods){
@@ -79,12 +99,24 @@ public class ModelBuilder {
         return methodType;
     }
 
-    public List<ModelMethod> getMethods(String methodName) {
-        List<ModelMethod> methods = mMethodMap.get(methodName);
-        if(methods == null){
-            methods = new ArrayList<>();
-            mMethodMap.put(methodName, methods);
+    public void addSetObserver(String fieldName, ModelMethod method){
+        mMethodMap.get("set" + fieldName.toLowerCase()).add(method);
+    }
+
+    public static void buildModel(Object model, ModelBuilderMap map){
+        for(Map.Entry<String, com.ngandroid.lib.ng.ModelBuilder> entry : map.entrySet()){
+            attachDynamicField(entry.getValue().create(), entry.getKey(), model);
         }
-        return  methods;
+    }
+
+    private static void attachDynamicField(Object dynamicField, String modelName, Object model){
+        try {
+            Field f = model.getClass().getDeclaredField(modelName);
+            f.setAccessible(true);
+            f.set(model, dynamicField);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // TODO rename error
+            throw new RuntimeException("There is not a field in " + model.getClass().getSimpleName() + " called " + modelName);
+        }
     }
 }

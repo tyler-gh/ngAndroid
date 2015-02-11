@@ -34,6 +34,7 @@ public class SyntaxParser {
     public Token[] parseScript(){
         if (!
                 (
+                    offerPop(TokenType.KNOT) ||
                     offerPop(TokenType.MODEL_NAME) ||
                     offerPop(TokenType.FUNCTION_NAME) ||
                     offerPop(TokenType.EOF)
@@ -82,7 +83,10 @@ public class SyntaxParser {
                 inFunction = false;
                 functionClose();
                 break;
-            case OPERATOR:
+            case KNOT:
+                afterKnot();
+                break;
+            case BINARY_OPERATOR:
                 afterOperator();
                 break;
         }
@@ -94,6 +98,18 @@ public class SyntaxParser {
             throw new RuntimeException(token.getScript() + " is invalid. " + token.getTokenType() + " != " + tokenType);
         }
         popToken();
+    }
+
+    private void afterKnot(){
+        if(!
+            (
+                offerPop(TokenType.FUNCTION_NAME) ||
+                offerPop(TokenType.MODEL_NAME)
+            )
+        ){
+            // TODO error
+            throw new RuntimeException();
+        }
     }
 
     private void afterOperator(){
@@ -111,18 +127,22 @@ public class SyntaxParser {
     }
 
     private void afterModel(){
-        if(inFunction)
-            return;
-        if(!
-            (
-                offerPop(TokenType.TERNARY_COLON) ||
-                offerPop(TokenType.TERNARY_QUESTION_MARK) ||
-                offerPop(TokenType.OPERATOR) ||
-                offerPop(TokenType.EOF)
-            )
-        ){
-            // TODO error
-            throw new RuntimeException();
+        if(inFunction){
+            offerPop(TokenType.TERNARY_COLON);
+            offerPop(TokenType.TERNARY_QUESTION_MARK);
+            offerPop(TokenType.BINARY_OPERATOR);
+        }else {
+            if (!
+                (
+                    offerPop(TokenType.TERNARY_COLON) ||
+                    offerPop(TokenType.TERNARY_QUESTION_MARK) ||
+                    offerPop(TokenType.BINARY_OPERATOR) ||
+                    offerPop(TokenType.EOF)
+                )
+            ) {
+                // TODO error
+                throw new RuntimeException();
+            }
         }
     }
 
@@ -141,7 +161,10 @@ public class SyntaxParser {
             (
                 offerPop(TokenType.TERNARY_COLON) ||
                 offerPop(TokenType.TERNARY_QUESTION_MARK) ||
-                offerPop(TokenType.EOF)
+                offerPop(TokenType.BINARY_OPERATOR) ||
+                offerPop(TokenType.EOF) ||
+                topIs(TokenType.COMMA) ||
+                topIs(TokenType.CLOSE_PARENTHESIS)
             )
         ){
             // TODO error
@@ -149,12 +172,17 @@ public class SyntaxParser {
         }
     }
 
+    private boolean topIs(TokenType tokenType) {
+        return mTokens.peek().getTokenType() == tokenType;
+    }
+
     private void continueFunction(){
         if(!
             (
                 offerPop(TokenType.MODEL_NAME) ||
                 offerPop(TokenType.STRING) ||
-                offerPop(TokenType.NUMBER_CONSTANT)
+                offerPop(TokenType.NUMBER_CONSTANT) ||
+                offerPop(TokenType.FUNCTION_NAME)
             )
         ){
             // TODO error
@@ -178,7 +206,10 @@ public class SyntaxParser {
         if(!
             (
                 offerPop(TokenType.MODEL_NAME) ||
-                offerPop(TokenType.FUNCTION_NAME)
+                offerPop(TokenType.FUNCTION_NAME) ||
+                offerPop(TokenType.NUMBER_CONSTANT) ||
+                offerPop(TokenType.KNOT) ||
+                offerPop(TokenType.STRING)
             )
         ){
             // TODO error

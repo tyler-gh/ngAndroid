@@ -1,66 +1,246 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ngAndroid="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
-    tools:ignore="MissingPrefix" >
-
-    <android.widget.EditText
-        android:id="@+id/editText"
-        ngAndroid:ngModel="input.input"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <android.widget.TextView
-        android:id="@+id/textView"
-        android:layout_alignParentRight="true"
-        android:layout_width="wrap_content"
+    tools:ignore="MissingPrefix">
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        ngAndroid:ngModel="input.input"/>
+        android:padding="20dp"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/stringClickEvent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editText"
-        android:layout_marginTop="20dp"
-        ngAndroid:ngClick="clickReally()"
-        android:text="Touch me"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NgModel"
+            android:textStyle="bold"
+            android:textSize="20sp"/>
+        <View
+            android:background="#AAA"
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="1dp"/>
 
-    <android.widget.EditText
-        android:id="@+id/editText2"
-        ngAndroid:ngModel="input.test"
-        android:layout_width="wrap_content"
-        android:layout_below="@+id/stringClickEvent"
-        android:layout_marginTop="20dp"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NgModel String"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
 
-    <android.widget.EditText
-        android:id="@+id/textView2"
-        android:layout_alignParentRight="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/editText2"
-        ngAndroid:ngModel="input.test"/>
+        <android.widget.EditText
+            android:id="@+id/editText"
+            ngAndroid:ngModel="input.input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/really2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editText2"
-        android:layout_marginTop="20dp"
-        ngAndroid:ngClick="clickWithParameter(input.test)"
-        android:text="Hmm"/>
+        <android.widget.TextView
+            android:id="@+id/textView"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            ngAndroid:ngModel="input.input"/>
 
-    <Button
-        android:id="@+id/multiplyButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/really2"
-        android:layout_marginTop="20dp"
-        ngAndroid:ngClick="multiply(input.test,2)"
-        android:text="Multiply"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="NgModel Integer"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
+
+        <android.widget.EditText
+            android:id="@+id/editText2"
+            ngAndroid:ngModel="input.test"
+            android:layout_width="wrap_content"
+            android:layout_below="@+id/stringClickEvent"
+            android:layout_marginTop="20dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/editText2"
+            ngAndroid:ngModel="input.test"/>
 
 
-</RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="NgClick"
+            android:textStyle="bold"
+            android:textSize="20sp"/>
+        <View
+            android:background="#AAA"
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="1dp"/>
+
+        <Button
+            android:id="@+id/stringClickEvent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/editText"
+            android:layout_marginTop="20dp"
+            ngAndroid:ngClick="clickReally()"
+            android:text="clickReally()"/>
+
+
+        <Button
+            android:id="@+id/really2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/editText2"
+            android:layout_marginTop="20dp"
+            ngAndroid:ngClick="clickWithParameter(input.test)"
+            android:text="clickWithParameter(input.test)"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="NgLongClick"
+            android:textStyle="bold"
+            android:textSize="20sp"/>
+
+        <Button
+            android:id="@+id/multiplyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/really2"
+            android:layout_marginTop="20dp"
+            ngAndroid:ngClick="multiply(input.test,2)"
+            ngAndroid:ngLongClick="multiply(3,input.test)"
+            android:text="multiply(input.test,2) onClick \n multiply(3,input.test) onLongClick"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:text="NgChange"
+            android:textSize="20sp"/>
+        <View
+            android:background="#AAA"
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="1dp"/>
+
+
+        <android.widget.EditText
+            android:id="@+id/ngChangeEditText"
+            ngAndroid:ngChange="onChange()"
+            android:hint="onChange()"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/multiplyButton"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:text="NgIf"
+            android:textSize="20sp"/>
+        <View
+            android:background="#AAA"
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="1dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:text="NgDisabled"
+            android:textSize="20sp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/ngdisabledcheckbox"
+                ngAndroid:ngModel="input.disabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/ineedthisid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ngAndroid:ngDisabled="input.disabled"
+                android:text="button"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:text="NgInvisible"
+            android:textSize="20sp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/nginvisible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ngAndroid:ngInvisible="input.invisible"
+                android:text="button"/>
+
+            <CheckBox
+                android:id="@+id/ngvisiblecb"
+                ngAndroid:ngModel="input.invisible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:text="NgGone"
+            android:textSize="20sp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/nggone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ngAndroid:ngGone="input.gone"
+                android:text="button"/>
+
+            <CheckBox
+                android:id="@+id/nggonedb"
+                ngAndroid:ngModel="input.gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</ScrollView>

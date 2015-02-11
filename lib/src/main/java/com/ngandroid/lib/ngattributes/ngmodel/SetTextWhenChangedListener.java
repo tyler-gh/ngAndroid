@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngmodel;
+package com.ngandroid.lib.ngattributes.ngmodel;
 
 import android.text.Editable;
 import android.text.TextWatcher;
 
-import com.ngandroid.lib.ng.ModelSetter;
+import com.ngandroid.lib.ng.setters.ModelSetter;
 import com.ngandroid.lib.utils.TypeUtils;
 
 /**

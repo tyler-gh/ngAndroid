@@ -14,17 +14,28 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ngattributes.ngform;
 
 import android.view.View;
 
 import com.ngandroid.lib.interpreter.Token;
+import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.Getter;
 
 /**
- * Created by davityle on 1/23/15.
+ * Created by tyler on 2/10/15.
  */
-public interface NgAttribute {
-    public void typeCheck(Token[] tokens, Getter getter) throws Exception;
-    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Throwable;
+public class NgForm implements NgAttribute{
+
+
+    @Override
+    public void typeCheck(Token[] tokens, Getter getter) throws Exception {
+
+    }
+
+    @Override
+    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Exception {
+
+    }
 }

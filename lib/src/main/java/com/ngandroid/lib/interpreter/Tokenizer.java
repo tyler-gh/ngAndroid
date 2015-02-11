@@ -49,7 +49,7 @@ public class Tokenizer {
         NUMBER_CONSTANT_END,
         IN_CHAR_SEQUENCE,
         IN_MODEL_FIELD,
-        OPERATOR
+        KNOT_VALUE, OPERATOR
     }
 
     private int index, readIndex;
@@ -89,7 +89,6 @@ public class Tokenizer {
         switch (state){
             case BEGIN:
             case EQUALS_START:
-            case KNOT_EQUALS_START:
             case IN_STRING:
                 result = getNextState();
                 break;
@@ -169,6 +168,17 @@ public class Tokenizer {
                     result = getNextState();
                 }
                 break;
+            case KNOT_EQUALS_START:
+                if(peek() != '='){
+                    result = State.KNOT_VALUE;
+                }else{
+                    result = getNextState();
+                }
+                break;
+            case KNOT_VALUE:
+                emit(TokenType.KNOT);
+                result = State.IN_CHAR_SEQUENCE;
+                break;
             case MODEL_FIELD_END:
                 emit(TokenType.MODEL_FIELD);
                 result = getNextState();
@@ -176,7 +186,7 @@ public class Tokenizer {
             case KNOT_EQUALS:
             case EQUALS:
             case OPERATOR:
-                emit(TokenType.OPERATOR);
+                emit(TokenType.BINARY_OPERATOR);
                 result = getNextState();
                 break;
             default:
@@ -196,6 +206,9 @@ public class Tokenizer {
             }
 
             char currentCharacter = script.charAt(index);
+
+            if(state == State.IN_STRING && currentCharacter != '\'')
+                return state;
 
             if (Character.isDigit(currentCharacter)) {
                 switch (state){
@@ -233,6 +246,8 @@ public class Tokenizer {
                     case EQUALS:
                     case KNOT_EQUALS:
                         return State.IN_CHAR_SEQUENCE;
+                    case KNOT_EQUALS_START:
+                        return State.KNOT_VALUE;
                     default:
                         // TODO error
                         throw new RuntimeException("Invalid character '" + currentCharacter + "' at state " + state.toString());
@@ -264,10 +279,9 @@ public class Tokenizer {
                 case '/':
                     return State.OPERATOR;
             }
-            if(state == State.IN_STRING)
-                return state;
+
             //        TODO throw error
-            throw new RuntimeException("Invalid character : " + currentCharacter);
+            throw new RuntimeException("Invalid character : " + currentCharacter + " in state " + state);
         }finally {
             advance();
         }

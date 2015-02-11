@@ -14,22 +14,26 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ngattributes.ngif;
+
+import android.view.View;
+
+import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ng.getters.Getter;
 
 /**
- * Created by davityle on 1/24/15.
+ * Created by tyler on 2/10/15.
  */
-public class ModelGetter implements Getter {
+public class NgInvisible extends NgIf {
+    private static NgInvisible ngInvisible = new NgInvisible();
+    private NgInvisible(){}
 
-    private final String mFieldName;
-    private final MethodInvoker mMethodInvoker;
-
-    public ModelGetter(String mFieldName, MethodInvoker mMethodInvoker) {
-        this.mFieldName = mFieldName;
-        this.mMethodInvoker = mMethodInvoker;
+    public static NgInvisible getInstance() {
+        return ngInvisible;
     }
 
-    public Object get() throws Throwable {
-        return mMethodInvoker.invoke("get" + mFieldName);
+    @Override
+    protected FireCheckObserver getModelMethod(Getter<Boolean> getter, View view) {
+        return new FireCheckObserver(getter, view, false);
     }
 }

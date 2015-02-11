@@ -2,13 +2,26 @@ package com.ngandroid.demo;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
+import android.view.View;
 
+import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.SyntaxParser;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.interpreter.Tokenizer;
+import com.ngandroid.lib.ng.ModelBuilder;
+import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
+import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.ng.getters.KnotGetter;
+import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
+import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
+import com.ngandroid.lib.ngattributes.ngif.NgGone;
+import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
 
+import java.lang.reflect.Field;
 import java.util.Queue;
+import java.util.Random;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
@@ -304,7 +317,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals("joe"));
 
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.OPERATOR);
+        assertTrue(token.getTokenType() == TokenType.BINARY_OPERATOR);
         assertTrue(token.getScript().equals("+"));
 
         token = tokenqueue.poll();
@@ -320,7 +333,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals("frank"));
 
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.OPERATOR);
+        assertTrue(token.getTokenType() == TokenType.BINARY_OPERATOR);
         assertTrue(token.getScript().equals("=="));
 
         token = tokenqueue.poll();
@@ -342,7 +355,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getTokenType() == TokenType.MODEL_FIELD);
         assertTrue(token.getScript().equals("joe"));
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.OPERATOR);
+        assertTrue(token.getTokenType() == TokenType.BINARY_OPERATOR);
         assertTrue(token.getScript().equals("!="));
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == TokenType.STRING);
@@ -400,42 +413,137 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public void testFunctionNumberConstant(){
-        try {
-            System.out.println("///////////////////////////////////////////////////////");
-            SyntaxParser parser = new SyntaxParser("multiply(input.test,2)");
-            parser.parseScript();
-        }finally {
-            System.out.println("///////////////////////////////////////////////////////");
+        SyntaxParser parser = new SyntaxParser("multiply(input.test,2)");
+        parser.parseScript();
+    }
+
+    public void testBooleanExpressionSyntax() {
+        SyntaxParser parser = new SyntaxParser("!model.value");
+        Token[] tokens = parser.parseScript();
+        int tokenIndex = 0;
+        while(tokenIndex < tokens.length){
+            Token token = tokens[tokenIndex];
+            switch (tokenIndex++){
+                case 0:
+                    assertEquals(token.getTokenType(), TokenType.KNOT);
+                    assertEquals(token.getScript(), "!");
+                    break;
+                case 1:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_NAME);
+                    assertEquals(token.getScript(), "model");
+                    break;
+                case 2:
+                    assertEquals(token.getTokenType(), TokenType.PERIOD);
+                    assertEquals(token.getScript(), ".");
+                    break;
+                case 3:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_FIELD);
+                    assertEquals(token.getScript(), "value");
+                    break;
+                case 4:
+                    assertEquals(token.getTokenType(), TokenType.EOF);
+                    break;
+                default:
+                    assertTrue(false);
+                    break;
+            }
         }
     }
 
-    public void testFunctionTernaryPeramater(){
-//        SyntaxParser parser = new SyntaxParser("functionName(model.boolValue ? 'this string' : 'bool value was false')");
-//        Token[] tokens = parser.parseScript();
-//        int tokenIndex = 0;
-//        while(tokenIndex < tokens.length){
-//            Token token = tokens[tokenIndex];
-//            switch (tokenIndex++){
-//                case 0:
-//                    assertEquals(token.getTokenType(), TokenType.FUNCTION_NAME);
-//                    assertEquals(token.getScript(), "functionName");
-//                    break;
-//                case 1:
-//                    assertEquals(token.getTokenType(), TokenType.OPEN_PARENTHESIS);
-//                    assertEquals(token.getScript(), "(");
-//                    break;
-//                case 2:
-//                    assertEquals(token.getTokenType(), TokenType.CLOSE_PARENTHESIS);
-//                    assertEquals(token.getScript(), ")");
-//                    break;
-//                case 3:
-//                    assertEquals(token.getTokenType(), TokenType.EOF);
-//                    break;
-//                default:
-//                    assertTrue(false);
-//                    break;
-//            }
-//        }
+    public void testModelAddition() {
+        SyntaxParser parser = new SyntaxParser("model.a + model.b");
+        Token[] tokens = parser.parseScript();
+        int tokenIndex = 0;
+        while(tokenIndex < tokens.length) {
+            Token token = tokens[tokenIndex];
+            switch (tokenIndex++) {
+                case 0:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_NAME);
+                    assertEquals(token.getScript(), "model");
+                    break;
+                case 1:
+                    assertEquals(token.getTokenType(), TokenType.PERIOD);
+                    assertEquals(token.getScript(), ".");
+                    break;
+                case 2:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_FIELD);
+                    assertEquals(token.getScript(), "a");
+                    break;
+                case 3:
+                    assertEquals(token.getTokenType(), TokenType.BINARY_OPERATOR);
+                    assertEquals(token.getScript(), "+");
+                    break;
+                case 4:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_NAME);
+                    assertEquals(token.getScript(), "model");
+                    break;
+                case 5:
+                    assertEquals(token.getTokenType(), TokenType.PERIOD);
+                    assertEquals(token.getScript(), ".");
+                    break;
+                case 6:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_FIELD);
+                    assertEquals(token.getScript(), "b");
+                    break;
+            }
+        }
+    }
+
+    public void testFunctionTernaryParamater(){
+        SyntaxParser parser = new SyntaxParser("functionName(model.boolValue ? 'this string' : 'bool value was false')");
+        Token[] tokens = parser.parseScript();
+        int tokenIndex = 0;
+        while(tokenIndex < tokens.length){
+            Token token = tokens[tokenIndex];
+            switch (tokenIndex++){
+                case 0:
+                    assertEquals(token.getTokenType(), TokenType.FUNCTION_NAME);
+                    assertEquals(token.getScript(), "functionName");
+                    break;
+                case 1:
+                    assertEquals(token.getTokenType(), TokenType.OPEN_PARENTHESIS);
+                    assertEquals(token.getScript(), "(");
+                    break;
+                case 2:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_NAME);
+                    assertEquals(token.getScript(), "model");
+                    break;
+                case 3:
+                    assertEquals(token.getTokenType(), TokenType.PERIOD);
+                    assertEquals(token.getScript(), ".");
+                    break;
+                case 4:
+                    assertEquals(token.getTokenType(), TokenType.MODEL_FIELD);
+                    assertEquals(token.getScript(), "boolValue");
+                    break;
+                case 5:
+                    assertEquals(token.getTokenType(), TokenType.TERNARY_QUESTION_MARK);
+                    assertEquals(token.getScript(), "?");
+                    break;
+                case 6:
+                    assertEquals(token.getTokenType(), TokenType.STRING);
+                    assertEquals(token.getScript(), "'this string'");
+                    break;
+                case 7:
+                    assertEquals(token.getTokenType(), TokenType.TERNARY_COLON);
+                    assertEquals(token.getScript(), ":");
+                    break;
+                case 8:
+                    assertEquals(token.getTokenType(), TokenType.STRING);
+                    assertEquals(token.getScript(), "'bool value was false'");
+                    break;
+                case 9:
+                    assertEquals(token.getTokenType(), TokenType.CLOSE_PARENTHESIS);
+                    assertEquals(token.getScript(), ")");
+                    break;
+                case 10:
+                    assertEquals(token.getTokenType(), TokenType.EOF);
+                    break;
+                default:
+                    assertTrue(false);
+                    break;
+            }
+        }
     }
 
     public void testSyntaxParser(){
@@ -667,7 +775,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
                     assertEquals(token.getScript(), "joe");
                     break;
                 case 3:
-                    assertEquals(token.getTokenType(), TokenType.OPERATOR);
+                    assertEquals(token.getTokenType(), TokenType.BINARY_OPERATOR);
                     assertEquals(token.getScript(), "!=");
                     break;
                 case 4:
@@ -718,4 +826,182 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
             assertTrue(false);
         }catch(Exception ignored){}
     }
+
+
+    public static interface TestModel{
+        public String getJoe();
+        public void setJoe(String joe);
+        public boolean getIsinvisible();
+        public void setIsInvisible(boolean isVisible);
+    }
+
+    public class TestContainer{
+        private TestModel modelName;
+        private void method(){
+        }
+        private void method(String value){
+            System.out.println(value);
+        }
+        private void method(int value){
+            System.out.println(value);
+        }
+        private String getStringValue(){
+            return "This is a string value ";
+        }
+        private int getIntValue(){
+            return 42;
+        }
+        private boolean isTrue(){
+            return true;
+        }
+    }
+
+    public void testExpressionBuilder() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("modelName.joe != 'orange'");
+        TestContainer tc = new TestContainer();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        try {
+            Field m = TestContainer.class.getDeclaredField("modelName");
+            m.setAccessible(true);
+            m.set(tc, map.get("modelName").create());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        Getter<Boolean> getter = builder.build(tc, map);
+        System.out.println(getter.getClass().getSimpleName());
+        assertTrue(getter instanceof BinaryOperatorGetter);
+        tc.modelName.setJoe("Joe");
+        System.out.println(tc.modelName.getJoe());
+        assertTrue(getter.get());
+        tc.modelName.setJoe("orange");
+        assertFalse(getter.get());
+    }
+
+
+
+    public void testFunctionExpression() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("method()");
+        TestContainer tc = new TestContainer();
+        Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
+        assertTrue(getter instanceof ClickInvoker);
+        try {
+            getter.get();
+        }catch (Throwable e){
+            assertTrue(false);
+        }
+
+    }
+
+    public void testMethodTypeFinding() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("method('string')");
+        TestContainer tc = new TestContainer();
+        Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
+        assertTrue(getter instanceof ClickInvoker);
+        try {
+            getter.get();
+        }catch (Throwable e){
+            assertTrue(false);
+        }
+
+        builder = new ExpressionBuilder("method(58)");
+        getter = builder.build(tc, new ModelBuilderMap(tc));
+        assertTrue(getter instanceof ClickInvoker);
+        try {
+            getter.get();
+        }catch (Throwable e){
+            assertTrue(false);
+        }
+    }
+
+    public void testMethodInMethod() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("method(getStringValue())");
+        TestContainer tc = new TestContainer();
+        Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
+        assertTrue(getter instanceof ClickInvoker);
+        try {
+            getter.get();
+        }catch (Throwable e){
+            assertTrue(false);
+        }
+
+        builder = new ExpressionBuilder("method('Int value = ' + getIntValue())");
+        tc = new TestContainer();
+        getter = builder.build(tc, new ModelBuilderMap(tc));
+        assertTrue(getter instanceof ClickInvoker);
+        try {
+            getter.get();
+        }catch (Throwable e){
+            assertTrue(false);
+        }
+    }
+
+    public void testKnotExpression(){
+        TestContainer tc = new TestContainer();
+        Getter<Boolean> getter = new ExpressionBuilder("!isTrue()").build(tc, new ModelBuilderMap(tc));
+        assertTrue(getter instanceof KnotGetter);
+        try {
+            assertFalse(getter.get());
+        }catch (Throwable e){
+            assertTrue(false);
+        }
+    }
+
+    public void testNgVisible() throws Exception {
+        View v = new View(testApplication);
+        TestContainer tc = new TestContainer();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
+        NgInvisible.getInstance().attach(getter, map, v);
+        ModelBuilder.buildModel(tc, map);
+        tc.modelName.setIsInvisible(false);
+        assertEquals(View.VISIBLE, v.getVisibility());
+        tc.modelName.setIsInvisible(true);
+        assertEquals(View.INVISIBLE, v.getVisibility());
+    }
+
+    public void testNgGone() throws Exception {
+        View v = new View(testApplication);
+        TestContainer tc = new TestContainer();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
+        NgGone.getInstance().attach(getter, map, v);
+        ModelBuilder.buildModel(tc, map);
+        tc.modelName.setIsInvisible(false);
+        assertEquals(View.VISIBLE, v.getVisibility());
+        tc.modelName.setIsInvisible(true);
+        assertEquals(View.GONE, v.getVisibility());
+
+        map = new ModelBuilderMap(tc);
+        getter = new ExpressionBuilder("!modelName.isInvisible").build(tc, map);
+        NgGone.getInstance().attach(getter, map, v);
+        ModelBuilder.buildModel(tc, map);
+        tc.modelName.setIsInvisible(true);
+        assertEquals(View.VISIBLE, v.getVisibility());
+        tc.modelName.setIsInvisible(false);
+        assertEquals(View.GONE, v.getVisibility());
+
+        map = new ModelBuilderMap(tc);
+        getter = new ExpressionBuilder("!modelName.isInvisible ? isTrue() : !isTrue()").build(tc, map);
+        NgGone.getInstance().attach(getter, map, v);
+        ModelBuilder.buildModel(tc, map);
+        tc.modelName.setIsInvisible(true);
+        assertEquals(View.VISIBLE, v.getVisibility());
+        tc.modelName.setIsInvisible(false);
+        assertEquals(View.GONE, v.getVisibility());
+    }
+
+    public void testNgDisable() throws Exception {
+        View v = new View(testApplication);
+        TestContainer tc = new TestContainer();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
+        NgDisabled.getInstance().attach(getter, map, v);
+        ModelBuilder.buildModel(tc, map);
+        tc.modelName.setIsInvisible(false);
+        assertTrue(v.isEnabled());
+        tc.modelName.setIsInvisible(true);
+        assertFalse(v.isEnabled());
+    }
+
+
 }

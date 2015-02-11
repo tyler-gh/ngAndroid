@@ -14,11 +14,32 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ng.getters;
+
+import com.ngandroid.lib.utils.TypeUtils;
 
 /**
  * Created by davityle on 1/24/15.
  */
-public interface Getter {
-    public Object get() throws Throwable;
+public class StaticGetter<T> implements Getter<T>{
+    private final T object;
+    private final int type;
+
+    public StaticGetter(T object, int type) {
+        if(type == TypeUtils.STRING){
+            String value = (String) object;
+            this.object = (T) value.substring(1, value.length() - 1);
+        }else
+            this.object = object;
+        this.type = type;
+    }
+
+    @Override
+    public T get() throws Throwable {
+        return object;
+    }
+
+    public int getType(){
+        return type;
+    }
 }

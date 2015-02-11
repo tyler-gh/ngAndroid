@@ -57,4 +57,8 @@ public class MethodInvoker {
         // TODO throw error
         return null;
     }
+
+    public int getType(String fieldName){
+        return fieldMap.get(fieldName.toLowerCase()).getFirst();
+    }
 }

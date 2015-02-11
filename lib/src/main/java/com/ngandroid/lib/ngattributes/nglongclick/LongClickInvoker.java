@@ -14,17 +14,25 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ngattributes.nglongclick;
 
 import android.view.View;
 
-import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
 
 /**
- * Created by davityle on 1/23/15.
- */
-public interface NgAttribute {
-    public void typeCheck(Token[] tokens, Getter getter) throws Exception;
-    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Throwable;
+* Created by tyler on 1/28/15.
+*/
+public class LongClickInvoker implements View.OnLongClickListener {
+    private final ClickInvoker invoker;
+
+    public LongClickInvoker(ClickInvoker invoker) {
+        this.invoker = invoker;
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        invoker.onClick(v);
+        return true;
+    }
 }

@@ -14,20 +14,24 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ng.setters;
+
+import com.ngandroid.lib.ng.MethodInvoker;
 
 /**
  * Created by davityle on 1/24/15.
  */
-public class StaticGetter implements Getter{
-    private final Object object;
+public class ModelSetter implements Setter {
 
-    public StaticGetter(Object object) {
-        this.object = object;
+    private final String mFieldName;
+    private final MethodInvoker mMethodInvoker;
+
+    public ModelSetter(String mFieldName, MethodInvoker mMethodInvoker) {
+        this.mFieldName = mFieldName;
+        this.mMethodInvoker = mMethodInvoker;
     }
 
-    @Override
-    public Object get() throws Throwable {
-        return object;
+    public void set(Object ... parameters) throws Throwable {
+        mMethodInvoker.invoke("set" + mFieldName, parameters);
     }
 }

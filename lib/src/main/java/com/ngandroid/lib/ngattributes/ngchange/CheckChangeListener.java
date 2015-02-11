@@ -14,17 +14,23 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ngattributes.ngchange;
 
-import android.view.View;
+import android.widget.RadioGroup;
 
-import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
 
 /**
- * Created by davityle on 1/23/15.
- */
-public interface NgAttribute {
-    public void typeCheck(Token[] tokens, Getter getter) throws Exception;
-    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Throwable;
+* Created by tyler on 1/29/15.
+*/
+class CheckChangeListener implements RadioGroup.OnCheckedChangeListener {
+    private final ClickInvoker invoker;
+
+    public CheckChangeListener(ClickInvoker invoker) {
+        this.invoker = invoker;
+    }
+
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        invoker.onClick(group.findViewById(checkedId));
+    }
 }
