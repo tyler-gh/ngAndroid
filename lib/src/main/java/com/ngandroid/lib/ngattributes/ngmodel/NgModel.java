@@ -70,7 +70,6 @@ public class NgModel implements NgAttribute {
         }
         boolean isChecked = compoundButton.isChecked();
         String fieldName = getter.getFieldName().toLowerCase();
-//        builder.setField(fieldName, TypeUtils.BOOLEAN, isChecked);
         final ModelSetter modelSetter = new ModelSetter(fieldName, builder.getMethodInvoker());
         modelSetter.set(isChecked);
         CompundButtonInteracter compundButtonInteracter = new CompundButtonInteracter(modelSetter, compoundButton);
@@ -119,12 +118,13 @@ public class NgModel implements NgAttribute {
     }
 
 
-    private void bindModelToTextView(ModelGetter getter, final TextView textView, ModelBuilder builder) throws Exception {
+    private void bindModelToTextView(ModelGetter getter, final TextView textView, ModelBuilder builder) throws Throwable {
+        // TODO check for type
         final String fieldNamelower = getter.getFieldName();
         String defaultText =  textView.getText().toString();
-        int methodType = getter.getType();
-        builder.setField(fieldNamelower, methodType, TypeUtils.fromString(methodType, defaultText));
-        final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(new ModelSetter(fieldNamelower, builder.getMethodInvoker()), methodType);
+        ModelSetter setter = new ModelSetter(fieldNamelower, builder.getMethodInvoker());
+        setter.set(defaultText);
+        final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(setter, getter.getType());
         textView.addTextChangedListener(setTextWhenChangedListener);
         // TODO clean this up
         builder.addSetObserver(fieldNamelower, new ModelMethod(){

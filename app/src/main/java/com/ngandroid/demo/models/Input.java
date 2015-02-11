@@ -6,8 +6,8 @@ package com.ngandroid.demo.models;
 public interface Input {
     public String getInput();
     public void setInput(String input);
-    public int getTest();
-    public void setTest(int input);
+    public int getInteger();
+    public void setInteger(int input);
     public boolean getDisabled();
     public void setDisabled(boolean disabled);
     public boolean getGone();

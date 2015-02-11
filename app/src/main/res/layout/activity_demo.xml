@@ -53,7 +53,7 @@
 
         <android.widget.EditText
             android:id="@+id/editText2"
-            ngAndroid:ngModel="input.test"
+            ngAndroid:ngModel="input.integer"
             android:layout_width="wrap_content"
             android:layout_below="@+id/stringClickEvent"
             android:layout_marginTop="20dp"
@@ -65,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/editText2"
-            ngAndroid:ngModel="input.test"/>
+            ngAndroid:ngModel="input.integer"/>
 
 
         <TextView
@@ -98,8 +98,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/editText2"
             android:layout_marginTop="20dp"
-            ngAndroid:ngClick="clickWithParameter(input.test)"
-            android:text="clickWithParameter(input.test)"/>
+            ngAndroid:ngClick="clickWithParameter(input.integer)"
+            android:text="clickWithParameter(input.integer)"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -115,9 +115,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/really2"
             android:layout_marginTop="20dp"
-            ngAndroid:ngClick="multiply(input.test,2)"
-            ngAndroid:ngLongClick="multiply(3,input.test)"
-            android:text="multiply(input.test,2) onClick \n multiply(3,input.test) onLongClick"/>
+            ngAndroid:ngClick="multiply(input.integer,2)"
+            ngAndroid:ngLongClick="multiply(3,input.integer)"
+            android:text="multiply(input.integer,2) onClick \n multiply(3,input.integer) onLongClick"/>
 
         <TextView
             android:layout_width="wrap_content"
