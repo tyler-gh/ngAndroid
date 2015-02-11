@@ -4,13 +4,13 @@ ngAndroid brings some of the angular directives to android xml attributes.
 
 Currently supported angular directives.
 
-[NgModel](#ngmodel)
-[NgLongClick](#nglongclick)
-[NgClick](#ngclick)
-[NgInvisible](#nginvisible)
-[NgGone](#nggone)
-[NgChange](#ngchange)
-[NgDisabled](#ngdisabled)
+[NgModel](#ngmodel)<br>
+[NgClick](#ngclick)<br>
+[NgLongClick](#nglongclick)<br>
+[NgChange](#ngchange)<br>
+[NgDisabled](#ngdisabled)<br>
+[NgInvisible](#nginvisible)<br>
+[NgGone](#nggone)<br>
 
 Directives that are on the road map
 ```
