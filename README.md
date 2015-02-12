@@ -1,6 +1,6 @@
 # ngAndroid
 
-ngAndroid brings some of the angular directives to android xml attributes.
+ngAndroid brings some of the angular directives to android xml attributes. ngandroid is still under heavy development and is probably not suitable for production code just yet, but look forwared to some wicked Android dev using ngAndroid in the future. I will have an aar up on mavencentral soon so you can start trying it out.
 
 Currently supported angular directives.
 
@@ -23,7 +23,7 @@ ngSubmit
 ngForm
 ```
 --------
-![Alt text](/../pictures/images/screencast.gif?raw=true "ngAndroid at work")
+![NgAndroid Demonstration](/../pictures/images/screencast.gif?raw=true "ngAndroid at work")
 --------
 
 <b>All examples are using this model</b>
