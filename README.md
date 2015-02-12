@@ -22,20 +22,29 @@ ngJsonSrc
 ngSubmit
 ngForm
 ```
-
+--------
+![Alt text](/../pictures/images/screencast.gif?raw=true "ngAndroid at work")
 --------
 
-##ngModel
-
+<b>All examples are using this model</b>
 ```java
 // create model
-
 public interface Input {
     public String getInput();
     public void setInput(String input);
-    ...
+    public int getInteger();
+    public void setInteger(int input);
+    public boolean getDisabled();
+    public void setDisabled(boolean disabled);
+    public boolean getGone();
+    public void setGone(boolean disabled);
+    public boolean getInvisible();
+    public void setInvisible(boolean disabled);
 }
 ```
+
+##ngModel
+
 ```xml
 <!-- add xml attributes -->
 
@@ -71,25 +80,23 @@ private Input input;
 
 With those lines of code, your view is now bound to your data model and vice versa.
 
-![Alt text](/../pictures/images/screencast.gif?raw=true "ngAndroid at work")
-
 --------
 
 ##ngClick
 
 ```xml
 <Button
-    android:id="@+id/multiplyButton"
+    android:id="@+id/stringClickEvent"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_below="@+id/really2"
+    android:layout_below="@+id/editText"
     android:layout_marginTop="20dp"
-    ngAndroid:ngClick="multiply(input.test,2)"
-    android:text="Multiply"/>
+    ngAndroid:ngClick="stringClickEvent()"
+    android:text="stringClickEvent()"/>
 ```
 ```java
-private void multiply(int num1, int num2){
-    Toast.makeText(this, String.valueOf(num1 * num2), Toast.LENGTH_SHORT).show();
+private void stringClickEvent(){
+    stringClickEvent.setText(input.getInput());
 }
 ```
 
@@ -108,7 +115,11 @@ private void multiply(int num1, int num2){
     android:text="multiply(input.integer,2) onClick \n multiply(3,input.integer) onLongClick"/>
 
 ```
-
+```java
+private void multiply(int num1, int num2){
+    Toast.makeText(this, String.valueOf(num1 * num2), Toast.LENGTH_SHORT).show();
+}
+```
 --------
 
 ##ngChange
@@ -144,7 +155,7 @@ private void onChange(){
     ngAndroid:ngDisabled="input.disabled"
     android:text="button"/>
 ```
-
+![NgDisabled Demonstration](/../pictures/images/ngdisable.gif?raw=true "ngdisabled demonstration")
 --------
 
 ##ngInvisible
@@ -162,7 +173,7 @@ private void onChange(){
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
 ```
-
+![NgInvisible Demonstration](/../pictures/images/nginvisible.gif?raw=true "nginvisible demonstration")
 --------
 
 ##ngGone
@@ -180,3 +191,4 @@ private void onChange(){
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
 ```
+![NgGone Demonstration](/../pictures/images/nggone.gif?raw=true "nggone demonstration")
