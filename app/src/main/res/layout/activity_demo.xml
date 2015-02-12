@@ -88,8 +88,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/editText"
             android:layout_marginTop="20dp"
-            ngAndroid:ngClick="clickReally()"
-            android:text="clickReally()"/>
+            ngAndroid:ngClick="stringClickEvent()"
+            android:text="stringClickEvent()"/>
 
 
         <Button
@@ -98,8 +98,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/editText2"
             android:layout_marginTop="20dp"
-            ngAndroid:ngClick="clickWithParameter(input.integer)"
-            android:text="clickWithParameter(input.integer)"/>
+            ngAndroid:ngClick="intClickEvent(input.integer)"
+            android:text="intClickEvent(input.integer)"/>
 
         <TextView
             android:layout_width="wrap_content"

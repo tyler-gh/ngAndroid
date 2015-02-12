@@ -33,12 +33,12 @@ public class DemoActivity extends Activity {
     }
 
 
-    private void clickReally(){
+    private void stringClickEvent(){
         stringClickEvent.setText(input.getInput());
     }
 
 
-    private void clickWithParameter(int num){
+    private void intClickEvent(int num){
         really2.setText(String.valueOf(num));
     }
 
