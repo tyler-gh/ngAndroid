@@ -21,6 +21,7 @@ import com.ngandroid.lib.utils.TypeUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by davityle on 1/12/15.
@@ -59,6 +60,9 @@ public class MethodInvoker {
     }
 
     public int getType(String fieldName){
-        return fieldMap.get(fieldName.toLowerCase()).getFirst();
+        Tuple<Integer, Object> tuple = fieldMap.get(fieldName.toLowerCase());
+        if(tuple == null)
+            throw new RuntimeException("Field " + fieldName + " does not exist");
+        return tuple.getFirst();
     }
 }
