@@ -106,6 +106,7 @@ public class InflaterFactory implements LayoutInflater.Factory2, LayoutInflater.
             setSettable(inflater);
             inflater.setFactory(new InflaterFactory(factory, attrArray));
         }else{
+            throw new RuntimeException();
             // TODO throw error
         }
 

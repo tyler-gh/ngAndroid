@@ -48,8 +48,8 @@ public class ExpressionBuilder<T> {
         this.tokens = tokens;
     }
 
-    public Getter<T> build(Object mModel,ModelBuilderMap builders){
-        Getter[] getters = createGetters(0, tokens.length - 1, mModel, tokens, builders).getFirst();
+    public Getter<T> build(Object scope,ModelBuilderMap builders){
+        Getter[] getters = createGetters(0, tokens.length - 1, scope, tokens, builders).getFirst();
         if(getters.length != 1){
             for(Getter g : getters)
                 System.out.println(g.getClass().getSimpleName());
@@ -94,7 +94,7 @@ public class ExpressionBuilder<T> {
         throw new RuntimeException("Ternary is not formed properly");
     }
 
-    public Tuple<Getter[], Integer> createGetters(int startIndex, int endIndex, Object mModel, Token[] tokens, ModelBuilderMap builders){
+    public Tuple<Getter[], Integer> createGetters(int startIndex, int endIndex, Object scope, Token[] tokens, ModelBuilderMap builders){
         List<Getter> getters = new ArrayList<>();
         int index = startIndex;
         while (index < endIndex){
@@ -102,7 +102,7 @@ public class ExpressionBuilder<T> {
             switch(token.getTokenType()){
                 case FUNCTION_NAME:{
                     int end = findEndOfFunction(tokens, index+2);
-                    Tuple<Getter[], Integer> values = createGetters(index+2, end,mModel, tokens, builders);
+                    Tuple<Getter[], Integer> values = createGetters(index+2, end,scope, tokens, builders);
                     Getter[] parameters = values.getFirst();
                     index = values.getSecond();
                     String functionName = token.getScript();
@@ -110,12 +110,12 @@ public class ExpressionBuilder<T> {
                     for(int i = 0; i < paramTypes.length; i++){
                         paramTypes[i] = parameters[i].getType();
                     }
-                    Method method = findMethod(functionName, mModel.getClass(), paramTypes);
-                    getters.add(new ClickInvoker(method, mModel, parameters));
+                    Method method = findMethod(functionName, scope.getClass(), paramTypes);
+                    getters.add(new ClickInvoker(method, scope, parameters));
                     break;
                 }
                 case KNOT:{
-                    Tuple<Getter[], Integer> value = createGetters(index+1, endIndex,mModel, tokens, builders);
+                    Tuple<Getter[], Integer> value = createGetters(index+1, endIndex,scope, tokens, builders);
                     KnotGetter getter = new KnotGetter(value.getFirst()[0]);
                     index = value.getSecond();
                     getters.add(getter);
@@ -148,9 +148,9 @@ public class ExpressionBuilder<T> {
                 case TERNARY_QUESTION_MARK: {
                     Getter<Boolean> getter =  getMostRecentGetter(getters, "Ternary Question mark cannot be the first expression.");
                     int ternaryColonIndex = findColon(tokens, index);
-                    Tuple<Getter[], Integer> values = createGetters(index + 1, ternaryColonIndex, mModel, tokens, builders);
+                    Tuple<Getter[], Integer> values = createGetters(index + 1, ternaryColonIndex, scope, tokens, builders);
                     Getter trueGetter = values.getFirst()[0];
-                    values = createGetters(ternaryColonIndex + 1, endIndex, mModel, tokens, builders);
+                    values = createGetters(ternaryColonIndex + 1, endIndex, scope, tokens, builders);
                     Getter falseGetter = values.getFirst()[0];
                     index = values.getSecond();
                     getters.add(new TernaryGetter(getter, trueGetter, falseGetter));
@@ -159,7 +159,7 @@ public class ExpressionBuilder<T> {
                 case BINARY_OPERATOR: {
                     Getter leftgetter =  getMostRecentGetter(getters, "Binary Operator cannot be the first expression.");
                     TokenType.BinaryOperator operator = TokenType.BinaryOperator.getOperator(token.getScript());
-                    Tuple<Getter[], Integer> values = createGetters(index + 1, endIndex, mModel, tokens, builders);
+                    Tuple<Getter[], Integer> values = createGetters(index + 1, endIndex, scope, tokens, builders);
                     Getter rightgetter = values.getFirst()[0];
                     index = values.getSecond();
                     int lefttype = leftgetter.getType();

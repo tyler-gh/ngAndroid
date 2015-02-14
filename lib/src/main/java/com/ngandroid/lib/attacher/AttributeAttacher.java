@@ -17,11 +17,9 @@
 
 package com.ngandroid.lib.attacher;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,24 +41,25 @@ import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
 import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
 import com.ngandroid.lib.ngattributes.ngmodel.NgModel;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-
 /**
  * Created by davityle on 1/13/15.
  */
 public class AttributeAttacher {
 
     private final LayoutInflater mInflater;
-    private final Object mModel;
+    private final Object mScope;
     private final SparseArray<TypedArray> mAttrArray;
     private final ModelBuilderMap mBuilders;
 
     public AttributeAttacher(final Context context, Object model) {
-        this.mModel = model;
+        this((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE), model);
+    }
+
+    public AttributeAttacher(final LayoutInflater inflater, Object scope) {
+        this.mScope = scope;
         this.mAttrArray = new SparseArray<>();
-        this.mBuilders = new ModelBuilderMap(mModel);
-        this.mInflater =(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.mBuilders = new ModelBuilderMap(mScope);
+        this.mInflater = inflater;
         InflaterFactory.setFactory(mInflater, mAttrArray);
     }
 
@@ -71,7 +70,7 @@ public class AttributeAttacher {
             for(int i = 0 ; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
                 Token[] tokens = new SyntaxParser(array.getString(attr)).parseScript();
-                Getter getter = new ExpressionBuilder(tokens).build(mModel, mBuilders);
+                Getter getter = new ExpressionBuilder(tokens).build(mScope, mBuilders);
 
                 NgAttribute attribute;
                 if(attr == R.styleable.ngAndroid_ngModel){
@@ -99,7 +98,7 @@ public class AttributeAttacher {
                 }
             }
         }
-        ModelBuilder.buildModel(mModel, mBuilders);
+        ModelBuilder.buildModel(mScope, mBuilders);
     }
     public void setContentView(Activity activity, int resourceId){
         View v = mInflater.inflate(resourceId, null);

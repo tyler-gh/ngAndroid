@@ -29,7 +29,6 @@ import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
-import com.ngandroid.lib.ngattributes.ngclick.NgClick;
 import com.ngandroid.lib.utils.TypeUtils;
 
 /**

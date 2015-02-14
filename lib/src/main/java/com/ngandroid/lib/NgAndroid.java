@@ -17,6 +17,7 @@
 package com.ngandroid.lib;
 
 import android.app.Activity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -32,19 +33,27 @@ public class NgAndroid {
         new AttributeAttacher(activity, activity).setContentView(activity, resourceId);
     }
 
-    public static void setContentView(Activity activity, int resourceId, Object model) {
-        new AttributeAttacher(activity, model).setContentView(activity, resourceId);
+    public static void setContentView(Object scope, Activity activity, int resourceId) {
+        new AttributeAttacher(activity, scope).setContentView(activity, resourceId);
     }
 
     public static View inflate(Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
-        return new AttributeAttacher(activity, activity).inflate(resourceId, viewGroup, attach);
+        return inflate(activity, activity, resourceId, viewGroup, attach);
     }
 
     public static View inflate(Activity activity, int resourceId, ViewGroup viewGroup){
-        return new AttributeAttacher(activity, activity).inflate(resourceId, viewGroup, false);
+        return inflate(activity, activity, resourceId, viewGroup, false);
     }
 
-    public static View inflate(Activity activity, int resourceId, ViewGroup viewGroup, boolean attach, Object model){
-        return new AttributeAttacher(activity, model).inflate(resourceId, viewGroup, attach);
+    public static View inflate(Object scope, Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
+        return new AttributeAttacher(activity, scope).inflate(resourceId, viewGroup, attach);
+    }
+
+    public static View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
+        return inflate(scope, inflater, resourceId, viewGroup, false);
+    }
+
+    public static View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
+        return new AttributeAttacher(inflater, scope).inflate(resourceId, viewGroup, attach);
     }
 }

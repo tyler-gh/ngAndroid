@@ -20,17 +20,11 @@ import android.view.View;
 
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
-import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
-import com.ngandroid.lib.ng.getters.ModelGetter;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.ng.getters.StaticGetter;
+import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ngattributes.nglongclick.LongClickInvoker;
 import com.ngandroid.lib.utils.TypeUtils;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 
 /**
  * Created by davityle on 1/23/15.

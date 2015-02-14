@@ -18,7 +18,6 @@ package com.ngandroid.lib.ngattributes.ngif;
 
 import android.view.View;
 
-import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.Getter;
 
 /**

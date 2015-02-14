@@ -19,7 +19,6 @@ package com.ngandroid.lib.utils;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
 
-import java.util.Objects;
 
 /**
  * Created by davityle on 1/13/15.

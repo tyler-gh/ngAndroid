@@ -23,10 +23,10 @@ import java.util.HashMap;
 * Created by davityle on 1/17/15.
 */
 public class ModelBuilderMap extends HashMap<String, ModelBuilder> {
-    private final Object model;
+    private final Object scope;
 
-    public ModelBuilderMap(Object model) {
-        this.model = model;
+    public ModelBuilderMap(Object scope) {
+        this.scope = scope;
     }
 
     @Override
@@ -36,13 +36,13 @@ public class ModelBuilderMap extends HashMap<String, ModelBuilder> {
 
         try {
             if(builder == null){
-                Field f = model.getClass().getDeclaredField(modelName);
-                builder = new ModelBuilder(f.getType(), model);
+                Field f = scope.getClass().getDeclaredField(modelName);
+                builder = new ModelBuilder(f.getType());
                 put(modelName, builder);
             }
         } catch (NoSuchFieldException e) {
             // TODO rename error
-            throw new RuntimeException("There is not a model in " + model.getClass().getSimpleName() + " called " + modelName);
+            throw new RuntimeException("There is not a model in scope '" + scope.getClass().getSimpleName() + "' called " + modelName);
         }
         return builder;
     }

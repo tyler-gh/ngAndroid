@@ -30,13 +30,13 @@ import java.lang.reflect.Method;
 public class ClickInvoker implements View.OnClickListener, Getter {
 
     private final Method mMethod;
-    private final Object mModel;
+    private final Object mScope;
     private final Getter[] mGetters;
     private final int type;
 
-    public ClickInvoker(Method method, Object model, Getter... getters) {
+    public ClickInvoker(Method method, Object scope, Getter... getters) {
         this.mMethod = method;
-        this.mModel = model;
+        this.mScope = scope;
         this.mGetters = getters;
         mMethod.setAccessible(true);
         type = TypeUtils.getType(method.getReturnType());
@@ -59,7 +59,7 @@ public class ClickInvoker implements View.OnClickListener, Getter {
             }
         }
         try {
-            return mMethod.invoke(mModel, parameters);
+            return mMethod.invoke(mScope, parameters);
         } catch (IllegalAccessException | InvocationTargetException e) {
             // TODO error
             e.printStackTrace();

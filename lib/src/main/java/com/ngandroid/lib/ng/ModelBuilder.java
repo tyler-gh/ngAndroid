@@ -38,14 +38,12 @@ public class ModelBuilder {
     private final Class mClass;
     private final Map<String, List<ModelMethod>> mMethodMap;
     private final Map<String, Tuple<Integer,Object>> mFieldMap;
-    private final Object mModel;
     private final MethodInvoker mInvocationHandler;
     private final Method[] mModelMethods;
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    public ModelBuilder(Class clzz, Object model) {
+    public ModelBuilder(Class clzz) {
         this.mClass = clzz;
-        this.mModel = model;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mMethodMap = new ArrayMap<>();
             mFieldMap = new ArrayMap<>();
@@ -92,7 +90,12 @@ public class ModelBuilder {
         int methodType = TypeUtils.STRING;
         for(Method m : mModelMethods){
             if(m.getName().toLowerCase().equals("set" + fieldNamelower)){
-                methodType = TypeUtils.getType(m.getParameterTypes()[0]);
+                Class<?>[] parameters = m.getParameterTypes();
+                if(parameters.length == 0){
+                    // TODO error
+                    throw new RuntimeException("method set" +fieldNamelower + " must have a parameter");
+                }
+                methodType = TypeUtils.getType(parameters[0]);
                 break;
             }
         }
@@ -103,20 +106,20 @@ public class ModelBuilder {
         mMethodMap.get("set" + fieldName.toLowerCase()).add(method);
     }
 
-    public static void buildModel(Object model, ModelBuilderMap map){
+    public static void buildModel(Object scope, ModelBuilderMap map){
         for(Map.Entry<String, com.ngandroid.lib.ng.ModelBuilder> entry : map.entrySet()){
-            attachDynamicField(entry.getValue().create(), entry.getKey(), model);
+            attachDynamicField(entry.getValue().create(), entry.getKey(), scope);
         }
     }
 
-    private static void attachDynamicField(Object dynamicField, String modelName, Object model){
+    private static void attachDynamicField(Object dynamicField, String modelName, Object scope){
         try {
-            Field f = model.getClass().getDeclaredField(modelName);
+            Field f = scope.getClass().getDeclaredField(modelName);
             f.setAccessible(true);
-            f.set(model, dynamicField);
+            f.set(scope, dynamicField);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             // TODO rename error
-            throw new RuntimeException("There is not a field in " + model.getClass().getSimpleName() + " called " + modelName);
+            throw new RuntimeException("There is not a field in scope '" + scope.getClass().getSimpleName() + "' called " + modelName);
         }
     }
 }

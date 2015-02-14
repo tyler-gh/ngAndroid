@@ -21,7 +21,6 @@ import com.ngandroid.lib.utils.TypeUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by davityle on 1/12/15.
