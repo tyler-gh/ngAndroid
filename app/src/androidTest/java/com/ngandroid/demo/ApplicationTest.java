@@ -4,15 +4,16 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 import android.view.View;
 
+import com.ngandroid.lib.NgAndroid;
 import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.SyntaxParser;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.interpreter.Tokenizer;
 import com.ngandroid.lib.ng.ModelBuilder;
+import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
 import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.getters.KnotGetter;
 import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
 import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
@@ -21,7 +22,6 @@ import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
 
 import java.lang.reflect.Field;
 import java.util.Queue;
-import java.util.Random;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
@@ -835,7 +835,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         public void setIsInvisible(boolean isVisible);
     }
 
-    public class TestContainer{
+    public class TestScope {
         private TestModel modelName;
         private void method(){
         }
@@ -858,10 +858,10 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testExpressionBuilder() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("modelName.joe != 'orange'");
-        TestContainer tc = new TestContainer();
+        TestScope tc = new TestScope();
         ModelBuilderMap map = new ModelBuilderMap(tc);
         try {
-            Field m = TestContainer.class.getDeclaredField("modelName");
+            Field m = TestScope.class.getDeclaredField("modelName");
             m.setAccessible(true);
             m.set(tc, map.get("modelName").create());
         } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -881,7 +881,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testFunctionExpression() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("method()");
-        TestContainer tc = new TestContainer();
+        TestScope tc = new TestScope();
         Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
         assertTrue(getter instanceof ClickInvoker);
         try {
@@ -894,7 +894,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testMethodTypeFinding() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("method('string')");
-        TestContainer tc = new TestContainer();
+        TestScope tc = new TestScope();
         Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
         assertTrue(getter instanceof ClickInvoker);
         try {
@@ -915,7 +915,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testMethodInMethod() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("method(getStringValue())");
-        TestContainer tc = new TestContainer();
+        TestScope tc = new TestScope();
         Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
         assertTrue(getter instanceof ClickInvoker);
         try {
@@ -925,7 +925,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         }
 
         builder = new ExpressionBuilder("method('Int value = ' + getIntValue())");
-        tc = new TestContainer();
+        tc = new TestScope();
         getter = builder.build(tc, new ModelBuilderMap(tc));
         assertTrue(getter instanceof ClickInvoker);
         try {
@@ -936,7 +936,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public void testKnotExpression(){
-        TestContainer tc = new TestContainer();
+        TestScope tc = new TestScope();
         Getter<Boolean> getter = new ExpressionBuilder("!isTrue()").build(tc, new ModelBuilderMap(tc));
         assertTrue(getter instanceof KnotGetter);
         try {
@@ -948,7 +948,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testNgVisible() throws Exception {
         View v = new View(testApplication);
-        TestContainer tc = new TestContainer();
+        TestScope tc = new TestScope();
         ModelBuilderMap map = new ModelBuilderMap(tc);
         Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
         NgInvisible.getInstance().attach(getter, map, v);
@@ -961,7 +961,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testNgGone() throws Exception {
         View v = new View(testApplication);
-        TestContainer tc = new TestContainer();
+        TestScope tc = new TestScope();
         ModelBuilderMap map = new ModelBuilderMap(tc);
         Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
         NgGone.getInstance().attach(getter, map, v);
@@ -992,7 +992,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testNgDisable() throws Exception {
         View v = new View(testApplication);
-        TestContainer tc = new TestContainer();
+        TestScope tc = new TestScope();
         ModelBuilderMap map = new ModelBuilderMap(tc);
         Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
         NgDisabled.getInstance().attach(getter, map, v);
@@ -1001,6 +1001,13 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(v.isEnabled());
         tc.modelName.setIsInvisible(true);
         assertFalse(v.isEnabled());
+    }
+
+    public void testModelBuild(){
+        TestScope tc = new TestScope();
+        tc.modelName = NgAndroid.buildModel(TestModel.class);
+        tc.modelName.setJoe("Frank");
+        assertEquals("Frank", tc.modelName.getJoe());
     }
 
 

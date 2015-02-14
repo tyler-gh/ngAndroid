@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ngandroid.lib.attacher.AttributeAttacher;
+import com.ngandroid.lib.ng.ModelBuilder;
 
 /**
  * Created by davityle on 1/12/15.
@@ -30,7 +31,7 @@ public class NgAndroid {
 
 
     public static void setContentView(Activity activity, int resourceId) {
-        new AttributeAttacher(activity, activity).setContentView(activity, resourceId);
+        setContentView(activity, activity, resourceId);
     }
 
     public static void setContentView(Object scope, Activity activity, int resourceId) {
@@ -55,5 +56,9 @@ public class NgAndroid {
 
     public static View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
         return new AttributeAttacher(inflater, scope).inflate(resourceId, viewGroup, attach);
+    }
+
+    public static <T> T buildModel(Class<T> clss){
+        return (T) new ModelBuilder(clss).create();
     }
 }
