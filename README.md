@@ -1,6 +1,6 @@
 # ngAndroid
 
-ngAndroid brings some of the angular directives to android xml attributes. ngandroid is still under heavy development and is probably not suitable for production code just yet, but look forwared to some wicked Android dev using ngAndroid in the future. I will have an aar up on mavencentral soon so you can start trying it out.
+ngAndroid brings some of the angular directives to android xml attributes. ngandroid is still under heavy development and is not suitable for production code just yet. However, there is a build up on maven central for anyone who wants to start trying it out `com.github.davityle:ngandroid:0.0.0.1`, There are known bugs but feel free to report any bugs that you find or suggest any api improvements.
 
 Currently supported angular directives.
 
