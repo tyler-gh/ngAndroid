@@ -241,6 +241,40 @@
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:text="NgBlur"
+            android:textSize="20sp"/>
+        <View
+            android:background="#AAA"
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="1dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/blurtv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ngAndroid:ngBlur="input.blur"
+                android:text="Blur Me"/>
+
+            <CheckBox
+                android:id="@+id/blurcb"
+                ngAndroid:ngModel="input.blur"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 </ScrollView>
