@@ -11,16 +11,14 @@ Currently supported angular directives.
 [NgDisabled](#ngdisabled)<br>
 [NgInvisible](#nginvisible)<br>
 [NgGone](#nggone)<br>
+[NgBlur](#ngblur)<br>
+[NgFocus](#ngfocus)<br>
 
 Directives that are on the road map
 ```
-ngBlur
-ngFocus
 ngRepeat
 ngSrc
 ngJsonSrc
-ngSubmit
-ngForm
 ```
 --------
 ![NgAndroid Demonstration](/../pictures/images/screencast.gif?raw=true "ngAndroid at work")
