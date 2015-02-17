@@ -36,6 +36,7 @@ import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ngattributes.ngblur.NgBlur;
 import com.ngandroid.lib.ngattributes.ngchange.NgChange;
 import com.ngandroid.lib.ngattributes.ngclick.NgClick;
+import com.ngandroid.lib.ngattributes.ngfocus.NgFocus;
 import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
 import com.ngandroid.lib.ngattributes.ngif.NgGone;
 import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
@@ -90,6 +91,8 @@ public class AttributeAttacher {
                     attribute = NgDisabled.getInstance();
                 }else if(attr == R.styleable.ngAndroid_ngBlur){
                     attribute = NgBlur.getInstance();
+                }else if(attr == R.styleable.ngAndroid_ngFocus){
+                    attribute = NgFocus.getInstance();
                 }else {
                     throw new UnsupportedOperationException("Attribute not currently implemented");
                 }

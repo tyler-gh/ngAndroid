@@ -16,4 +16,6 @@ public interface Input {
     public void setInvisible(boolean disabled);
     public void setBlur(boolean blur);
     public boolean getBlur();
+    public void setFocus(boolean focus);
+    public boolean getFocus();
 }

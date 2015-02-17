@@ -29,7 +29,6 @@ import android.support.v8.renderscript.ScriptIntrinsicBlur;
 public class BlurUtils {
     private static final float SCALE_RATIO = 5f;
     private static final float DEFAULT_BLUR_RADIUS = 5.f;
-    private static RenderScript rs;
 
     public static Bitmap blurBitmap(Bitmap bitmap, Context context){
         int width = bitmap.getWidth(), height = bitmap.getHeight();
@@ -39,7 +38,7 @@ public class BlurUtils {
 
 
     private static Bitmap blurBitmap(Bitmap src, float blurRadius, Context context){
-        rs = RenderScript.create(context);
+        RenderScript rs = RenderScript.create(context);
         Bitmap.Config conf = Bitmap.Config.ARGB_8888;
         Bitmap blurredBitmap = Bitmap.createBitmap(src.getWidth(), src.getHeight(), conf);
 

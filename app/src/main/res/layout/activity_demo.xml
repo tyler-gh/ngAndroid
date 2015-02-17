@@ -275,6 +275,39 @@
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:text="NgFocus"
+            android:textSize="20sp"/>
+        <View
+            android:background="#AAA"
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="1dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/focustv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ngAndroid:ngFocus="input.focus"/>
+
+            <CheckBox
+                android:id="@+id/focuscb"
+                ngAndroid:ngModel="input.focus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 </ScrollView>

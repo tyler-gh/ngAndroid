@@ -21,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.ng.ModelMethod;
 import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ngattributes.ngif.NgIf;
@@ -38,12 +37,6 @@ public class NgBlur extends NgIf{
     }
 
     private NgBlur() {
-    }
-
-
-    @Override
-    public void typeCheck(Token[] tokens, Getter getter) throws Exception {
-
     }
 
     @Override

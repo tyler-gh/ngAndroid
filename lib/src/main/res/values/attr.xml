@@ -27,9 +27,5 @@
         <attr name="ngSrc" format="string"/>
         <!--custom android attribute - must be used in correlation with ngModel-->
         <attr name="ngJsonSrc" format="string"/>
-        <!--https://docs.angularjs.org/api/ng/directive/ngSubmit-->
-        <attr name="ngSubmit" format="string"/>
-        <!--https://docs.angularjs.org/api/ng/directive/ngForm-->
-        <attr name="ngForm" format="string"/>
     </declare-styleable>
 </resources>
