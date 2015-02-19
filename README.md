@@ -192,3 +192,9 @@ private void onChange(){
     android:layout_height="wrap_content" />
 ```
 ![NgGone Demonstration](/../pictures/images/nggone.gif?raw=true "nggone demonstration")
+
+--------
+
+"[AngularJS logo.svg](https://github.com/angular/angular.js/tree/master/images/logo)" by [AngularJS](https://angularjs.org/) is licensed under <a rel="nofollow" class="external text" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>
+
+
