@@ -1,3 +1,5 @@
+![Android + Angular](/../pictures/images/ngandroid.png?raw=true "Android + Angular")
+
 # ngAndroid
 
 ngAndroid brings some of the angular directives to android xml attributes. ngandroid is still under heavy development and is not suitable for production code just yet. However, there is a build up on maven central for anyone who wants to start trying it out `com.github.davityle:ngandroid:0.0.0.1`, There are known bugs but feel free to report any bugs that you find or suggest any api improvements.
