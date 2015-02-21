@@ -5,7 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/AngularAndroid.iml" filepath="$PROJECT_DIR$/AngularAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/lib/lib.iml" filepath="$PROJECT_DIR$/lib/lib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ngAndroid.iml" filepath="$PROJECT_DIR$/ngAndroid.iml" />
     </modules>
   </component>
 </project>

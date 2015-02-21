@@ -121,9 +121,24 @@ public class ExpressionBuilder<T> {
                     getters.add(getter);
                     break;
                 }
-                case NUMBER_CONSTANT: {
-                    // TODO add support for floats, doubles, and longs
+                case INTEGER_CONSTANT: {
                     getters.add(new StaticGetter<>(Integer.parseInt(token.getScript()), TypeUtils.INTEGER));
+                    index++;
+                    break;
+                }
+                case LONG_CONSTANT: {
+                    String longStr = token.getScript();
+                    getters.add(new StaticGetter<>(Long.parseLong(longStr.substring(0,longStr.length() - 1)), TypeUtils.LONG));
+                    index++;
+                    break;
+                }
+                case FLOAT_CONSTANT: {
+                    getters.add(new StaticGetter<>(Float.parseFloat(token.getScript()), TypeUtils.FLOAT));
+                    index++;
+                    break;
+                }
+                case DOUBLE_CONSTANT: {
+                    getters.add(new StaticGetter<>(Double.parseDouble(token.getScript()), TypeUtils.DOUBLE));
                     index++;
                     break;
                 }

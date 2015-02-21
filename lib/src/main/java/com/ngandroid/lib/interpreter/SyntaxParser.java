@@ -72,7 +72,10 @@ public class SyntaxParser {
                 parseTernary();
                 break;
             case STRING:
-            case NUMBER_CONSTANT:
+            case INTEGER_CONSTANT:
+            case FLOAT_CONSTANT:
+            case LONG_CONSTANT:
+            case DOUBLE_CONSTANT:
             case MODEL_FIELD:
                 afterModel();
                 break;
@@ -118,7 +121,10 @@ public class SyntaxParser {
                 offerPop(TokenType.FUNCTION_NAME) ||
                 offerPop(TokenType.MODEL_NAME) ||
                 offerPop(TokenType.STRING) ||
-                offerPop(TokenType.NUMBER_CONSTANT)
+                offerPop(TokenType.INTEGER_CONSTANT) ||
+                offerPop(TokenType.FLOAT_CONSTANT) ||
+                offerPop(TokenType.DOUBLE_CONSTANT) ||
+                offerPop(TokenType.LONG_CONSTANT)
             )
         ){
             // TODO error
@@ -181,7 +187,10 @@ public class SyntaxParser {
             (
                 offerPop(TokenType.MODEL_NAME) ||
                 offerPop(TokenType.STRING) ||
-                offerPop(TokenType.NUMBER_CONSTANT) ||
+                offerPop(TokenType.INTEGER_CONSTANT) ||
+                offerPop(TokenType.FLOAT_CONSTANT) ||
+                offerPop(TokenType.DOUBLE_CONSTANT) ||
+                offerPop(TokenType.LONG_CONSTANT) ||
                 offerPop(TokenType.FUNCTION_NAME)
             )
         ){
@@ -207,7 +216,10 @@ public class SyntaxParser {
             (
                 offerPop(TokenType.MODEL_NAME) ||
                 offerPop(TokenType.FUNCTION_NAME) ||
-                offerPop(TokenType.NUMBER_CONSTANT) ||
+                offerPop(TokenType.INTEGER_CONSTANT) ||
+                offerPop(TokenType.FLOAT_CONSTANT) ||
+                offerPop(TokenType.DOUBLE_CONSTANT) ||
+                offerPop(TokenType.LONG_CONSTANT) ||
                 offerPop(TokenType.KNOT) ||
                 offerPop(TokenType.STRING)
             )

@@ -116,8 +116,8 @@
             android:layout_below="@+id/really2"
             android:layout_marginTop="20dp"
             ngAndroid:ngClick="multiply(input.integer,2)"
-            ngAndroid:ngLongClick="multiply(3,input.integer)"
-            android:text="multiply(input.integer,2) onClick \n multiply(3,input.integer) onLongClick"/>
+            ngAndroid:ngLongClick="multiply(3.75,input.integer)"
+            android:text="multiply(input.integer,2) onClick \n multiply(3.75,input.integer) onLongClick"/>
 
         <TextView
             android:layout_width="wrap_content"

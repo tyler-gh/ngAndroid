@@ -59,8 +59,63 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(2, tokenqueue.size());
 
         Token token = tokenqueue.poll();
-        assertEquals(TokenType.NUMBER_CONSTANT, token.getTokenType());
+        assertEquals(TokenType.FLOAT_CONSTANT, token.getTokenType());
         assertEquals("234.453", token.getScript());
+
+        tokenizer = new Tokenizer("234l");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.LONG_CONSTANT, token.getTokenType());
+        assertEquals("234l", token.getScript());
+
+
+        tokenizer = new Tokenizer("234L");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.LONG_CONSTANT, token.getTokenType());
+        assertEquals("234L", token.getScript());
+
+        tokenizer = new Tokenizer("234f");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.FLOAT_CONSTANT, token.getTokenType());
+        assertEquals("234f", token.getScript());
+
+        tokenizer = new Tokenizer("234D");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.DOUBLE_CONSTANT, token.getTokenType());
+        assertEquals("234D", token.getScript());
+
+        tokenizer = new Tokenizer("234.0d");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.DOUBLE_CONSTANT, token.getTokenType());
+        assertEquals("234.0d", token.getScript());
+
+        tokenizer = new Tokenizer("234.0f");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.FLOAT_CONSTANT, token.getTokenType());
+        assertEquals("234.0f", token.getScript());
     }
 
     public void testTokenizer(){
@@ -154,7 +209,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals(","));
 
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.NUMBER_CONSTANT);
+        assertTrue(token.getTokenType() == TokenType.INTEGER_CONSTANT);
         assertEquals(token.getScript(),"12345");
 
         token = tokenqueue.poll();
@@ -337,7 +392,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals("=="));
 
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.NUMBER_CONSTANT);
+        assertTrue(token.getTokenType() == TokenType.INTEGER_CONSTANT);
         assertTrue(token.getScript().equals("2"));
 
 

@@ -28,6 +28,10 @@ public class DemoActivity extends Activity {
         input.setDisabled(true);
     }
 
+    private void multiply(float num1, int num2){
+        Toast.makeText(this, String.valueOf(num1 * num2), Toast.LENGTH_SHORT).show();
+    }
+
     private void multiply(int num1, int num2){
         Toast.makeText(this, String.valueOf(num1 * num2), Toast.LENGTH_SHORT).show();
     }
