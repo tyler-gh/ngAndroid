@@ -37,6 +37,10 @@ public class SyntaxParser {
                     offerPop(TokenType.KNOT) ||
                     offerPop(TokenType.MODEL_NAME) ||
                     offerPop(TokenType.FUNCTION_NAME) ||
+                    offerPop(TokenType.INTEGER_CONSTANT) ||
+                    offerPop(TokenType.FLOAT_CONSTANT) ||
+                    offerPop(TokenType.DOUBLE_CONSTANT) ||
+                    offerPop(TokenType.LONG_CONSTANT) ||
                     offerPop(TokenType.EOF)
                 )
         ) {

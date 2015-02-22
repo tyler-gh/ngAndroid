@@ -933,6 +933,35 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         fgetter = builder.build(tc, map);
         assertEquals(42.0f, fgetter.get());
 
+        builder = new ExpressionBuilder("getIntValue() + 1*5.0 - 2");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        fgetter = builder.build(tc, map);
+        assertEquals(45.0f, fgetter.get());
+
+
+        builder = new ExpressionBuilder("10d + 25f/5 - getIntValue() + 1*5.0 - 2");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        Getter<Double> dgetter = builder.build(tc, map);
+        printClass((BinaryOperatorGetter) dgetter);
+        assertEquals(-24d, dgetter.get());
+    }
+
+    private void printClass(BinaryOperatorGetter getter){
+        System.out.print(getter.getClass().getSimpleName() + " is the parent of ");
+
+        System.out.print(getter.getLeftSide().getClass().getSimpleName());
+        System.out.print(" and ");
+        System.out.print(getter.getRightSide().getClass().getSimpleName());
+        System.out.println();
+        Getter left = getter.getLeftSide();
+        Getter right = getter.getRightSide();
+
+        if(left instanceof  BinaryOperatorGetter)
+            printClass((BinaryOperatorGetter)left);
+        if(right instanceof BinaryOperatorGetter)
+            printClass((BinaryOperatorGetter)right);
     }
 
 

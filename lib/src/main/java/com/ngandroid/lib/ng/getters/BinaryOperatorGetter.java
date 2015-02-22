@@ -22,7 +22,7 @@ import com.ngandroid.lib.utils.TypeUtils;
 /**
  * Created by tyler on 2/6/15.
  */
-public abstract class BinaryOperatorGetter implements Getter {
+public abstract class BinaryOperatorGetter<T> implements Getter<T> {
 
     protected final Getter leftSide;
     protected final Getter rightSide;
@@ -40,17 +40,53 @@ public abstract class BinaryOperatorGetter implements Getter {
         return type;
     }
 
+    @Override
+    public final T get() throws Throwable{
+        T t = operate();
+        System.out.println(t);
+        return t;
+    }
+
+    protected abstract T operate() throws Throwable;
+
     public static  BinaryOperatorGetter getOperator(Getter leftSide, Getter rightSide, int type, TokenType.BinaryOperator operator){
         switch(operator){
             case ADDITION:
+                if(rightSide instanceof SubtractionOperator){
+                    SubtractionOperator subOp = (SubtractionOperator) rightSide;
+                    AdditionOperator addOp = new AdditionOperator(leftSide, subOp.getLeftSide(), type, operator);
+                    return new SubtractionOperator(addOp, subOp.getRightSide(), subOp.getType(), subOp.operator);
+                }
                 return new AdditionOperator(leftSide, rightSide, type, operator);
             case SUBTRACTION:
                 return new SubtractionOperator(leftSide, rightSide, type, operator);
             case KNOT_EQUALS:
                 return new NotEqualOperator(leftSide, rightSide, type, operator);
             case MULTIPLICATION:
+                if(rightSide instanceof AdditionOperator){
+                    AdditionOperator addOp = (AdditionOperator) rightSide;
+                    MultiplicationOperator mulOp = new MultiplicationOperator(leftSide, addOp.getLeftSide(), type, operator);
+                    return new AdditionOperator(mulOp, addOp.getRightSide(), addOp.getType(), addOp.operator);
+                }
+                if(rightSide instanceof SubtractionOperator){
+                    SubtractionOperator subopOp = (SubtractionOperator) rightSide;
+                    MultiplicationOperator mulOp = new MultiplicationOperator(leftSide, subopOp.getLeftSide(), type, operator);
+                    return new SubtractionOperator(mulOp, subopOp.getRightSide(), subopOp.getType(), subopOp.operator);
+                }
                 return new MultiplicationOperator(leftSide, rightSide, type, operator);
             case DIVISION:
+                // TODO clean up this code
+                // A not very clean way of operator precedence
+                if(rightSide instanceof AdditionOperator){
+                    AdditionOperator addOp = (AdditionOperator) rightSide;
+                    DivisionOperator divOp = new DivisionOperator(leftSide, addOp.getLeftSide(), type, operator);
+                    return new AdditionOperator(divOp, addOp.getRightSide(), addOp.getType(), addOp.operator);
+                }
+                if(rightSide instanceof SubtractionOperator){
+                    SubtractionOperator subopOp = (SubtractionOperator) rightSide;
+                    DivisionOperator divOp = new DivisionOperator(leftSide, subopOp.getLeftSide(), type, operator);
+                    return new SubtractionOperator(divOp, subopOp.getRightSide(), subopOp.getType(), subopOp.operator);
+                }
                 return new DivisionOperator(leftSide, rightSide, type, operator);
             case EQUALS_EQUALS:
                 return new EqualOperator(leftSide, rightSide, type, operator);
@@ -65,7 +101,7 @@ public abstract class BinaryOperatorGetter implements Getter {
         }
 
         @Override
-        public Object get() throws Throwable {
+        public Object operate() throws Throwable {
             switch (type) {
                 case TypeUtils.INTEGER:
                     return ((Number)leftSide.get()).intValue() + ((Number)rightSide.get()).intValue();
@@ -96,7 +132,7 @@ public abstract class BinaryOperatorGetter implements Getter {
         }
 
         @Override
-        public Object get() throws Throwable {
+        public Object operate() throws Throwable {
             switch (type) {
                 case TypeUtils.INTEGER:
                     return ((Number)leftSide.get()).intValue() - ((Number)rightSide.get()).intValue();
@@ -122,23 +158,23 @@ public abstract class BinaryOperatorGetter implements Getter {
     }
 
     private static class NotEqualOperator extends EqualOperator{
-        public NotEqualOperator(Getter<Boolean> leftSide, Getter<Boolean> rightSide, int type, TokenType.BinaryOperator operator) {
+        public NotEqualOperator(Getter leftSide, Getter rightSide, int type, TokenType.BinaryOperator operator) {
             super(leftSide, rightSide, type, operator);
         }
 
         @Override
-        public Boolean get() throws Throwable {
+        public Boolean operate() throws Throwable {
             return !super.get();
         }
     }
 
-    private static class EqualOperator extends BinaryOperatorGetter{
-        public EqualOperator(Getter<Boolean> leftSide, Getter<Boolean> rightSide, int type, TokenType.BinaryOperator operator) {
+    private static class EqualOperator extends BinaryOperatorGetter<Boolean>{
+        public EqualOperator(Getter leftSide, Getter rightSide, int type, TokenType.BinaryOperator operator) {
             super(leftSide, rightSide, type, operator);
         }
 
         @Override
-        public Boolean get() throws Throwable {
+        public Boolean operate() throws Throwable {
             Object leftValue = leftSide.get();
             if(leftValue == null)
                 return rightSide.get() == null;
@@ -152,7 +188,7 @@ public abstract class BinaryOperatorGetter implements Getter {
         }
 
         @Override
-        public Object get() throws Throwable {
+        public Object operate() throws Throwable {
             switch (type) {
                 case TypeUtils.INTEGER:
                     return ((Number)leftSide.get()).intValue() * ((Number)rightSide.get()).intValue();
@@ -183,7 +219,7 @@ public abstract class BinaryOperatorGetter implements Getter {
         }
 
         @Override
-        public Object get() throws Throwable {
+        public Object operate() throws Throwable {
             switch (type) {
                 case TypeUtils.INTEGER:
                     return ((Number)leftSide.get()).intValue() / ((Number)rightSide.get()).intValue();
