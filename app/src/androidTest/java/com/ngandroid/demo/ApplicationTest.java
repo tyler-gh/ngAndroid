@@ -911,6 +911,93 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         }
     }
 
+
+    public void testNumericAdditions() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("getIntValue() + 2 - 10/5");
+        TestScope tc = new TestScope();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter<Integer> getter = builder.build(tc, map);
+        assertEquals(42, (int)getter.get());
+
+
+        builder = new ExpressionBuilder("getIntValue() + 2 - 10/5.0");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        Getter<Float> fgetter = builder.build(tc, map);
+        assertEquals(42.0f, fgetter.get());
+
+        // this is  a serious issue....
+        builder = new ExpressionBuilder("getIntValue() + 10/5.0 - 2");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        fgetter = builder.build(tc, map);
+        assertEquals(42.0f, fgetter.get());
+
+    }
+
+
+
+    public void testStringAdditions() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("getStringValue() + 'orange ' + getIntValue()");
+        TestScope tc = new TestScope();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter<String> getter = builder.build(tc, map);
+        assertEquals("This is a string value orange 42", getter.get());
+
+        builder = new ExpressionBuilder("getStringValue() + getIntValue()");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals("This is a string value 42", getter.get());
+
+        builder = new ExpressionBuilder("getIntValue() + getStringValue()");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals("42This is a string value ", getter.get());
+
+        builder = new ExpressionBuilder("isTrue() ? 'abcdefg ' + getIntValue() : getStringValue()");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals("abcdefg 42", getter.get());
+
+        builder = new ExpressionBuilder("isTrue() ? getStringValue() + getIntValue() : getStringValue()");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals("This is a string value 42", getter.get());
+
+        builder = new ExpressionBuilder("modelName.joe + 'orange'");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        try {
+            Field m = TestScope.class.getDeclaredField("modelName");
+            m.setAccessible(true);
+            m.set(tc, map.get("modelName").create());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            fail();
+        }
+        tc.modelName.setJoe("joe");
+        assertEquals("joeorange", getter.get());
+
+        builder = new ExpressionBuilder("modelName.joe + getIntValue()");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        try {
+            Field m = TestScope.class.getDeclaredField("modelName");
+            m.setAccessible(true);
+            m.set(tc, map.get("modelName").create());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            fail();
+        }
+        tc.modelName.setJoe("joe");
+        assertEquals("joe42", getter.get());
+    }
+
+
     public void testExpressionBuilder() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("modelName.joe != 'orange'");
         TestScope tc = new TestScope();

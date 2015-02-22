@@ -51,8 +51,6 @@ public class ExpressionBuilder<T> {
     public Getter<T> build(Object scope,ModelBuilderMap builders){
         Getter[] getters = createGetters(0, tokens.length - 1, scope, tokens, builders).getFirst();
         if(getters.length != 1){
-            for(Getter g : getters)
-                System.out.println(g.getClass().getSimpleName());
             throw new RuntimeException("Each expression can only return one value instead found "+ getters.length);
         }
         return (Getter<T>) getters[0];
@@ -180,12 +178,19 @@ public class ExpressionBuilder<T> {
                     int lefttype = leftgetter.getType();
                     int righttype = rightgetter.getType();
                     int type;
+                    if((righttype == TypeUtils.BOOLEAN || righttype == TypeUtils.OBJECT) || (lefttype == TypeUtils.BOOLEAN || lefttype == TypeUtils.OBJECT))
+                        throw new RuntimeException("Types " + lefttype + " and " + righttype + " cannot be compared");
+
                     if(lefttype == TypeUtils.STRING || righttype == TypeUtils.STRING){
                         type = TypeUtils.STRING;
+                    }else if(lefttype == TypeUtils.DOUBLE || righttype == TypeUtils.DOUBLE){
+                        type = TypeUtils.DOUBLE;
+                    }else if(lefttype == TypeUtils.FLOAT || righttype == TypeUtils.FLOAT){
+                        type = TypeUtils.FLOAT;
+                    }else if(lefttype == TypeUtils.LONG || righttype == TypeUtils.LONG){
+                        type = TypeUtils.LONG;
                     }else{
-                        if(lefttype != righttype)
-                            throw new RuntimeException("Types " + lefttype + " & " + righttype + " cannot be compared");
-                        type = lefttype;
+                        type = TypeUtils.INTEGER;
                     }
                     getters.add(BinaryOperatorGetter.getOperator(leftgetter, rightgetter, type, operator));
                     break;
