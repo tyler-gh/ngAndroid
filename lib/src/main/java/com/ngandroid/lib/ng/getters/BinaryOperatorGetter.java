@@ -41,10 +41,13 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
     }
 
     @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
+
+    @Override
     public final T get() throws Throwable{
-        T t = operate();
-        System.out.println(t);
-        return t;
+        return operate();
     }
 
     protected abstract T operate() throws Throwable;
@@ -52,41 +55,14 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
     public static  BinaryOperatorGetter getOperator(Getter leftSide, Getter rightSide, int type, TokenType.BinaryOperator operator){
         switch(operator){
             case ADDITION:
-                if(rightSide instanceof SubtractionOperator){
-                    SubtractionOperator subOp = (SubtractionOperator) rightSide;
-                    AdditionOperator addOp = new AdditionOperator(leftSide, subOp.getLeftSide(), type, operator);
-                    return new SubtractionOperator(addOp, subOp.getRightSide(), subOp.getType(), subOp.operator);
-                }
                 return new AdditionOperator(leftSide, rightSide, type, operator);
             case SUBTRACTION:
                 return new SubtractionOperator(leftSide, rightSide, type, operator);
             case KNOT_EQUALS:
                 return new NotEqualOperator(leftSide, rightSide, type, operator);
             case MULTIPLICATION:
-                if(rightSide instanceof AdditionOperator){
-                    AdditionOperator addOp = (AdditionOperator) rightSide;
-                    MultiplicationOperator mulOp = new MultiplicationOperator(leftSide, addOp.getLeftSide(), type, operator);
-                    return new AdditionOperator(mulOp, addOp.getRightSide(), addOp.getType(), addOp.operator);
-                }
-                if(rightSide instanceof SubtractionOperator){
-                    SubtractionOperator subopOp = (SubtractionOperator) rightSide;
-                    MultiplicationOperator mulOp = new MultiplicationOperator(leftSide, subopOp.getLeftSide(), type, operator);
-                    return new SubtractionOperator(mulOp, subopOp.getRightSide(), subopOp.getType(), subopOp.operator);
-                }
                 return new MultiplicationOperator(leftSide, rightSide, type, operator);
             case DIVISION:
-                // TODO clean up this code
-                // A not very clean way of operator precedence
-                if(rightSide instanceof AdditionOperator){
-                    AdditionOperator addOp = (AdditionOperator) rightSide;
-                    DivisionOperator divOp = new DivisionOperator(leftSide, addOp.getLeftSide(), type, operator);
-                    return new AdditionOperator(divOp, addOp.getRightSide(), addOp.getType(), addOp.operator);
-                }
-                if(rightSide instanceof SubtractionOperator){
-                    SubtractionOperator subopOp = (SubtractionOperator) rightSide;
-                    DivisionOperator divOp = new DivisionOperator(leftSide, subopOp.getLeftSide(), type, operator);
-                    return new SubtractionOperator(divOp, subopOp.getRightSide(), subopOp.getType(), subopOp.operator);
-                }
                 return new DivisionOperator(leftSide, rightSide, type, operator);
             case EQUALS_EQUALS:
                 return new EqualOperator(leftSide, rightSide, type, operator);
@@ -111,10 +87,6 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
                     return ((Number)leftSide.get()).doubleValue() + ((Number)rightSide.get()).doubleValue();
                 case TypeUtils.FLOAT:
                     return ((Number)leftSide.get()).floatValue() + ((Number)rightSide.get()).floatValue();
-//                case TypeUtils.SHORT:
-//                    return (Short)leftSide.get() + (Short)rightSide.get();
-//                case TypeUtils.BYTE:
-//                    return(Byte)leftSide.get() + (Byte)rightSide.get();
                 case TypeUtils.BOOLEAN:
                     throw new RuntimeException("You cannot add a boolean");
                 case TypeUtils.STRING:
@@ -142,10 +114,6 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
                     return ((Number)leftSide.get()).doubleValue() - ((Number)rightSide.get()).doubleValue();
                 case TypeUtils.FLOAT:
                     return ((Number)leftSide.get()).floatValue() - ((Number)rightSide.get()).floatValue();
-//                case TypeUtils.SHORT:
-//                    return (Short)leftSide.get() - (Short)rightSide.get();
-//                case TypeUtils.BYTE:
-//                    return(Byte)leftSide.get() - (Byte)rightSide.get();
                 case TypeUtils.BOOLEAN:
                     throw new RuntimeException("You cannot subtract a boolean");
                 case TypeUtils.STRING:
@@ -164,7 +132,7 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
 
         @Override
         public Boolean operate() throws Throwable {
-            return !super.get();
+            return !super.operate();
         }
     }
 
@@ -198,10 +166,6 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
                     return ((Number)leftSide.get()).doubleValue() * ((Number)rightSide.get()).doubleValue();
                 case TypeUtils.FLOAT:
                     return ((Number)leftSide.get()).floatValue() * ((Number)rightSide.get()).floatValue();
-//                case TypeUtils.SHORT:
-//                    return (Short)leftSide.get() * (Short)rightSide.get();
-//                case TypeUtils.BYTE:
-//                    return(Byte)leftSide.get() * (Byte)rightSide.get();
                 case TypeUtils.BOOLEAN:
                     throw new RuntimeException("You cannot multiply a boolean");
                 case TypeUtils.STRING:
@@ -229,10 +193,6 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
                     return ((Number)leftSide.get()).doubleValue() / ((Number)rightSide.get()).doubleValue();
                 case TypeUtils.FLOAT:
                     return ((Number)leftSide.get()).floatValue() / ((Number)rightSide.get()).floatValue();
-//                case TypeUtils.SHORT:
-//                    return (Short)leftSide.get() / (Short)rightSide.get();
-//                case TypeUtils.BYTE:
-//                    return(Byte)leftSide.get() / (Byte)rightSide.get();
                 case TypeUtils.BOOLEAN:
                     throw new RuntimeException("You cannot divide a boolean");
                 case TypeUtils.STRING:

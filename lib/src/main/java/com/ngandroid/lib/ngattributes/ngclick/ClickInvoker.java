@@ -75,4 +75,9 @@ public class ClickInvoker implements View.OnClickListener, Getter {
     public int getReturnType(){
         return type;
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(get());
+    }
 }

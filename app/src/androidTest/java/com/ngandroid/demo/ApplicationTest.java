@@ -888,6 +888,8 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         public void setJoe(String joe);
         public boolean getIsinvisible();
         public void setIsInvisible(boolean isVisible);
+        public int getNum();
+        public void setNum(int num);
     }
 
     public class TestScope {
@@ -944,24 +946,25 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         tc = new TestScope();
         map = new ModelBuilderMap(tc);
         Getter<Double> dgetter = builder.build(tc, map);
-        printClass((BinaryOperatorGetter) dgetter);
         assertEquals(-24d, dgetter.get());
-    }
 
-    private void printClass(BinaryOperatorGetter getter){
-        System.out.print(getter.getClass().getSimpleName() + " is the parent of ");
-
-        System.out.print(getter.getLeftSide().getClass().getSimpleName());
-        System.out.print(" and ");
-        System.out.print(getter.getRightSide().getClass().getSimpleName());
-        System.out.println();
-        Getter left = getter.getLeftSide();
-        Getter right = getter.getRightSide();
-
-        if(left instanceof  BinaryOperatorGetter)
-            printClass((BinaryOperatorGetter)left);
-        if(right instanceof BinaryOperatorGetter)
-            printClass((BinaryOperatorGetter)right);
+        builder = new ExpressionBuilder("10d + 25f/5 - getIntValue() + 1*5.0 - 2*modelName.num");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        dgetter = builder.build(tc, map);
+        try {
+            Field m = TestScope.class.getDeclaredField("modelName");
+            m.setAccessible(true);
+            m.set(tc, map.get("modelName").create());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            fail();
+        }
+        tc.modelName.setNum(1);
+        assertEquals(-24d, dgetter.get());
+        tc.modelName.setNum(2);
+        assertEquals(-26d, dgetter.get());
+        tc.modelName.setNum(3);
+        assertEquals(-28d, dgetter.get());
     }
 
 
