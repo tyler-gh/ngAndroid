@@ -961,6 +961,28 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         getter = builder.build(tc, map);
         assertEquals(-11, (int)getter.get());
 
+        builder = new ExpressionBuilder("(3 - (2+7)) - 10/(5-3)");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals(-11, (int)getter.get());
+
+        builder = new ExpressionBuilder("(modelName.num - (2*(7-1))) - 10/(modelName.num-3)");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        Field m = TestScope.class.getDeclaredField("modelName");
+        m.setAccessible(true);
+        m.set(tc, map.get("modelName").create());
+        tc.modelName.setNum(1);
+        assertEquals(-6, (int)getter.get());
+        tc.modelName.setNum(-12);
+        assertEquals(-24, (int)getter.get());
+        tc.modelName.setNum(1);
+        assertEquals(-6, (int)getter.get());
+        tc.modelName.setNum(24);
+        assertEquals(12, (int)getter.get());
+
     }
 
 
@@ -1009,7 +1031,6 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         Getter<Float> fgetter = builder.build(tc, map);
         assertEquals(42.0f, fgetter.get());
 
-        // this is  a serious issue....
         builder = new ExpressionBuilder("getIntValue() + 10/5.0 - 2");
         tc = new TestScope();
         map = new ModelBuilderMap(tc);
