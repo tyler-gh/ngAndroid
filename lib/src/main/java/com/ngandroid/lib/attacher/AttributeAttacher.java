@@ -72,7 +72,6 @@ public class AttributeAttacher {
             for(int i = 0 ; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
                 String value = array.getString(attr);
-                System.out.println(value);
                 Token[] tokens = new SyntaxParser(value).parseScript();
                 Getter getter = new ExpressionBuilder(tokens).build(mScope, mBuilders);
 

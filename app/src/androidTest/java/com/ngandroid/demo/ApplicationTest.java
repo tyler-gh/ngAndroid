@@ -20,6 +20,9 @@ import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
 import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
 import com.ngandroid.lib.ngattributes.ngif.NgGone;
 import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
+import com.ngandroid.lib.utils.JsonUtils;
+
+import org.json.JSONException;
 
 import java.lang.reflect.Field;
 import java.util.Queue;
@@ -986,15 +989,47 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     }
 
-    public static class TextBugScope{
+    public static class TestBugScope {
         private Input input;
         private void multiply(int x, int y){
 
         }
     }
 
+    public static interface TestJsonModel{
+        public int getInt();
+        public void setInt(int i);
+        public float getFloat();
+        public void setFloat(float f);
+        public double getDouble();
+        public void setDouble(double d);
+        public String getString();
+        public void setString(String s);
+        public boolean getBoolean();
+        public void setBoolean(boolean b);
+    }
+
+    public void testBuildModelFromJson() throws JSONException {
+        String json = "{ \"joe\" : \"xyz\", \"isInvisible\" : false, \"num\" : 10 }";
+        TestModel model = JsonUtils.buildModelFromJson(json, TestModel.class);
+        assertEquals("xyz", model.getJoe());
+        assertEquals(false, model.getIsinvisible());
+        assertEquals(10, model.getNum());
+
+        json = "{ \"int\" : 25, \"float\" : 1.72, \"double\" : 0.0078 , \"string\" : \"string value\", \"boolean\" : false }";
+
+        TestJsonModel jsonmodel = JsonUtils.buildModelFromJson(json, TestJsonModel.class);
+        assertEquals(25, jsonmodel.getInt());
+        assertEquals(1.72f, jsonmodel.getFloat());
+        assertEquals(0.0078, jsonmodel.getDouble());
+        assertEquals("string value", jsonmodel.getString());
+        assertEquals(false, jsonmodel.getBoolean());
+
+
+    }
+
     public void testBug(){
-        TextBugScope tc = new TextBugScope();
+        TestBugScope tc = new TestBugScope();
         ModelBuilderMap map = new ModelBuilderMap(tc);
         Getter getter = new ExpressionBuilder("multiply(input.integer,2)").build(tc, map);
 

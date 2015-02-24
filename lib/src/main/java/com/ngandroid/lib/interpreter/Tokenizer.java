@@ -266,7 +266,6 @@ public class Tokenizer {
                 return State.STRING_SLASH_END;
             }
             if(state == State.STRING_SLASH_END) {
-                System.out.println(peek());
                 return State.IN_STRING;
             }
 

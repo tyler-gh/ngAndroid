@@ -44,7 +44,6 @@ public class SetTextWhenChangedListener implements TextWatcher {
         try {
             str = editable.toString();
             value = TypeUtils.fromStringEmptyStringIfEmpty(mMethodType, str);
-            System.out.println(value.getClass().getSimpleName());
         } catch (Throwable e) {
             // TODO handle error | this replace does not actually work
             editable.replace(0, editable.length(), mValidText);

@@ -71,6 +71,14 @@ public class ModelBuilder {
         return Proxy.newProxyInstance(mClass.getClassLoader(), new Class[]{mClass}, new Model(mInvocationHandler));
     }
 
+    public boolean hasField(String fieldNamelower){
+        return mFieldMap.containsKey(fieldNamelower);
+    }
+
+    public int getFieldType(String fieldNamelower){
+        return mFieldMap.get(fieldNamelower).getFirst();
+    }
+
     public void setField(String fieldNamelower, int type,  Object defaultValue) {
         mFieldMap.put(fieldNamelower, Tuple.of(type, defaultValue));
     }
