@@ -77,53 +77,14 @@ public class NgModel implements NgAttribute {
         builder.addSetObserver(fieldName, compundButtonInteracter);
     }
 
-    private static final class CompundButtonInteracter implements CompoundButton.OnCheckedChangeListener, ModelMethod {
-        private final ModelSetter modelSetter;
-        private final CompoundButton compoundButton;
-        private boolean isFromSelf;
-
-        private CompundButtonInteracter(ModelSetter modelSetter, CompoundButton compoundButton) {
-            this.modelSetter = modelSetter;
-            this.compoundButton = compoundButton;
-        }
-
-        @Override
-        public Object invoke(String fieldName, Object... args) {
-            try{
-                if(!isFromSelf){
-                    isFromSelf = true;
-                    Boolean b = (Boolean) args[0];
-                    compoundButton.setChecked(b);
-                }
-            }finally {
-                isFromSelf = false;
-            }
-            return null;
-        }
-
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            try {
-                if(!isFromSelf) {
-                    isFromSelf = true;
-                    modelSetter.set(isChecked);
-                }
-            } catch (Throwable throwable) {
-                // TODO - error
-                throwable.printStackTrace();
-            }finally {
-                isFromSelf = false;
-            }
-        }
-    }
-
 
     private void bindModelToTextView(ModelGetter getter, final TextView textView, ModelBuilder builder) throws Throwable {
         final String fieldNamelower = getter.getFieldName();
         String defaultText =  textView.getText().toString();
         int methodType = getter.getType();
         ModelSetter setter = new ModelSetter(fieldNamelower, builder.getMethodInvoker());
-        setter.set(TypeUtils.fromString(methodType, defaultText));
+        if(!defaultText.isEmpty())
+            setter.set(TypeUtils.fromString(methodType, defaultText));
         final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(setter, methodType);
         textView.addTextChangedListener(setTextWhenChangedListener);
         // TODO clean this up

@@ -71,7 +71,9 @@ public class AttributeAttacher {
             TypedArray array = mAttrArray.get(id);
             for(int i = 0 ; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
-                Token[] tokens = new SyntaxParser(array.getString(attr)).parseScript();
+                String value = array.getString(attr);
+                System.out.println(value);
+                Token[] tokens = new SyntaxParser(value).parseScript();
                 Getter getter = new ExpressionBuilder(tokens).build(mScope, mBuilders);
 
                 NgAttribute attribute;

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 import android.view.View;
 
+import com.ngandroid.demo.models.Input;
 import com.ngandroid.lib.NgAndroid;
 import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.SyntaxParser;
@@ -983,6 +984,21 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         tc.modelName.setNum(24);
         assertEquals(12, (int)getter.get());
 
+    }
+
+    public static class TextBugScope{
+        private Input input;
+        private void multiply(int x, int y){
+
+        }
+    }
+
+    public void testBug(){
+        TextBugScope tc = new TextBugScope();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter getter = new ExpressionBuilder("multiply(input.integer,2)").build(tc, map);
+
+        //multiply(input.integer,2)
     }
 
 

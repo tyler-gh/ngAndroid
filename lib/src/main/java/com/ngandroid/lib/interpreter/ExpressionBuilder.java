@@ -129,7 +129,7 @@ public class ExpressionBuilder<T> {
                         int nextIndex = findEndOfParameter(tokens, index);
                         Tuple<Getter, Integer> values = createGetter(index, nextIndex, scope, tokens, builders);
                         parameters.add(values.getFirst());
-                        index = values.getSecond();
+                        index = values.getSecond() + 1;
                     }
                     String functionName = token.getScript();
                     int[] paramTypes = new int[parameters.size()];
