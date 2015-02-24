@@ -882,6 +882,87 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         }catch(Exception ignored){}
     }
 
+    public void testStringSlash(){
+        Tokenizer tokenizer = new Tokenizer("'\\''");
+        Queue<Token> tokens = tokenizer.getTokens();
+        assertEquals(2, tokens.size());
+        assertEquals("'''", tokens.poll().getScript());
+    }
+
+
+    public void testNestedExpressions() throws Throwable {
+
+        Tokenizer tokenizer = new Tokenizer("(3 + 2) - 10/5");
+        Queue<Token> tokens = tokenizer.getTokens();
+        assertEquals(10, tokens.size());
+        assertEquals(TokenType.OPEN_PARENTHESIS_EXP, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.CLOSE_PARENTHESIS, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+
+        tokenizer = new Tokenizer("(3 + (2)) - 10/5");
+        tokens = tokenizer.getTokens();
+
+        assertEquals(12, tokens.size());
+        assertEquals(TokenType.OPEN_PARENTHESIS_EXP, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.OPEN_PARENTHESIS_EXP, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.CLOSE_PARENTHESIS, tokens.poll().getTokenType());
+        assertEquals(TokenType.CLOSE_PARENTHESIS, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+
+        SyntaxParser parser = new SyntaxParser("(3 + (2)) - 10/5");
+        Token[] tks = parser.parseScript();
+        assertEquals(12, tks.length);
+        assertEquals(TokenType.OPEN_PARENTHESIS_EXP, tks[0].getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tks[1].getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tks[2].getTokenType());
+        assertEquals(TokenType.OPEN_PARENTHESIS_EXP, tks[3].getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tks[4].getTokenType());
+        assertEquals(TokenType.CLOSE_PARENTHESIS, tks[5].getTokenType());
+        assertEquals(TokenType.CLOSE_PARENTHESIS, tks[6].getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tks[7].getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tks[8].getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tks[9].getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tks[10].getTokenType());
+
+
+        ExpressionBuilder builder = new ExpressionBuilder("(3 + (2)) - 10/5");
+        TestScope tc = new TestScope();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter<Integer> getter = builder.build(tc, map);
+        assertEquals(3, (int)getter.get());
+
+        builder = new ExpressionBuilder("(3 - (2)) - 10/5");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals(-1, (int)getter.get());
+
+        builder = new ExpressionBuilder("(3 - (2+7)) - 10/5");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals(-8, (int)getter.get());
+
+        builder = new ExpressionBuilder("(3 - (2+7)) - 10/(5-3)");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals(-11, (int)getter.get());
+
+    }
+
 
     public static interface TestModel{
         public String getJoe();

@@ -31,7 +31,7 @@ public class Tokenizer {
         END,
         MODEL_PERIOD,
         FUNCTION_PARAMETER_START,
-        FUNCTION_PARAMETER_END,
+        CLOSE_PARENTHESIS,
         TERNARY_QUESTION,
         TERNARY_COLON,
         STRING_START,
@@ -56,7 +56,10 @@ public class Tokenizer {
         DOUBLE_END,
         INTEGER_END,
         LONG_END,
-        FLOAT_F_END, SHORT_END
+        NESTED_EXPRESSION,
+        IN_STRING_SLASH,
+        STRING_SLASH_END,
+        FLOAT_F_END
     }
 
     private int index, readIndex;
@@ -96,7 +99,18 @@ public class Tokenizer {
         switch (state){
             case BEGIN:
             case EQUALS_START:
+                result = getNextState();
+                break;
             case IN_STRING:
+                if(peek() == '\\'){
+                    result = State.IN_STRING_SLASH;
+                }else
+                    result = getNextState();
+                break;
+            case IN_STRING_SLASH:
+                result = getNextState();
+                break;
+            case STRING_SLASH_END:
                 result = getNextState();
                 break;
             case IN_CHAR_SEQUENCE: {
@@ -133,7 +147,7 @@ public class Tokenizer {
                 emit(TokenType.OPEN_PARENTHESIS);
                 result = getNextState();
                 break;
-            case FUNCTION_PARAMETER_END:
+            case CLOSE_PARENTHESIS:
                 emit(TokenType.CLOSE_PARENTHESIS);
                 result = getNextState();
                 break;
@@ -205,6 +219,10 @@ public class Tokenizer {
                     result = getNextState();
                 }
                 break;
+            case NESTED_EXPRESSION:
+                emit(TokenType.OPEN_PARENTHESIS_EXP);
+                result = getNextState();
+                break;
             case KNOT_EQUALS_START:
                 if(peek() != '='){
                     result = State.KNOT_VALUE;
@@ -242,6 +260,16 @@ public class Tokenizer {
                 return State.END;
             }
 
+            if(state == State.IN_STRING_SLASH) {
+                script = script.substring(0, index) + script.substring(index + 1, script.length());
+                index--;
+                return State.STRING_SLASH_END;
+            }
+            if(state == State.STRING_SLASH_END) {
+                System.out.println(peek());
+                return State.IN_STRING;
+            }
+
             char currentCharacter = script.charAt(index);
 
             if(state == State.IN_STRING && currentCharacter != '\'')
@@ -264,6 +292,7 @@ public class Tokenizer {
                     case FUNCTION_PARAMETER_DELIMINATOR:
                     case EQUALS:
                     case KNOT_EQUALS:
+                    case NESTED_EXPRESSION:
                         return State.IN_NUMBER_CONSTANT;
                     default:
                         // TODO error
@@ -287,6 +316,7 @@ public class Tokenizer {
                     case FUNCTION_PARAMETER_START:
                     case FUNCTION_PARAMETER_DELIMINATOR:
                     case EQUALS:
+                    case NESTED_EXPRESSION:
                     case KNOT_EQUALS:
                         return State.IN_CHAR_SEQUENCE;
                     case KNOT_EQUALS_START:
@@ -311,9 +341,9 @@ public class Tokenizer {
                 case '.':
                     return state == State.IN_NUMBER_CONSTANT ? State.IN_NUMBER_CONSTANT : State.MODEL_PERIOD;
                 case '(':
-                    return State.FUNCTION_PARAMETER_START;
+                    return state == State.FUNCTION_NAME_END ? State.FUNCTION_PARAMETER_START : State.NESTED_EXPRESSION;
                 case ')':
-                    return State.FUNCTION_PARAMETER_END;
+                    return State.CLOSE_PARENTHESIS;
                 case '?':
                     return State.TERNARY_QUESTION;
                 case ':':

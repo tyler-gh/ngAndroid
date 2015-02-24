@@ -83,6 +83,20 @@ public class ExpressionBuilder<T> {
         throw new RuntimeException("Function is not closed properly");
     }
 
+    private int findCloseParenthesis(int startIndex) {
+        int openCount = 1;
+        for(int index = startIndex; index < tokens.length; index++){
+            Token token = tokens[index];
+            if(token.getTokenType() == TokenType.OPEN_PARENTHESIS_EXP || token.getTokenType() == TokenType.OPEN_PARENTHESIS){
+                openCount++;
+            }else if(token.getTokenType() == TokenType.CLOSE_PARENTHESIS) {
+                if(--openCount == 0)
+                    return index;
+            }
+        }
+        throw new RuntimeException("Nested expression is not closed properly " + openCount);
+    }
+
     private int findEndOfParameter(Token[] tokens, int startIndex){
         for(int index = startIndex; index < tokens.length; index++){
             Token token = tokens[index];
@@ -165,6 +179,14 @@ public class ExpressionBuilder<T> {
                 case STRING: {
                     getterList.add(new StaticGetter<>(token.getScript(), TypeUtils.STRING));
                     index++;
+                    break;
+                }
+                case OPEN_PARENTHESIS_EXP:{
+                    index++;
+                    int end = findCloseParenthesis(index);
+                    Tuple<Getter, Integer> values = createGetter(index, end, scope, tokens, builders);
+                    getterList.add(values.getFirst());
+                    index = values.getSecond();
                     break;
                 }
                 case CLOSE_PARENTHESIS:

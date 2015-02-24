@@ -17,13 +17,14 @@
 package com.ngandroid.lib.interpreter;
 
 import java.util.Queue;
+import java.util.Stack;
 
 public class SyntaxParser {
 
     private final Queue<Token> mTokens;
     private final Token[] mTokenArray;
     private int mTokenArrayIndex;
-    private boolean inFunction;
+    private Stack<TokenType> parenthesisStack = new Stack<>();
 
     public SyntaxParser(String script){
         this.mTokens = new Tokenizer(script).getTokens();
@@ -41,11 +42,21 @@ public class SyntaxParser {
                     offerPop(TokenType.FLOAT_CONSTANT) ||
                     offerPop(TokenType.DOUBLE_CONSTANT) ||
                     offerPop(TokenType.LONG_CONSTANT) ||
+                    offerPop(TokenType.OPEN_PARENTHESIS_EXP) ||
                     offerPop(TokenType.EOF)
                 )
         ) {
             // TODO error
             throw new RuntimeException();
+        }
+        if(mTokens.size() > 0){
+            //TODO
+            throw new RuntimeException("Dangling tokens " + mTokens.toString());
+        }
+
+        if(parenthesisStack.size() > 0){
+            //TODO
+            throw new RuntimeException("Unclosed nested expression");
         }
         return mTokenArray;
     }
@@ -83,11 +94,15 @@ public class SyntaxParser {
             case MODEL_FIELD:
                 afterModel();
                 break;
+            case OPEN_PARENTHESIS_EXP:
+                parenthesisStack.push(TokenType.OPEN_PARENTHESIS_EXP);
+                inExpression();
+                break;
             case OPEN_PARENTHESIS:
-                inFunction = true;
+                parenthesisStack.push(TokenType.OPEN_PARENTHESIS);
                 break;
             case CLOSE_PARENTHESIS:
-                inFunction = false;
+                parenthesisStack.pop();
                 functionClose();
                 break;
             case KNOT:
@@ -97,6 +112,25 @@ public class SyntaxParser {
                 afterOperator();
                 break;
         }
+    }
+
+    private void inExpression() {
+        if (!
+            (
+                offerPop(TokenType.KNOT) ||
+                offerPop(TokenType.MODEL_NAME) ||
+                offerPop(TokenType.FUNCTION_NAME) ||
+                offerPop(TokenType.INTEGER_CONSTANT) ||
+                offerPop(TokenType.FLOAT_CONSTANT) ||
+                offerPop(TokenType.DOUBLE_CONSTANT) ||
+                offerPop(TokenType.LONG_CONSTANT) ||
+                offerPop(TokenType.OPEN_PARENTHESIS_EXP)
+            )
+        ){
+            // TODO
+            throw new RuntimeException();
+        }
+        emit(TokenType.CLOSE_PARENTHESIS);
     }
 
     private void emit(TokenType tokenType){
@@ -128,7 +162,8 @@ public class SyntaxParser {
                 offerPop(TokenType.INTEGER_CONSTANT) ||
                 offerPop(TokenType.FLOAT_CONSTANT) ||
                 offerPop(TokenType.DOUBLE_CONSTANT) ||
-                offerPop(TokenType.LONG_CONSTANT)
+                offerPop(TokenType.LONG_CONSTANT) ||
+                offerPop(TokenType.OPEN_PARENTHESIS_EXP)
             )
         ){
             // TODO error
@@ -137,7 +172,7 @@ public class SyntaxParser {
     }
 
     private void afterModel(){
-        if(inFunction){
+        if(parenthesisStack.size() > 0 && parenthesisStack.peek() == TokenType.OPEN_PARENTHESIS){
             offerPop(TokenType.TERNARY_COLON);
             offerPop(TokenType.TERNARY_QUESTION_MARK);
             offerPop(TokenType.BINARY_OPERATOR);
@@ -147,7 +182,8 @@ public class SyntaxParser {
                     offerPop(TokenType.TERNARY_COLON) ||
                     offerPop(TokenType.TERNARY_QUESTION_MARK) ||
                     offerPop(TokenType.BINARY_OPERATOR) ||
-                    offerPop(TokenType.EOF)
+                    offerPop(TokenType.EOF) ||
+                    topIs(TokenType.CLOSE_PARENTHESIS)
                 )
             ) {
                 // TODO error
