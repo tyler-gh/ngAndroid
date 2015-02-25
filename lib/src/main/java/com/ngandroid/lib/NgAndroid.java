@@ -17,48 +17,94 @@
 package com.ngandroid.lib;
 
 import android.app.Activity;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.ngandroid.lib.attacher.AttributeAttacher;
 import com.ngandroid.lib.ng.ModelBuilder;
+import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.utils.JsonUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by davityle on 1/12/15.
  */
 public class NgAndroid {
 
+    private static NgAndroid instance;
 
-    public static void setContentView(Activity activity, int resourceId) {
+    /**
+     * this method is not thread safe
+     * @return
+     */
+    public static NgAndroid getInstance(){
+        if(instance == null){
+            instance = new Builder().build();
+        }
+        return instance;
+    }
+
+    private final SparseArray<NgAttribute> mCustomAttributes;
+
+    private NgAndroid(SparseArray<NgAttribute> customAttributes){
+        this.mCustomAttributes = customAttributes;
+    }
+
+
+    public void setContentView(Activity activity, int resourceId) {
         setContentView(activity, activity, resourceId);
     }
 
-    public static void setContentView(Object scope, Activity activity, int resourceId) {
-        new AttributeAttacher(activity, scope).setContentView(activity, resourceId);
+    public void setContentView(Object scope, Activity activity, int resourceId) {
+        new AttributeAttacher(activity, scope, mCustomAttributes).setContentView(activity, resourceId);
     }
 
-    public static View inflate(Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
+    public View inflate(Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
         return inflate(activity, activity, resourceId, viewGroup, attach);
     }
 
-    public static View inflate(Activity activity, int resourceId, ViewGroup viewGroup){
+    public View inflate(Activity activity, int resourceId, ViewGroup viewGroup){
         return inflate(activity, activity, resourceId, viewGroup, false);
     }
 
-    public static View inflate(Object scope, Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
-        return new AttributeAttacher(activity, scope).inflate(resourceId, viewGroup, attach);
+    public View inflate(Object scope, Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
+        return new AttributeAttacher(activity, scope, mCustomAttributes).inflate(resourceId, viewGroup, attach);
     }
 
-    public static View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
+    public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
         return inflate(scope, inflater, resourceId, viewGroup, false);
     }
 
-    public static View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
-        return new AttributeAttacher(inflater, scope).inflate(resourceId, viewGroup, attach);
+    public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
+        return new AttributeAttacher(inflater, scope, mCustomAttributes).inflate(resourceId, viewGroup, attach);
     }
 
-    public static <T> T buildModel(Class<T> clss){
+    public <T> T buildModel(Class<T> clss){
         return (T) new ModelBuilder(clss).create();
+    }
+
+    public <T> T modelFromJson(String json, Class<T> clss) throws JSONException {
+        return JsonUtils.buildModelFromJson(new JSONObject(json), clss);
+    }
+
+
+    public static final class Builder {
+        private SparseArray<NgAttribute> mCustomAttributes;
+
+        public Builder addCustomAttribute(int attributeId, NgAttribute ngAttribute){
+            if(mCustomAttributes == null){
+                mCustomAttributes = new SparseArray<>();
+            }
+            mCustomAttributes.append(attributeId, ngAttribute);
+            return this;
+        }
+
+        public NgAndroid build(){
+            return new NgAndroid(mCustomAttributes);
+        }
     }
 }

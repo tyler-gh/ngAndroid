@@ -1295,7 +1295,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testModelBuild(){
         TestScope tc = new TestScope();
-        tc.modelName = NgAndroid.buildModel(TestModel.class);
+        tc.modelName = NgAndroid.getInstance().buildModel(TestModel.class);
         tc.modelName.setJoe("Frank");
         assertEquals("Frank", tc.modelName.getJoe());
     }

@@ -18,7 +18,7 @@ public class DemoActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        NgAndroid.setContentView(this, R.layout.activity_demo);
+        NgAndroid.getInstance().setContentView(this, R.layout.activity_demo);
 
         input.setInput("Hello world");
 

@@ -33,10 +33,8 @@ class SelectionChangeListener implements AdapterView.OnItemSelectedListener {
 
     @Override
     public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-//        invoker.onClick(selectedItemView);
         methodGetter.get();
     }
-
 
     @Override
     public void onNothingSelected(AdapterView<?> parentView) {

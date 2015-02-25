@@ -30,6 +30,7 @@ import org.json.JSONException;
 public class ModelTests extends ApplicationTestCase<Application> {
 
     Application testApplication;
+    NgAndroid ngAndroid = NgAndroid.getInstance();
 
     public ModelTests() {
         super(Application.class);
@@ -48,7 +49,7 @@ public class ModelTests extends ApplicationTestCase<Application> {
 
     public void testSetterRequired(){
         try{
-            NgAndroid.buildModel(TestSetterRequired.class);
+            ngAndroid.buildModel(TestSetterRequired.class);
             fail();
         }catch (Exception e){}
     }
@@ -59,7 +60,7 @@ public class ModelTests extends ApplicationTestCase<Application> {
 
     public void testGetterNotRequired(){
         try{
-            NgAndroid.buildModel(TestGetterNotRequired.class);
+            ngAndroid.buildModel(TestGetterNotRequired.class);
         }catch (Exception e){
             fail();
         }
@@ -86,10 +87,10 @@ public class ModelTests extends ApplicationTestCase<Application> {
     }
 
     public void testBuildModelWithSubModels(){
-        TestJsonModel jsonModel = NgAndroid.buildModel(TestJsonModel.class);
+        TestJsonModel jsonModel = ngAndroid.buildModel(TestJsonModel.class);
         assertNull(jsonModel.getJsonModel());
 
-        TestSubModel jsonsubModel = NgAndroid.buildModel(TestSubModel.class);
+        TestSubModel jsonsubModel = ngAndroid.buildModel(TestSubModel.class);
         assertNotNull(jsonsubModel.getJsonModel());
     }
 
@@ -126,6 +127,18 @@ public class ModelTests extends ApplicationTestCase<Application> {
         "}";
 
         jsonmodel = JsonUtils.buildModelFromJson(json, TestJsonModel.class);
+        assertEquals(25, jsonmodel.getInt());
+        assertEquals(1.72f, jsonmodel.getFloat());
+        assertEquals(0.0078, jsonmodel.getDouble());
+        assertEquals("string value", jsonmodel.getString());
+        assertEquals(false, jsonmodel.getBoolean());
+        assertEquals(25, jsonmodel.getJsonModel().getInt());
+        assertEquals(1.72f, jsonmodel.getJsonModel().getFloat());
+        assertEquals(894.378, jsonmodel.getJsonModel().getDouble());
+        assertEquals("xyc", jsonmodel.getJsonModel().getString());
+        assertEquals(false, jsonmodel.getJsonModel().getBoolean());
+
+        jsonmodel = ngAndroid.modelFromJson(json, TestJsonModel.class);
         assertEquals(25, jsonmodel.getInt());
         assertEquals(1.72f, jsonmodel.getFloat());
         assertEquals(0.0078, jsonmodel.getDouble());

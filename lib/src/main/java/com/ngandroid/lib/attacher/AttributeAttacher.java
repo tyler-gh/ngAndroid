@@ -52,16 +52,18 @@ public class AttributeAttacher {
     private final Object mScope;
     private final SparseArray<TypedArray> mAttrArray;
     private final ModelBuilderMap mBuilders;
+    private final SparseArray<NgAttribute> mCustomAttributes;
 
-    public AttributeAttacher(final Context context, Object model) {
-        this((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE), model);
+    public AttributeAttacher(final Context context, Object model, SparseArray<NgAttribute> customAttributes) {
+        this((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE), model, customAttributes);
     }
 
-    public AttributeAttacher(final LayoutInflater inflater, Object scope) {
+    public AttributeAttacher(final LayoutInflater inflater, Object scope, SparseArray<NgAttribute> customAttributes) {
         this.mScope = scope;
         this.mAttrArray = new SparseArray<>();
         this.mBuilders = new ModelBuilderMap(mScope);
         this.mInflater = inflater;
+        this.mCustomAttributes = customAttributes;
         InflaterFactory.setFactory(mInflater, mAttrArray);
     }
 
@@ -76,6 +78,7 @@ public class AttributeAttacher {
                 Getter getter = new ExpressionBuilder(tokens).build(mScope, mBuilders);
 
                 NgAttribute attribute;
+                // TODO put all of these attributes into a static sparse array for quicker searching
                 if(attr == R.styleable.ngAndroid_ngModel){
                     attribute = NgModel.getInstance();
                 }else if (attr == R.styleable.ngAndroid_ngClick){
@@ -95,7 +98,9 @@ public class AttributeAttacher {
                 }else if(attr == R.styleable.ngAndroid_ngFocus){
                     attribute = NgFocus.getInstance();
                 }else {
-                    throw new UnsupportedOperationException("Attribute not currently implemented");
+                    attribute = mCustomAttributes.get(attr);
+                    if(attribute == null)
+                        throw new UnsupportedOperationException("Attribute not currently implemented");
                 }
                 try {
                     attribute.typeCheck(tokens, getter);
