@@ -18,66 +18,21 @@ package com.ngandroid.lib.ngattributes.ngclick;
 
 import android.view.View;
 
-import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.utils.TypeUtils;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import com.ngandroid.lib.ng.getters.MethodGetter;
 
 /**
-* Created by davityle on 1/24/15.
-*/
-public class ClickInvoker implements View.OnClickListener, Getter {
+ * Created by tyler on 2/24/15.
+ */
+public class ClickInvoker implements View.OnClickListener {
 
-    private final Method mMethod;
-    private final Object mScope;
-    private final Getter[] mGetters;
-    private final int type;
+    private final MethodGetter mMethodGetter;
 
-    public ClickInvoker(Method method, Object scope, Getter... getters) {
-        this.mMethod = method;
-        this.mScope = scope;
-        this.mGetters = getters;
-        mMethod.setAccessible(true);
-        type = TypeUtils.getType(method.getReturnType());
+    public ClickInvoker(MethodGetter methodGetter) {
+        this.mMethodGetter = methodGetter;
     }
 
     @Override
-    public void onClick(View view) {
-        get();
-    }
-
-    @Override
-    public Object get() {
-        Object[] parameters = new Object[mGetters.length];
-        for(int index = 0; index < parameters.length; index++){
-            try {
-                parameters[index] = mGetters[index].get();
-            } catch (Throwable throwable) {
-                // TODO error
-                throwable.printStackTrace();
-            }
-        }
-        try {
-            return mMethod.invoke(mScope, parameters);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            // TODO error
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public int getType() {
-        return type;
-    }
-
-    public int getReturnType(){
-        return type;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(get());
+    public void onClick(View v) {
+        mMethodGetter.get();
     }
 }

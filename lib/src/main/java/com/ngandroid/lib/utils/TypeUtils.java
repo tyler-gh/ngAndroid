@@ -103,10 +103,11 @@ public class TypeUtils {
             case BOOLEAN:
                 return false;
             case STRING:
+                return "";
             case OBJECT:
                 // TODO what to do here with object?
             default:
-                return "";
+                return null;
         }
     }
 

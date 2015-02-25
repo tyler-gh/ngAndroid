@@ -24,7 +24,7 @@ import com.ngandroid.lib.ng.getters.KnotGetter;
 import com.ngandroid.lib.ng.getters.ModelGetter;
 import com.ngandroid.lib.ng.getters.StaticGetter;
 import com.ngandroid.lib.ng.getters.TernaryGetter;
-import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
+import com.ngandroid.lib.ng.getters.MethodGetter;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 
@@ -137,10 +137,11 @@ public class ExpressionBuilder<T> {
                         paramTypes[i] = parameters.get(i).getType();
                     }
                     Method method = findMethod(functionName, scope.getClass(), paramTypes);
-                    getterList.add(new ClickInvoker(method, scope, parameters.toArray(new Getter[parameters.size()])));
+                    getterList.add(new MethodGetter(method, scope, parameters.toArray(new Getter[parameters.size()])));
                     break;
                 }
                 case KNOT:{
+                    // TODO take a closer look at whether or not this can trail off and grab multiple getters
                     Tuple<Getter, Integer> value = createGetter(index + 1, endIndex, scope, tokens, builders);
                     KnotGetter getter = new KnotGetter(value.getFirst());
                     index = value.getSecond();

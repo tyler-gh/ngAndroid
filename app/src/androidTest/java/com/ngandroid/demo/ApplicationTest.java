@@ -16,13 +16,10 @@ import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
 import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ng.getters.KnotGetter;
-import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
+import com.ngandroid.lib.ng.getters.MethodGetter;
 import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
 import com.ngandroid.lib.ngattributes.ngif.NgGone;
 import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
-import com.ngandroid.lib.utils.JsonUtils;
-
-import org.json.JSONException;
 
 import java.lang.reflect.Field;
 import java.util.Queue;
@@ -996,44 +993,10 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         }
     }
 
-    public static interface TestJsonModel{
-        public int getInt();
-        public void setInt(int i);
-        public float getFloat();
-        public void setFloat(float f);
-        public double getDouble();
-        public void setDouble(double d);
-        public String getString();
-        public void setString(String s);
-        public boolean getBoolean();
-        public void setBoolean(boolean b);
-    }
-
-    public void testBuildModelFromJson() throws JSONException {
-        String json = "{ \"joe\" : \"xyz\", \"isInvisible\" : false, \"num\" : 10 }";
-        TestModel model = JsonUtils.buildModelFromJson(json, TestModel.class);
-        assertEquals("xyz", model.getJoe());
-        assertEquals(false, model.getIsinvisible());
-        assertEquals(10, model.getNum());
-
-        json = "{ \"int\" : 25, \"float\" : 1.72, \"double\" : 0.0078 , \"string\" : \"string value\", \"boolean\" : false }";
-
-        TestJsonModel jsonmodel = JsonUtils.buildModelFromJson(json, TestJsonModel.class);
-        assertEquals(25, jsonmodel.getInt());
-        assertEquals(1.72f, jsonmodel.getFloat());
-        assertEquals(0.0078, jsonmodel.getDouble());
-        assertEquals("string value", jsonmodel.getString());
-        assertEquals(false, jsonmodel.getBoolean());
-
-
-    }
-
     public void testBug(){
         TestBugScope tc = new TestBugScope();
         ModelBuilderMap map = new ModelBuilderMap(tc);
         Getter getter = new ExpressionBuilder("multiply(input.integer,2)").build(tc, map);
-
-        //multiply(input.integer,2)
     }
 
 
@@ -1210,7 +1173,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         ExpressionBuilder builder = new ExpressionBuilder("method()");
         TestScope tc = new TestScope();
         Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
-        assertTrue(getter instanceof ClickInvoker);
+        assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
         }catch (Throwable e){
@@ -1223,7 +1186,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         ExpressionBuilder builder = new ExpressionBuilder("method('string')");
         TestScope tc = new TestScope();
         Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
-        assertTrue(getter instanceof ClickInvoker);
+        assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
         }catch (Throwable e){
@@ -1232,7 +1195,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
         builder = new ExpressionBuilder("method(58)");
         getter = builder.build(tc, new ModelBuilderMap(tc));
-        assertTrue(getter instanceof ClickInvoker);
+        assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
         }catch (Throwable e){
@@ -1244,7 +1207,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         ExpressionBuilder builder = new ExpressionBuilder("method(getStringValue())");
         TestScope tc = new TestScope();
         Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
-        assertTrue(getter instanceof ClickInvoker);
+        assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
         }catch (Throwable e){
@@ -1254,7 +1217,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         builder = new ExpressionBuilder("method('Int value = ' + getIntValue())");
         tc = new TestScope();
         getter = builder.build(tc, new ModelBuilderMap(tc));
-        assertTrue(getter instanceof ClickInvoker);
+        assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
         }catch (Throwable e){

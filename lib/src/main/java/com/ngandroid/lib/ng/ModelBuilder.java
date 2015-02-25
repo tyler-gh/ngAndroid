@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by davityle on 1/12/15.
@@ -60,14 +61,39 @@ public class ModelBuilder {
         for(Method method : mModelMethods){
             String name = method.getName().toLowerCase();
             if(name.startsWith("set")){
-                createField(name.substring(3));
+                Class<?>[] parameters = method.getParameterTypes();
+                if(parameters.length != 1){
+                    throw new RuntimeException("method set" + name + " must have single parameter");
+                }
+                createField(name.substring(3), parameters[0]);
+            }
+        }
+        // a setter is required if there is a getter but a getter is not required if there is a setter
+        for(Method method : mModelMethods){
+            String name = method.getName().toLowerCase();
+            if(name.startsWith("get") ){
+                String field = name.substring(3).toLowerCase();
+                if(hasField(field)) {
+                    Class returnType = method.getReturnType();
+                    if (TypeUtils.getType(returnType) != getFieldType(field)) {
+                        throw new RuntimeException("Getter and setter types do not match for field " + field);
+                    }
+                }else{
+                    throw new RuntimeException(field + " is missing it's setter");
+                }
             }
         }
     }
 
-
-
     public Object create(){
+        Set<Map.Entry<String, Tuple<Integer, Object>>> entries = mFieldMap.entrySet();
+        for(Map.Entry<String, Tuple<Integer, Object>> entry : entries){
+            Tuple<Integer, Object> value = entry.getValue();
+            Object second = value.getSecond();
+            if(second != null && second instanceof ModelBuilder){
+                value.setSecond(((ModelBuilder)second).create());
+            }
+        }
         return Proxy.newProxyInstance(mClass.getClassLoader(), new Class[]{mClass}, new Model(mInvocationHandler));
     }
 
@@ -87,27 +113,14 @@ public class ModelBuilder {
         return mInvocationHandler;
     }
 
-    private void createField(String fieldName){
+    private void createField(String fieldName, Class clzz){
         final String fieldNamelower = fieldName.toLowerCase();
-        int methodType = getMethodType(fieldNamelower);
-        setField(fieldNamelower, methodType, TypeUtils.getEmptyValue(methodType));
+        int methodType = TypeUtils.getType(clzz);
+        if(methodType != TypeUtils.OBJECT)
+            setField(fieldNamelower, methodType, TypeUtils.getEmptyValue(methodType));
+        else
+            setField(fieldNamelower, methodType, (clzz.equals(mClass) ? null : new ModelBuilder(clzz)));
         mMethodMap.put("set" + fieldNamelower, new ArrayList<ModelMethod>());
-    }
-
-    public int getMethodType(String fieldNamelower) {
-        int methodType = TypeUtils.STRING;
-        for(Method m : mModelMethods){
-            if(m.getName().toLowerCase().equals("set" + fieldNamelower)){
-                Class<?>[] parameters = m.getParameterTypes();
-                if(parameters.length == 0){
-                    // TODO error
-                    throw new RuntimeException("method set" +fieldNamelower + " must have a parameter");
-                }
-                methodType = TypeUtils.getType(parameters[0]);
-                break;
-            }
-        }
-        return methodType;
     }
 
     public void addSetObserver(String fieldName, ModelMethod method){
@@ -129,5 +142,19 @@ public class ModelBuilder {
             // TODO rename error
             throw new RuntimeException("There is not a field in scope '" + scope.getClass().getSimpleName() + "' called " + modelName);
         }
+    }
+
+    public Class<?> getFieldTypeClass(String keyLower) {
+        for(Method method : mModelMethods){
+            String name = method.getName().toLowerCase();
+            if(name.toLowerCase().equals("set" + keyLower)){
+                Class<?>[] parameters = method.getParameterTypes();
+                if(parameters.length != 1){
+                    throw new RuntimeException("method 'set" + keyLower + "' must have single parameter");
+                }
+                return parameters[0];
+            }
+        }
+        throw new RuntimeException("method 'set" + keyLower + "' does not exist");
     }
 }

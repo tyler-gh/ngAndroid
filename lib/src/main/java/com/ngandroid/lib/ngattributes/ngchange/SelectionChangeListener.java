@@ -19,26 +19,28 @@ package com.ngandroid.lib.ngattributes.ngchange;
 import android.view.View;
 import android.widget.AdapterView;
 
-import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
+import com.ngandroid.lib.ng.getters.MethodGetter;
 
 /**
 * Created by tyler on 1/29/15.
 */
 class SelectionChangeListener implements AdapterView.OnItemSelectedListener {
-    private final ClickInvoker invoker;
+    private final MethodGetter methodGetter;
 
-    public SelectionChangeListener(ClickInvoker invoker) {
-        this.invoker = invoker;
+    public SelectionChangeListener(MethodGetter methodGetter) {
+        this.methodGetter = methodGetter;
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-        invoker.onClick(selectedItemView);
+//        invoker.onClick(selectedItemView);
+        methodGetter.get();
     }
+
 
     @Override
     public void onNothingSelected(AdapterView<?> parentView) {
-        invoker.onClick(null);
+        methodGetter.get();
     }
 
 }

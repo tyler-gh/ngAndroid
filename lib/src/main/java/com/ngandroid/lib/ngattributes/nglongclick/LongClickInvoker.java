@@ -18,21 +18,21 @@ package com.ngandroid.lib.ngattributes.nglongclick;
 
 import android.view.View;
 
-import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
+import com.ngandroid.lib.ng.getters.MethodGetter;
 
 /**
 * Created by tyler on 1/28/15.
 */
 public class LongClickInvoker implements View.OnLongClickListener {
-    private final ClickInvoker invoker;
+    private final MethodGetter mMethodGetter;
 
-    public LongClickInvoker(ClickInvoker invoker) {
-        this.invoker = invoker;
+    public LongClickInvoker(MethodGetter methodGetter) {
+        this.mMethodGetter = methodGetter;
     }
 
     @Override
     public boolean onLongClick(View v) {
-        invoker.onClick(v);
+        mMethodGetter.get();
         return true;
     }
 }

@@ -29,9 +29,12 @@ import java.util.Iterator;
 public class JsonUtils {
 
     public static <T> T buildModelFromJson(String json, Class<T> clzz) throws JSONException {
+        return buildModelFromJson(new JSONObject(json), clzz);
+    }
+
+    public static <T> T buildModelFromJson(JSONObject jsonObject , Class<T> clzz) throws JSONException {
 
         ModelBuilder builder = new ModelBuilder(clzz);
-        JSONObject jsonObject = new JSONObject(json);
         Iterator<String> jsonkeys = jsonObject.keys();
         while(jsonkeys.hasNext()){
             String key = jsonkeys.next();
@@ -57,9 +60,13 @@ public class JsonUtils {
                     case TypeUtils.LONG:
                         builder.setField(keyLower, type, jsonObject.getLong(key));
                         break;
-                    case TypeUtils.OBJECT:
-                        // TODO
+                    case TypeUtils.OBJECT: {
+                        Class clss = builder.getFieldTypeClass(keyLower);
+                        if(clss.isInterface()){
+                            builder.setField(keyLower, type, buildModelFromJson(jsonObject.getJSONObject(key), clss));
+                        }
                         break;
+                    }
                 }
 
             }

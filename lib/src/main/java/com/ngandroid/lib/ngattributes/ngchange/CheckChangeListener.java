@@ -18,19 +18,19 @@ package com.ngandroid.lib.ngattributes.ngchange;
 
 import android.widget.RadioGroup;
 
-import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
+import com.ngandroid.lib.ng.getters.MethodGetter;
 
 /**
 * Created by tyler on 1/29/15.
 */
 class CheckChangeListener implements RadioGroup.OnCheckedChangeListener {
-    private final ClickInvoker invoker;
+    private final MethodGetter invoker;
 
-    public CheckChangeListener(ClickInvoker invoker) {
+    public CheckChangeListener(MethodGetter invoker) {
         this.invoker = invoker;
     }
 
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        invoker.onClick(group.findViewById(checkedId));
+        invoker.get();
     }
 }
