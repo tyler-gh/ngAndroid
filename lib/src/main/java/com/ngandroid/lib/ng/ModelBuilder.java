@@ -24,6 +24,7 @@ import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -157,4 +158,45 @@ public class ModelBuilder {
         }
         throw new RuntimeException("method 'set" + keyLower + "' does not exist");
     }
+
+    public void pullDefaults(Object model){
+        for(Method method : mModelMethods){
+            String name = method.getName().toLowerCase();
+            if(name.startsWith("get")){
+                method.setAccessible(true);
+                try {
+                    setField(name.substring(3).toLowerCase(), TypeUtils.getType(method.getReturnType()), method.invoke(model));
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    // TODO
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+    public static ModelBuilder createBuilder(Object scope, String modelName){
+        try {
+            System.out.println(modelName);
+            Field f = scope.getClass().getDeclaredField(modelName);
+            System.out.println(scope.getClass().getSimpleName());
+            System.out.println(f.getType().getSimpleName());
+            ModelBuilder builder = new ModelBuilder(f.getType());
+            f.setAccessible(true);
+            Object model = f.get(scope);
+            if(model != null){
+                System.out.println("Not null");
+                builder.pullDefaults(model);
+            }else{
+                System.out.println("is null");
+            }
+            return builder;
+        } catch (NoSuchFieldException e) {
+            // TODO rename error
+            throw new RuntimeException("There is not a model in scope '" + scope.getClass().getSimpleName() + "' called " + modelName);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

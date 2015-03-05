@@ -23,12 +23,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ngandroid.lib.attacher.AttributeAttacher;
+import com.ngandroid.lib.ng.Ignore;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.utils.JsonUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.lang.reflect.Field;
 
 /**
  * Created by davityle on 1/12/15.
@@ -84,7 +87,41 @@ public class NgAndroid {
     }
 
     public <T> T buildModel(Class<T> clss){
-        return (T) new ModelBuilder(clss).create();
+        return  (T) new ModelBuilder(clss).create();
+    }
+
+    public <T> T buildModel(Object scope, String fieldName, Class<T> clss){
+        try {
+            Field f = scope.getClass().getDeclaredField(fieldName);
+            f.setAccessible(true);
+            T val = (T) new ModelBuilder(clss).create();
+            f.set(scope, val);
+            return val;
+        } catch (NoSuchFieldException e) {
+            //TODO
+            throw new RuntimeException("There is no such field '" + fieldName + "' found in " + scope.getClass().getSimpleName());
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Unable to access field '" + fieldName + "' in " + scope.getClass().getSimpleName());
+        }
+    }
+
+    public <T> T buildScope(Class<T> clss){
+        T instance;
+        try {
+            instance = clss.newInstance();
+            Field[] fields = clss.getDeclaredFields();
+            for(Field f : fields){
+                f.setAccessible(true);
+                Class type = f.getType();
+                if(type.isInterface() && !f.isAnnotationPresent(Ignore.class)){
+                    f.set(instance, buildModel(type));
+                }
+            }
+        } catch (InstantiationException | IllegalAccessException e) {
+            // TODO
+            throw new RuntimeException("Error instantiating scope.", e);
+        }
+        return instance;
     }
 
     public <T> T modelFromJson(String json, Class<T> clss) throws JSONException {

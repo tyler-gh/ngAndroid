@@ -16,26 +16,15 @@
 
 package com.ngandroid.lib.ng;
 
-import java.util.HashMap;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
-* Created by davityle on 1/17/15.
-*/
-public class ModelBuilderMap extends HashMap<String, ModelBuilder> {
-    private final Object scope;
-
-    public ModelBuilderMap(Object scope) {
-        this.scope = scope;
-    }
-
-    @Override
-    public ModelBuilder get(Object key) {
-        String modelName = (String) key;
-        ModelBuilder builder = super.get(modelName);
-        if(builder == null){
-            builder = ModelBuilder.createBuilder(scope, modelName);
-            put(modelName, builder);
-        }
-        return builder;
-    }
+ * Created by tyler on 3/5/15.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Ignore {
 }
