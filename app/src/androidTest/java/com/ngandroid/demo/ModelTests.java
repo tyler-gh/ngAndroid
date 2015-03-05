@@ -21,7 +21,7 @@ import android.test.ApplicationTestCase;
 
 import com.ngandroid.lib.NgAndroid;
 import com.ngandroid.lib.interpreter.ExpressionBuilder;
-import com.ngandroid.lib.ng.Ignore;
+import com.ngandroid.lib.annotations.Ignore;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.utils.JsonUtils;

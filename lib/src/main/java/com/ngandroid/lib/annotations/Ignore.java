@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by tyler on 3/5/15.
+ * This class only has an effect when using the function {@link com.ngandroid.lib.NgAndroid#buildScope(Class)}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

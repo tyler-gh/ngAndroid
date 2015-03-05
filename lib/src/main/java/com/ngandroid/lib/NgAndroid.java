@@ -23,7 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ngandroid.lib.attacher.AttributeAttacher;
-import com.ngandroid.lib.ng.Ignore;
+import com.ngandroid.lib.annotations.Ignore;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.utils.JsonUtils;
