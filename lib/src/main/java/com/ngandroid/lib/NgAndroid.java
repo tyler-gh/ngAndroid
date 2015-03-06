@@ -26,6 +26,15 @@ import com.ngandroid.lib.attacher.AttributeAttacher;
 import com.ngandroid.lib.annotations.Ignore;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ngattributes.ngblur.NgBlur;
+import com.ngandroid.lib.ngattributes.ngchange.NgChange;
+import com.ngandroid.lib.ngattributes.ngclick.NgClick;
+import com.ngandroid.lib.ngattributes.ngfocus.NgFocus;
+import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
+import com.ngandroid.lib.ngattributes.ngif.NgGone;
+import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
+import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
+import com.ngandroid.lib.ngattributes.ngmodel.NgModel;
 import com.ngandroid.lib.utils.JsonUtils;
 
 import org.json.JSONException;
@@ -51,10 +60,10 @@ public class NgAndroid {
         return instance;
     }
 
-    private final SparseArray<NgAttribute> mCustomAttributes;
+    private final SparseArray<NgAttribute> mAttributes;
 
-    private NgAndroid(SparseArray<NgAttribute> customAttributes){
-        this.mCustomAttributes = customAttributes;
+    private NgAndroid(SparseArray<NgAttribute> attributes){
+        this.mAttributes = attributes;
     }
 
 
@@ -63,7 +72,7 @@ public class NgAndroid {
     }
 
     public void setContentView(Object scope, Activity activity, int resourceId) {
-        new AttributeAttacher(activity, scope, mCustomAttributes).setContentView(activity, resourceId);
+        new AttributeAttacher(activity, scope, mAttributes).setContentView(activity, resourceId);
     }
 
     public View inflate(Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
@@ -75,7 +84,7 @@ public class NgAndroid {
     }
 
     public View inflate(Object scope, Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
-        return new AttributeAttacher(activity, scope, mCustomAttributes).inflate(resourceId, viewGroup, attach);
+        return new AttributeAttacher(activity, scope, mAttributes).inflate(resourceId, viewGroup, attach);
     }
 
     public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
@@ -83,7 +92,7 @@ public class NgAndroid {
     }
 
     public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
-        return new AttributeAttacher(inflater, scope, mCustomAttributes).inflate(resourceId, viewGroup, attach);
+        return new AttributeAttacher(inflater, scope, mAttributes).inflate(resourceId, viewGroup, attach);
     }
 
     public <T> T buildModel(Class<T> clss){
@@ -130,18 +139,24 @@ public class NgAndroid {
 
 
     public static final class Builder {
-        private SparseArray<NgAttribute> mCustomAttributes;
+        private SparseArray<NgAttribute> attributes = new SparseArray<>();
 
         public Builder addCustomAttribute(int attributeId, NgAttribute ngAttribute){
-            if(mCustomAttributes == null){
-                mCustomAttributes = new SparseArray<>();
-            }
-            mCustomAttributes.append(attributeId, ngAttribute);
+            attributes.put(attributeId, ngAttribute);
             return this;
         }
 
         public NgAndroid build(){
-            return new NgAndroid(mCustomAttributes);
+            attributes.put(R.styleable.ngAndroid_ngModel, NgModel.getInstance());
+            attributes.put(R.styleable.ngAndroid_ngClick, NgClick.getInstance());
+            attributes.put(R.styleable.ngAndroid_ngLongClick, NgLongClick.getInstance());
+            attributes.put(R.styleable.ngAndroid_ngChange, NgChange.getInstance());
+            attributes.put(R.styleable.ngAndroid_ngGone, NgGone.getInstance());
+            attributes.put(R.styleable.ngAndroid_ngInvisible, NgInvisible.getInstance());
+            attributes.put(R.styleable.ngAndroid_ngDisabled, NgDisabled.getInstance());
+            attributes.put(R.styleable.ngAndroid_ngBlur, NgBlur.getInstance());
+            attributes.put(R.styleable.ngAndroid_ngFocus, NgFocus.getInstance());
+            return new NgAndroid(attributes);
         }
     }
 }
