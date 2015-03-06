@@ -192,6 +192,21 @@ private void onChange(){
     android:layout_height="wrap_content" />
 ```
 ![NgGone Demonstration](/../pictures/images/nggone.gif?raw=true "nggone demonstration")
+--------
+##Other Functionality
+
+####Build a model from Json
+```java
+ngAndroid.modelFromJson(json, TestJsonModel.class)
+```
+####Build a model without a view
+```java
+ngAndroid.buildModel(TestSubModel.class);
+```
+###Pre-Build a scope
+```java
+ngAndroid.buildScope(TestScope.class);
+```
 
 --------
 
