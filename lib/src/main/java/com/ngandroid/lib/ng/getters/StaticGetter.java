@@ -42,4 +42,9 @@ public class StaticGetter<T> implements Getter<T>{
     public int getType(){
         return type;
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(object);
+    }
 }

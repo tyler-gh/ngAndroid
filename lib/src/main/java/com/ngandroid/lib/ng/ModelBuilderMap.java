@@ -16,7 +16,6 @@
 
 package com.ngandroid.lib.ng;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 
 /**
@@ -33,16 +32,9 @@ public class ModelBuilderMap extends HashMap<String, ModelBuilder> {
     public ModelBuilder get(Object key) {
         String modelName = (String) key;
         ModelBuilder builder = super.get(modelName);
-
-        try {
-            if(builder == null){
-                Field f = scope.getClass().getDeclaredField(modelName);
-                builder = new ModelBuilder(f.getType());
-                put(modelName, builder);
-            }
-        } catch (NoSuchFieldException e) {
-            // TODO rename error
-            throw new RuntimeException("There is not a model in scope '" + scope.getClass().getSimpleName() + "' called " + modelName);
+        if(builder == null){
+            builder = ModelBuilder.createBuilder(scope, modelName);
+            put(modelName, builder);
         }
         return builder;
     }

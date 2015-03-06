@@ -28,6 +28,7 @@ import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.ng.getters.MethodGetter;
 import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
 import com.ngandroid.lib.utils.TypeUtils;
 
@@ -52,13 +53,13 @@ public class NgChange implements NgAttribute {
 
     @Override
     public void attach(Getter getter, ModelBuilderMap builders, View bindView) throws Exception {
-        final ClickInvoker invoker = (ClickInvoker) getter;
+        final MethodGetter invoker = (MethodGetter) getter;
         if(bindView instanceof CompoundButton){
             RadioButton button = (RadioButton) bindView;
-            button.setOnClickListener(invoker);
+            button.setOnClickListener(new ClickInvoker(invoker));
         }else if(bindView instanceof TextView){
             TextView textView = (TextView) bindView;
-            textView.addTextChangedListener(new TextChangedWatcher(invoker, textView));
+            textView.addTextChangedListener(new TextChangedWatcher(invoker));
         }else if(bindView instanceof Spinner){
             Spinner spinner = (Spinner) bindView;
             spinner.setOnItemSelectedListener(new SelectionChangeListener(invoker));

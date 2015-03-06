@@ -14,23 +14,17 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngchange;
+package com.ngandroid.lib.annotations;
 
-import android.widget.RadioGroup;
-
-import com.ngandroid.lib.ng.getters.MethodGetter;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
-* Created by tyler on 1/29/15.
-*/
-class CheckChangeListener implements RadioGroup.OnCheckedChangeListener {
-    private final MethodGetter invoker;
-
-    public CheckChangeListener(MethodGetter invoker) {
-        this.invoker = invoker;
-    }
-
-    public void onCheckedChanged(RadioGroup group, int checkedId) {
-        invoker.get();
-    }
+ * This class only has an effect when using the function {@link com.ngandroid.lib.NgAndroid#buildScope(Class)}
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Ignore {
 }

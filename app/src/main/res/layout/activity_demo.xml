@@ -57,6 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_below="@+id/stringClickEvent"
             android:layout_marginTop="20dp"
+            android:text="123"
             android:layout_height="wrap_content" />
 
         <TextView
@@ -116,8 +117,8 @@
             android:layout_below="@+id/really2"
             android:layout_marginTop="20dp"
             ngAndroid:ngClick="multiply(input.integer,2)"
-            ngAndroid:ngLongClick="multiply(3,input.integer)"
-            android:text="multiply(input.integer,2) onClick \n multiply(3,input.integer) onLongClick"/>
+            ngAndroid:ngLongClick="multiply(3.75,input.integer)"
+            android:text="multiply(input.integer,2) onClick \n multiply(3.75,input.integer) onLongClick"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -236,6 +237,73 @@
             <CheckBox
                 android:id="@+id/nggonedb"
                 ngAndroid:ngModel="input.gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:text="NgBlur"
+            android:textSize="20sp"/>
+        <View
+            android:background="#AAA"
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="1dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/blurtv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ngAndroid:ngBlur="input.blur"
+                android:text="Blur Me"/>
+
+            <CheckBox
+                android:id="@+id/blurcb"
+                ngAndroid:ngModel="input.blur"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:text="NgFocus"
+            android:textSize="20sp"/>
+        <View
+            android:background="#AAA"
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="1dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/focustv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ngAndroid:ngFocus="input.focus"/>
+
+            <CheckBox
+                android:id="@+id/focuscb"
+                ngAndroid:ngModel="input.focus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 

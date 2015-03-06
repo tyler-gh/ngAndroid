@@ -31,9 +31,9 @@ public class Tokenizer {
         END,
         MODEL_PERIOD,
         FUNCTION_PARAMETER_START,
-        FUNCTION_PARAMETER_END,
+        CLOSE_PARENTHESIS,
         TERNARY_QUESTION,
-        TERNAY_COLON,
+        TERNARY_COLON,
         STRING_START,
         STRING_END,
         IN_STRING,
@@ -49,7 +49,17 @@ public class Tokenizer {
         NUMBER_CONSTANT_END,
         IN_CHAR_SEQUENCE,
         IN_MODEL_FIELD,
-        KNOT_VALUE, OPERATOR
+        KNOT_VALUE,
+        OPERATOR,
+        IN_FLOAT,
+        FLOAT_END,
+        DOUBLE_END,
+        INTEGER_END,
+        LONG_END,
+        NESTED_EXPRESSION,
+        IN_STRING_SLASH,
+        STRING_SLASH_END,
+        FLOAT_F_END
     }
 
     private int index, readIndex;
@@ -89,7 +99,18 @@ public class Tokenizer {
         switch (state){
             case BEGIN:
             case EQUALS_START:
+                result = getNextState();
+                break;
             case IN_STRING:
+                if(peek() == '\\'){
+                    result = State.IN_STRING_SLASH;
+                }else
+                    result = getNextState();
+                break;
+            case IN_STRING_SLASH:
+                result = getNextState();
+                break;
+            case STRING_SLASH_END:
                 result = getNextState();
                 break;
             case IN_CHAR_SEQUENCE: {
@@ -126,7 +147,7 @@ public class Tokenizer {
                 emit(TokenType.OPEN_PARENTHESIS);
                 result = getNextState();
                 break;
-            case FUNCTION_PARAMETER_END:
+            case CLOSE_PARENTHESIS:
                 emit(TokenType.CLOSE_PARENTHESIS);
                 result = getNextState();
                 break;
@@ -134,7 +155,7 @@ public class Tokenizer {
                 emit(TokenType.TERNARY_QUESTION_MARK);
                 result = getNextState();
                 break;
-            case TERNAY_COLON:
+            case TERNARY_COLON:
                 emit(TokenType.TERNARY_COLON);
                 result = getNextState();
                 break;
@@ -145,6 +166,13 @@ public class Tokenizer {
                 emit(TokenType.STRING);
                 result = getNextState();
                 break;
+            case IN_FLOAT: {
+                if (!Character.isDigit(peek())){
+                    result = State.FLOAT_END;
+                }else
+                    result = getNextState();
+                break;
+            }
             case IN_NUMBER_CONSTANT: {
                 char c = peek();
                 if (!Character.isDigit(c) && c != '.')
@@ -153,8 +181,31 @@ public class Tokenizer {
                     result = getNextState();
                 break;
             }
-            case NUMBER_CONSTANT_END:
-                emit(TokenType.NUMBER_CONSTANT);
+            case FLOAT_END: {
+                char c = peek();
+                if (c != 'd' && c != 'D' && c != 'f' && c != 'F')
+                    emit(TokenType.FLOAT_CONSTANT);
+                result = getNextState();
+                break;
+            }
+            case NUMBER_CONSTANT_END: {
+                char c = peek();
+                if (c != 'l' && c != 'L' && c != 'f' && c != 'F' && c != 'd' && c != 'D')
+                    emit(TokenType.INTEGER_CONSTANT);
+
+                result = getNextState();
+                break;
+            }
+            case FLOAT_F_END:
+                emit(TokenType.FLOAT_CONSTANT);
+                result = getNextState();
+                break;
+            case DOUBLE_END:
+                emit(TokenType.DOUBLE_CONSTANT);
+                result = getNextState();
+                break;
+            case LONG_END:
+                emit(TokenType.LONG_CONSTANT);
                 result = getNextState();
                 break;
             case FUNCTION_PARAMETER_DELIMINATOR:
@@ -167,6 +218,10 @@ public class Tokenizer {
                 }else{
                     result = getNextState();
                 }
+                break;
+            case NESTED_EXPRESSION:
+                emit(TokenType.OPEN_PARENTHESIS_EXP);
+                result = getNextState();
                 break;
             case KNOT_EQUALS_START:
                 if(peek() != '='){
@@ -205,22 +260,38 @@ public class Tokenizer {
                 return State.END;
             }
 
+            if(state == State.IN_STRING_SLASH) {
+                script = script.substring(0, index) + script.substring(index + 1, script.length());
+                index--;
+                return State.STRING_SLASH_END;
+            }
+            if(state == State.STRING_SLASH_END) {
+                return State.IN_STRING;
+            }
+
             char currentCharacter = script.charAt(index);
 
             if(state == State.IN_STRING && currentCharacter != '\'')
                 return state;
 
+            if(state == State.IN_NUMBER_CONSTANT && currentCharacter == '.'){
+                return State.IN_FLOAT;
+            }
+
             if (Character.isDigit(currentCharacter)) {
                 switch (state){
+                    case IN_FLOAT:
+                        return State.IN_FLOAT;
                     case IN_NUMBER_CONSTANT:
                     case FUNCTION_PARAMETER_START:
                     case OPERATOR:
                     case BEGIN:
                     case TERNARY_QUESTION:
-                    case TERNAY_COLON:
+                    case TERNARY_COLON:
                     case FUNCTION_PARAMETER_DELIMINATOR:
                     case EQUALS:
                     case KNOT_EQUALS:
+                    case NESTED_EXPRESSION:
                         return State.IN_NUMBER_CONSTANT;
                     default:
                         // TODO error
@@ -239,15 +310,24 @@ public class Tokenizer {
                     case BEGIN:
                     case IN_CHAR_SEQUENCE:
                     case TERNARY_QUESTION:
-                    case TERNAY_COLON:
+                    case TERNARY_COLON:
                     case OPERATOR:
                     case FUNCTION_PARAMETER_START:
                     case FUNCTION_PARAMETER_DELIMINATOR:
                     case EQUALS:
+                    case NESTED_EXPRESSION:
                     case KNOT_EQUALS:
                         return State.IN_CHAR_SEQUENCE;
                     case KNOT_EQUALS_START:
                         return State.KNOT_VALUE;
+                    case NUMBER_CONSTANT_END:
+                        if(currentCharacter == 'l' || currentCharacter == 'L')
+                            return State.LONG_END;
+                    case FLOAT_END:
+                        if(currentCharacter == 'd' || currentCharacter == 'D')
+                            return State.DOUBLE_END;
+                        if(currentCharacter == 'f' || currentCharacter == 'F')
+                            return State.FLOAT_F_END;
                     default:
                         // TODO error
                         throw new RuntimeException("Invalid character '" + currentCharacter + "' at state " + state.toString());
@@ -260,13 +340,13 @@ public class Tokenizer {
                 case '.':
                     return state == State.IN_NUMBER_CONSTANT ? State.IN_NUMBER_CONSTANT : State.MODEL_PERIOD;
                 case '(':
-                    return State.FUNCTION_PARAMETER_START;
+                    return state == State.FUNCTION_NAME_END ? State.FUNCTION_PARAMETER_START : State.NESTED_EXPRESSION;
                 case ')':
-                    return State.FUNCTION_PARAMETER_END;
+                    return State.CLOSE_PARENTHESIS;
                 case '?':
                     return State.TERNARY_QUESTION;
                 case ':':
-                    return State.TERNAY_COLON;
+                    return State.TERNARY_COLON;
                 case '\'':
                     return state == State.IN_STRING ? State.STRING_END : State.STRING_START;
                 case '!':

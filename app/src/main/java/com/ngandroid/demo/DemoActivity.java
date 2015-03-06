@@ -18,7 +18,7 @@ public class DemoActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        NgAndroid.setContentView(this, R.layout.activity_demo);
+        NgAndroid.getInstance().setContentView(this, R.layout.activity_demo);
 
         input.setInput("Hello world");
 
@@ -26,6 +26,10 @@ public class DemoActivity extends Activity {
         really2 = (TextView) findViewById(R.id.really2);
 
         input.setDisabled(true);
+    }
+
+    private void multiply(float num1, int num2){
+        Toast.makeText(this, String.valueOf(num1 * num2), Toast.LENGTH_SHORT).show();
     }
 
     private void multiply(int num1, int num2){

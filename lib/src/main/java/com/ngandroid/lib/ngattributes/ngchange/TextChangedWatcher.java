@@ -18,20 +18,17 @@ package com.ngandroid.lib.ngattributes.ngchange;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.widget.TextView;
 
-import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
+import com.ngandroid.lib.ng.getters.MethodGetter;
 
 /**
 * Created by tyler on 1/29/15.
 */
 class TextChangedWatcher implements TextWatcher {
-    private final ClickInvoker invoker;
-    private final TextView textView;
+    private final MethodGetter invoker;
 
-    public TextChangedWatcher(ClickInvoker invoker, TextView textView) {
+    public TextChangedWatcher(MethodGetter invoker) {
         this.invoker = invoker;
-        this.textView = textView;
     }
 
     @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -40,6 +37,6 @@ class TextChangedWatcher implements TextWatcher {
 
     @Override
     public void afterTextChanged(Editable s) {
-        invoker.onClick(textView);
+        invoker.get();
     }
 }

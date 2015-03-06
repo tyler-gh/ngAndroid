@@ -25,7 +25,7 @@ import com.ngandroid.lib.interpreter.TokenType;
  */
 public class TypeUtils {
     public static final Object EMPTY = new Object();
-    public static final int INTEGER = 0, LONG = 1, STRING = 2, DOUBLE = 3, FLOAT = 4, SHORT = 5, BYTE = 6, BOOLEAN = 7, OBJECT = 8;
+    public static final int INTEGER = 0, LONG = 1, STRING = 2, DOUBLE = 3, FLOAT = 4, BOOLEAN = 7, OBJECT = 8;
 
     public static int getType(Class<?> clzz){
         if(int.class.equals(clzz) || Integer.class.equals(clzz))
@@ -38,13 +38,8 @@ public class TypeUtils {
             return DOUBLE;
         if(float.class.equals(clzz) || Float.class.equals(clzz))
             return FLOAT;
-        if(short.class.equals(clzz) || Short.class.equals(clzz))
-            return SHORT;
-        if(byte.class.equals(clzz) || Byte.class.equals(clzz))
-            return BYTE;
         if(boolean.class.equals(clzz) || Boolean.class.equals(clzz))
             return BOOLEAN;
-        System.out.println(clzz.getSimpleName());
         return OBJECT;
     }
 
@@ -59,10 +54,6 @@ public class TypeUtils {
                     return Double.parseDouble(value);
                 case FLOAT:
                     return Float.parseFloat(value);
-                case SHORT:
-                    return Short.parseShort(value);
-                case BYTE:
-                    return Byte.parseByte(value);
                 case BOOLEAN:
                     return Boolean.parseBoolean(value);
                 case STRING:
@@ -86,10 +77,6 @@ public class TypeUtils {
                     return Double.parseDouble(value);
                 case FLOAT:
                     return Float.parseFloat(value);
-                case SHORT:
-                    return Short.parseShort(value);
-                case BYTE:
-                    return Byte.parseByte(value);
                 case BOOLEAN:
                     return Boolean.parseBoolean(value);
                 case STRING:
@@ -113,17 +100,14 @@ public class TypeUtils {
                 return 0d;
             case FLOAT:
                 return 0f;
-            case SHORT:
-                return (short)0;
-            case BYTE:
-                return (byte)0;
             case BOOLEAN:
                 return false;
             case STRING:
+                return "";
             case OBJECT:
                 // TODO what to do here with object?
             default:
-                return "";
+                return null;
         }
     }
 

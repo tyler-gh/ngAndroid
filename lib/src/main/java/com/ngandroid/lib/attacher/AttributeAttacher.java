@@ -25,7 +25,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ngandroid.lib.R;
 import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.SyntaxParser;
 import com.ngandroid.lib.interpreter.Token;
@@ -33,13 +32,6 @@ import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.ngattributes.ngchange.NgChange;
-import com.ngandroid.lib.ngattributes.ngclick.NgClick;
-import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
-import com.ngandroid.lib.ngattributes.ngif.NgGone;
-import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
-import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
-import com.ngandroid.lib.ngattributes.ngmodel.NgModel;
 
 /**
  * Created by davityle on 1/13/15.
@@ -50,16 +42,18 @@ public class AttributeAttacher {
     private final Object mScope;
     private final SparseArray<TypedArray> mAttrArray;
     private final ModelBuilderMap mBuilders;
+    private final SparseArray<NgAttribute> attributes;
 
-    public AttributeAttacher(final Context context, Object model) {
-        this((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE), model);
+    public AttributeAttacher(final Context context, Object model, SparseArray<NgAttribute> customAttributes) {
+        this((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE), model, customAttributes);
     }
 
-    public AttributeAttacher(final LayoutInflater inflater, Object scope) {
+    public AttributeAttacher(final LayoutInflater inflater, Object scope, SparseArray<NgAttribute> attributes) {
         this.mScope = scope;
         this.mAttrArray = new SparseArray<>();
         this.mBuilders = new ModelBuilderMap(mScope);
         this.mInflater = inflater;
+        this.attributes = attributes;
         InflaterFactory.setFactory(mInflater, mAttrArray);
     }
 
@@ -69,27 +63,13 @@ public class AttributeAttacher {
             TypedArray array = mAttrArray.get(id);
             for(int i = 0 ; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
-                Token[] tokens = new SyntaxParser(array.getString(attr)).parseScript();
+                String value = array.getString(attr);
+                Token[] tokens = new SyntaxParser(value).parseScript();
                 Getter getter = new ExpressionBuilder(tokens).build(mScope, mBuilders);
 
-                NgAttribute attribute;
-                if(attr == R.styleable.ngAndroid_ngModel){
-                    attribute = NgModel.getInstance();
-                }else if (attr == R.styleable.ngAndroid_ngClick){
-                    attribute = NgClick.getInstance();
-                }else if(attr == R.styleable.ngAndroid_ngLongClick){
-                    attribute = NgLongClick.getInstance();
-                }else if(attr == R.styleable.ngAndroid_ngChange){
-                    attribute = NgChange.getInstance();
-                }else if(attr == R.styleable.ngAndroid_ngGone){
-                    attribute = NgGone.getInstance();
-                }else if(attr == R.styleable.ngAndroid_ngInvisible){
-                    attribute = NgInvisible.getInstance();
-                }else if(attr == R.styleable.ngAndroid_ngDisabled){
-                    attribute = NgDisabled.getInstance();
-                }else {
+                NgAttribute attribute = attributes.get(attr);
+                if(attribute == null)
                     throw new UnsupportedOperationException("Attribute not currently implemented");
-                }
                 try {
                     attribute.typeCheck(tokens, getter);
                     attribute.attach(getter, mBuilders, v.findViewById(id));

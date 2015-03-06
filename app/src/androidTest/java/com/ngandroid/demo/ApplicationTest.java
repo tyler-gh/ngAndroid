@@ -4,6 +4,7 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 import android.view.View;
 
+import com.ngandroid.demo.models.Input;
 import com.ngandroid.lib.NgAndroid;
 import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.SyntaxParser;
@@ -15,7 +16,7 @@ import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
 import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ng.getters.KnotGetter;
-import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
+import com.ngandroid.lib.ng.getters.MethodGetter;
 import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
 import com.ngandroid.lib.ngattributes.ngif.NgGone;
 import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
@@ -59,8 +60,63 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(2, tokenqueue.size());
 
         Token token = tokenqueue.poll();
-        assertEquals(TokenType.NUMBER_CONSTANT, token.getTokenType());
+        assertEquals(TokenType.FLOAT_CONSTANT, token.getTokenType());
         assertEquals("234.453", token.getScript());
+
+        tokenizer = new Tokenizer("234l");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.LONG_CONSTANT, token.getTokenType());
+        assertEquals("234l", token.getScript());
+
+
+        tokenizer = new Tokenizer("234L");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.LONG_CONSTANT, token.getTokenType());
+        assertEquals("234L", token.getScript());
+
+        tokenizer = new Tokenizer("234f");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.FLOAT_CONSTANT, token.getTokenType());
+        assertEquals("234f", token.getScript());
+
+        tokenizer = new Tokenizer("234D");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.DOUBLE_CONSTANT, token.getTokenType());
+        assertEquals("234D", token.getScript());
+
+        tokenizer = new Tokenizer("234.0d");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.DOUBLE_CONSTANT, token.getTokenType());
+        assertEquals("234.0d", token.getScript());
+
+        tokenizer = new Tokenizer("234.0f");
+        tokenqueue = tokenizer.getTokens();
+        System.out.println(tokenqueue);
+        assertEquals(2, tokenqueue.size());
+
+        token = tokenqueue.poll();
+        assertEquals(TokenType.FLOAT_CONSTANT, token.getTokenType());
+        assertEquals("234.0f", token.getScript());
     }
 
     public void testTokenizer(){
@@ -154,7 +210,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals(","));
 
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.NUMBER_CONSTANT);
+        assertTrue(token.getTokenType() == TokenType.INTEGER_CONSTANT);
         assertEquals(token.getScript(),"12345");
 
         token = tokenqueue.poll();
@@ -337,7 +393,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertTrue(token.getScript().equals("=="));
 
         token = tokenqueue.poll();
-        assertTrue(token.getTokenType() == TokenType.NUMBER_CONSTANT);
+        assertTrue(token.getTokenType() == TokenType.INTEGER_CONSTANT);
         assertTrue(token.getScript().equals("2"));
 
 
@@ -827,12 +883,130 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         }catch(Exception ignored){}
     }
 
+    public void testStringSlash(){
+        Tokenizer tokenizer = new Tokenizer("'\\''");
+        Queue<Token> tokens = tokenizer.getTokens();
+        assertEquals(2, tokens.size());
+        assertEquals("'''", tokens.poll().getScript());
+    }
+
+
+    public void testNestedExpressions() throws Throwable {
+
+        Tokenizer tokenizer = new Tokenizer("(3 + 2) - 10/5");
+        Queue<Token> tokens = tokenizer.getTokens();
+        assertEquals(10, tokens.size());
+        assertEquals(TokenType.OPEN_PARENTHESIS_EXP, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.CLOSE_PARENTHESIS, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+
+        tokenizer = new Tokenizer("(3 + (2)) - 10/5");
+        tokens = tokenizer.getTokens();
+
+        assertEquals(12, tokens.size());
+        assertEquals(TokenType.OPEN_PARENTHESIS_EXP, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.OPEN_PARENTHESIS_EXP, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.CLOSE_PARENTHESIS, tokens.poll().getTokenType());
+        assertEquals(TokenType.CLOSE_PARENTHESIS, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tokens.poll().getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tokens.poll().getTokenType());
+
+        SyntaxParser parser = new SyntaxParser("(3 + (2)) - 10/5");
+        Token[] tks = parser.parseScript();
+        assertEquals(12, tks.length);
+        assertEquals(TokenType.OPEN_PARENTHESIS_EXP, tks[0].getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tks[1].getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tks[2].getTokenType());
+        assertEquals(TokenType.OPEN_PARENTHESIS_EXP, tks[3].getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tks[4].getTokenType());
+        assertEquals(TokenType.CLOSE_PARENTHESIS, tks[5].getTokenType());
+        assertEquals(TokenType.CLOSE_PARENTHESIS, tks[6].getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tks[7].getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tks[8].getTokenType());
+        assertEquals(TokenType.BINARY_OPERATOR, tks[9].getTokenType());
+        assertEquals(TokenType.INTEGER_CONSTANT, tks[10].getTokenType());
+
+
+        ExpressionBuilder builder = new ExpressionBuilder("(3 + (2)) - 10/5");
+        TestScope tc = new TestScope();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter<Integer> getter = builder.build(tc, map);
+        assertEquals(3, (int)getter.get());
+
+        builder = new ExpressionBuilder("(3 - (2)) - 10/5");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals(-1, (int)getter.get());
+
+        builder = new ExpressionBuilder("(3 - (2+7)) - 10/5");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals(-8, (int)getter.get());
+
+        builder = new ExpressionBuilder("(3 - (2+7)) - 10/(5-3)");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals(-11, (int)getter.get());
+
+        builder = new ExpressionBuilder("(3 - (2+7)) - 10/(5-3)");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals(-11, (int)getter.get());
+
+        builder = new ExpressionBuilder("(modelName.num - (2*(7-1))) - 10/(modelName.num-3)");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        Field m = TestScope.class.getDeclaredField("modelName");
+        m.setAccessible(true);
+        m.set(tc, map.get("modelName").create());
+        tc.modelName.setNum(1);
+        assertEquals(-6, (int)getter.get());
+        tc.modelName.setNum(-12);
+        assertEquals(-24, (int)getter.get());
+        tc.modelName.setNum(1);
+        assertEquals(-6, (int)getter.get());
+        tc.modelName.setNum(24);
+        assertEquals(12, (int)getter.get());
+
+    }
+
+    public static class TestBugScope {
+        private Input input;
+        private void multiply(int x, int y){
+
+        }
+    }
+
+    public void testBug(){
+        TestBugScope tc = new TestBugScope();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter getter = new ExpressionBuilder("multiply(input.integer,2)").build(tc, map);
+    }
+
 
     public static interface TestModel{
         public String getJoe();
         public void setJoe(String joe);
         public boolean getIsinvisible();
         public void setIsInvisible(boolean isVisible);
+        public int getNum();
+        public void setNum(int num);
     }
 
     public class TestScope {
@@ -855,6 +1029,122 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
             return true;
         }
     }
+
+
+    public void testNumericAdditions() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("getIntValue() + 2 - 10/5");
+        TestScope tc = new TestScope();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter<Integer> getter = builder.build(tc, map);
+        assertEquals(42, (int)getter.get());
+
+
+        builder = new ExpressionBuilder("getIntValue() + 2 - 10/5.0");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        Getter<Float> fgetter = builder.build(tc, map);
+        assertEquals(42.0f, fgetter.get());
+
+        builder = new ExpressionBuilder("getIntValue() + 10/5.0 - 2");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        fgetter = builder.build(tc, map);
+        assertEquals(42.0f, fgetter.get());
+
+        builder = new ExpressionBuilder("getIntValue() + 1*5.0 - 2");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        fgetter = builder.build(tc, map);
+        assertEquals(45.0f, fgetter.get());
+
+
+        builder = new ExpressionBuilder("10d + 25f/5 - getIntValue() + 1*5.0 - 2");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        Getter<Double> dgetter = builder.build(tc, map);
+        assertEquals(-24d, dgetter.get());
+
+        builder = new ExpressionBuilder("10d + 25f/5 - getIntValue() + 1*5.0 - 2*modelName.num");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        dgetter = builder.build(tc, map);
+        try {
+            Field m = TestScope.class.getDeclaredField("modelName");
+            m.setAccessible(true);
+            m.set(tc, map.get("modelName").create());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            fail();
+        }
+        tc.modelName.setNum(1);
+        assertEquals(-24d, dgetter.get());
+        tc.modelName.setNum(2);
+        assertEquals(-26d, dgetter.get());
+        tc.modelName.setNum(3);
+        assertEquals(-28d, dgetter.get());
+    }
+
+
+
+    public void testStringAdditions() throws Throwable {
+        ExpressionBuilder builder = new ExpressionBuilder("getStringValue() + 'orange ' + getIntValue()");
+        TestScope tc = new TestScope();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter<String> getter = builder.build(tc, map);
+        assertEquals("This is a string value orange 42", getter.get());
+
+        builder = new ExpressionBuilder("getStringValue() + getIntValue()");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals("This is a string value 42", getter.get());
+
+        builder = new ExpressionBuilder("getIntValue() + getStringValue()");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals("42This is a string value ", getter.get());
+
+        builder = new ExpressionBuilder("isTrue() ? 'abcdefg ' + getIntValue() : getStringValue()");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals("abcdefg 42", getter.get());
+
+        builder = new ExpressionBuilder("isTrue() ? getStringValue() + getIntValue() : getStringValue()");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        assertEquals("This is a string value 42", getter.get());
+
+        builder = new ExpressionBuilder("modelName.joe + 'orange'");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        try {
+            Field m = TestScope.class.getDeclaredField("modelName");
+            m.setAccessible(true);
+            m.set(tc, map.get("modelName").create());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            fail();
+        }
+        tc.modelName.setJoe("joe");
+        assertEquals("joeorange", getter.get());
+
+        builder = new ExpressionBuilder("modelName.joe + getIntValue()");
+        tc = new TestScope();
+        map = new ModelBuilderMap(tc);
+        getter = builder.build(tc, map);
+        try {
+            Field m = TestScope.class.getDeclaredField("modelName");
+            m.setAccessible(true);
+            m.set(tc, map.get("modelName").create());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            fail();
+        }
+        tc.modelName.setJoe("joe");
+        assertEquals("joe42", getter.get());
+    }
+
 
     public void testExpressionBuilder() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("modelName.joe != 'orange'");
@@ -883,7 +1173,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         ExpressionBuilder builder = new ExpressionBuilder("method()");
         TestScope tc = new TestScope();
         Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
-        assertTrue(getter instanceof ClickInvoker);
+        assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
         }catch (Throwable e){
@@ -896,7 +1186,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         ExpressionBuilder builder = new ExpressionBuilder("method('string')");
         TestScope tc = new TestScope();
         Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
-        assertTrue(getter instanceof ClickInvoker);
+        assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
         }catch (Throwable e){
@@ -905,7 +1195,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
         builder = new ExpressionBuilder("method(58)");
         getter = builder.build(tc, new ModelBuilderMap(tc));
-        assertTrue(getter instanceof ClickInvoker);
+        assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
         }catch (Throwable e){
@@ -917,7 +1207,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         ExpressionBuilder builder = new ExpressionBuilder("method(getStringValue())");
         TestScope tc = new TestScope();
         Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
-        assertTrue(getter instanceof ClickInvoker);
+        assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
         }catch (Throwable e){
@@ -927,7 +1217,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         builder = new ExpressionBuilder("method('Int value = ' + getIntValue())");
         tc = new TestScope();
         getter = builder.build(tc, new ModelBuilderMap(tc));
-        assertTrue(getter instanceof ClickInvoker);
+        assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
         }catch (Throwable e){
@@ -1005,7 +1295,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testModelBuild(){
         TestScope tc = new TestScope();
-        tc.modelName = NgAndroid.buildModel(TestModel.class);
+        NgAndroid.getInstance().buildModel(tc, "modelName", TestModel.class);
         tc.modelName.setJoe("Frank");
         assertEquals("Frank", tc.modelName.getJoe());
     }

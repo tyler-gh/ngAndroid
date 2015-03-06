@@ -16,21 +16,23 @@
 
 package com.ngandroid.lib.interpreter;
 
-import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
-import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
+import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ng.getters.KnotGetter;
 import com.ngandroid.lib.ng.getters.ModelGetter;
 import com.ngandroid.lib.ng.getters.StaticGetter;
 import com.ngandroid.lib.ng.getters.TernaryGetter;
-import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
+import com.ngandroid.lib.ng.getters.MethodGetter;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Created by tyler on 2/2/15.
@@ -49,13 +51,8 @@ public class ExpressionBuilder<T> {
     }
 
     public Getter<T> build(Object scope,ModelBuilderMap builders){
-        Getter[] getters = createGetters(0, tokens.length - 1, scope, tokens, builders).getFirst();
-        if(getters.length != 1){
-            for(Getter g : getters)
-                System.out.println(g.getClass().getSimpleName());
-            throw new RuntimeException("Each expression can only return one value instead found "+ getters.length);
-        }
-        return (Getter<T>) getters[0];
+        Getter getter = createGetter(0, tokens.length - 1, scope, tokens, builders).getFirst();
+        return (Getter<T>) getter;
     }
 
 
@@ -86,6 +83,29 @@ public class ExpressionBuilder<T> {
         throw new RuntimeException("Function is not closed properly");
     }
 
+    private int findCloseParenthesis(int startIndex) {
+        int openCount = 1;
+        for(int index = startIndex; index < tokens.length; index++){
+            Token token = tokens[index];
+            if(token.getTokenType() == TokenType.OPEN_PARENTHESIS_EXP || token.getTokenType() == TokenType.OPEN_PARENTHESIS){
+                openCount++;
+            }else if(token.getTokenType() == TokenType.CLOSE_PARENTHESIS) {
+                if(--openCount == 0)
+                    return index;
+            }
+        }
+        throw new RuntimeException("Nested expression is not closed properly " + openCount);
+    }
+
+    private int findEndOfParameter(Token[] tokens, int startIndex){
+        for(int index = startIndex; index < tokens.length; index++){
+            Token token = tokens[index];
+            if(token.getTokenType() == TokenType.CLOSE_PARENTHESIS || token.getTokenType() == TokenType.COMMA)
+                return index;
+        }
+        throw new RuntimeException("Function is not closed properly");
+    }
+
     private int findColon(Token[] tokens, int startIndex){
         for(int index = startIndex; index < tokens.length; index++){
             if(tokens[index].getTokenType() == TokenType.TERNARY_COLON)
@@ -94,36 +114,58 @@ public class ExpressionBuilder<T> {
         throw new RuntimeException("Ternary is not formed properly");
     }
 
-    public Tuple<Getter[], Integer> createGetters(int startIndex, int endIndex, Object scope, Token[] tokens, ModelBuilderMap builders){
-        List<Getter> getters = new ArrayList<>();
+    public Tuple<Getter, Integer> createGetter(int startIndex, int endIndex, Object scope, Token[] tokens, ModelBuilderMap builders){
+        List<Getter> getterList = new ArrayList<>();
+        List<TokenType.BinaryOperator> operatorList = new ArrayList<>();
         int index = startIndex;
         while (index < endIndex){
             Token token = tokens[index];
             switch(token.getTokenType()){
                 case FUNCTION_NAME:{
-                    int end = findEndOfFunction(tokens, index+2);
-                    Tuple<Getter[], Integer> values = createGetters(index+2, end,scope, tokens, builders);
-                    Getter[] parameters = values.getFirst();
-                    index = values.getSecond();
+                    index += 2;
+                    int end = findEndOfFunction(tokens, index);
+                    List<Getter> parameters = new ArrayList<>();
+                    while(index < end) {
+                        int nextIndex = findEndOfParameter(tokens, index);
+                        Tuple<Getter, Integer> values = createGetter(index, nextIndex, scope, tokens, builders);
+                        parameters.add(values.getFirst());
+                        index = values.getSecond() + 1;
+                    }
                     String functionName = token.getScript();
-                    int[]paramTypes = new int[parameters.length];
-                    for(int i = 0; i < paramTypes.length; i++){
-                        paramTypes[i] = parameters[i].getType();
+                    int[] paramTypes = new int[parameters.size()];
+                    for (int i = 0; i < paramTypes.length; i++) {
+                        paramTypes[i] = parameters.get(i).getType();
                     }
                     Method method = findMethod(functionName, scope.getClass(), paramTypes);
-                    getters.add(new ClickInvoker(method, scope, parameters));
+                    getterList.add(new MethodGetter(method, scope, parameters.toArray(new Getter[parameters.size()])));
                     break;
                 }
                 case KNOT:{
-                    Tuple<Getter[], Integer> value = createGetters(index+1, endIndex,scope, tokens, builders);
-                    KnotGetter getter = new KnotGetter(value.getFirst()[0]);
+                    // TODO take a closer look at whether or not this can trail off and grab multiple getters
+                    Tuple<Getter, Integer> value = createGetter(index + 1, endIndex, scope, tokens, builders);
+                    KnotGetter getter = new KnotGetter(value.getFirst());
                     index = value.getSecond();
-                    getters.add(getter);
+                    getterList.add(getter);
                     break;
                 }
-                case NUMBER_CONSTANT: {
-                    // TODO add support for floats, doubles, and longs
-                    getters.add(new StaticGetter<>(Integer.parseInt(token.getScript()), TypeUtils.INTEGER));
+                case INTEGER_CONSTANT: {
+                    getterList.add(new StaticGetter<>(Integer.parseInt(token.getScript()), TypeUtils.INTEGER));
+                    index++;
+                    break;
+                }
+                case LONG_CONSTANT: {
+                    String longStr = token.getScript();
+                    getterList.add(new StaticGetter<>(Long.parseLong(longStr.substring(0, longStr.length() - 1)), TypeUtils.LONG));
+                    index++;
+                    break;
+                }
+                case FLOAT_CONSTANT: {
+                    getterList.add(new StaticGetter<>(Float.parseFloat(token.getScript()), TypeUtils.FLOAT));
+                    index++;
+                    break;
+                }
+                case DOUBLE_CONSTANT: {
+                    getterList.add(new StaticGetter<>(Double.parseDouble(token.getScript()), TypeUtils.DOUBLE));
                     index++;
                     break;
                 }
@@ -131,13 +173,21 @@ public class ExpressionBuilder<T> {
                     String modelName = token.getScript();
                     String fieldName = tokens[index + 2].getScript();
                     ModelBuilder builder = builders.get(modelName);
-                    getters.add(new ModelGetter(fieldName, modelName, builder.getMethodInvoker()));
+                    getterList.add(new ModelGetter(fieldName, modelName, builder.getMethodInvoker()));
                     index += 3;
                     break;
                 }
                 case STRING: {
-                    getters.add(new StaticGetter<>(token.getScript(), TypeUtils.STRING));
+                    getterList.add(new StaticGetter<>(token.getScript(), TypeUtils.STRING));
                     index++;
+                    break;
+                }
+                case OPEN_PARENTHESIS_EXP:{
+                    index++;
+                    int end = findCloseParenthesis(index);
+                    Tuple<Getter, Integer> values = createGetter(index, end, scope, tokens, builders);
+                    getterList.add(values.getFirst());
+                    index = values.getSecond();
                     break;
                 }
                 case CLOSE_PARENTHESIS:
@@ -146,43 +196,67 @@ public class ExpressionBuilder<T> {
                     break;
                 }
                 case TERNARY_QUESTION_MARK: {
-                    Getter<Boolean> getter =  getMostRecentGetter(getters, "Ternary Question mark cannot be the first expression.");
+                    Getter<Boolean> getter =  getMostRecentGetter(getterList, "Ternary Question mark cannot be the first expression.");
                     int ternaryColonIndex = findColon(tokens, index);
-                    Tuple<Getter[], Integer> values = createGetters(index + 1, ternaryColonIndex, scope, tokens, builders);
-                    Getter trueGetter = values.getFirst()[0];
-                    values = createGetters(ternaryColonIndex + 1, endIndex, scope, tokens, builders);
-                    Getter falseGetter = values.getFirst()[0];
+                    Tuple<Getter, Integer> values = createGetter(index + 1, ternaryColonIndex, scope, tokens, builders);
+                    Getter trueGetter = values.getFirst();
+                    values = createGetter(ternaryColonIndex + 1, endIndex, scope, tokens, builders);
+                    Getter falseGetter = values.getFirst();
                     index = values.getSecond();
-                    getters.add(new TernaryGetter(getter, trueGetter, falseGetter));
+                    getterList.add(new TernaryGetter(getter, trueGetter, falseGetter));
                     break;
                 }
                 case BINARY_OPERATOR: {
-                    Getter leftgetter =  getMostRecentGetter(getters, "Binary Operator cannot be the first expression.");
+
                     TokenType.BinaryOperator operator = TokenType.BinaryOperator.getOperator(token.getScript());
-                    Tuple<Getter[], Integer> values = createGetters(index + 1, endIndex, scope, tokens, builders);
-                    Getter rightgetter = values.getFirst()[0];
-                    index = values.getSecond();
-                    int lefttype = leftgetter.getType();
-                    int righttype = rightgetter.getType();
-                    int type;
-                    if(lefttype == TypeUtils.STRING || righttype == TypeUtils.STRING){
-                        type = TypeUtils.STRING;
+
+                    if(operator.equals(TokenType.BinaryOperator.EQUALS_EQUALS) || operator.equals(TokenType.BinaryOperator.KNOT_EQUALS)){
+                        Getter leftgetter = getMostRecentGetter(getterList, "Binary Operator cannot be the first expression.");
+                        Tuple<Getter, Integer> values = createGetter(index + 1, endIndex, scope, tokens, builders);
+                        Getter rightgetter = values.getFirst();
+                        index = values.getSecond();
+                        getterList.add(compareGetters(leftgetter, rightgetter, operator));
                     }else{
-                        if(lefttype != righttype)
-                            throw new RuntimeException("Types " + lefttype + " & " + righttype + " cannot be compared");
-                        type = lefttype;
+                        operatorList.add(operator);
+                        index ++;
                     }
-                    getters.add(BinaryOperatorGetter.getOperator(leftgetter, rightgetter, type, operator));
                     break;
                 }
-
-
                 default:
                     throw new RuntimeException("Invalid token in expression: " + token.getTokenType());
             }
         }
 
-        return Tuple.of(getters.toArray(new Getter[getters.size()]), index);
+        if(operatorList.size() > 0){
+            return Tuple.of(evaluatePostFixExpression(PostfixConverter.convertToPostfix(convertToInfix(getterList, operatorList))), index);
+        }
+
+        if(getterList.size() != 1){
+            throw new RuntimeException("Each expression can only return one value instead found "+ getterList.size());
+        }
+
+        return Tuple.of(getterList.get(0), index);
+    }
+
+    private Getter compareGetters(Getter leftgetter, Getter rightgetter, TokenType.BinaryOperator operator){
+        int lefttype = leftgetter.getType();
+        int righttype = rightgetter.getType();
+        int type;
+        if((righttype == TypeUtils.BOOLEAN || righttype == TypeUtils.OBJECT) || (lefttype == TypeUtils.BOOLEAN || lefttype == TypeUtils.OBJECT))
+            throw new RuntimeException("Types " + lefttype + " and " + righttype + " cannot be compared");
+
+        if(lefttype == TypeUtils.STRING || righttype == TypeUtils.STRING){
+            type = TypeUtils.STRING;
+        }else if(lefttype == TypeUtils.DOUBLE || righttype == TypeUtils.DOUBLE){
+            type = TypeUtils.DOUBLE;
+        }else if(lefttype == TypeUtils.FLOAT || righttype == TypeUtils.FLOAT){
+            type = TypeUtils.FLOAT;
+        }else if(lefttype == TypeUtils.LONG || righttype == TypeUtils.LONG){
+            type = TypeUtils.LONG;
+        }else{
+            type = TypeUtils.INTEGER;
+        }
+        return BinaryOperatorGetter.getOperator(leftgetter, rightgetter, type, operator);
     }
 
     private Getter getMostRecentGetter(List<Getter> getters, String error){
@@ -192,6 +266,38 @@ public class ExpressionBuilder<T> {
         Getter getter =  getters.get(getters.size() - 1);
         getters.remove(getter);
         return getter;
+    }
+
+    public Getter evaluatePostFixExpression(Object[] postfixExpression){
+        Stack<Getter> stack = new Stack<>();
+        for (Object obj : postfixExpression){
+            if (obj instanceof Getter){
+                stack.push((Getter) obj);
+            }
+            else{
+                Getter rightGetter = stack.pop();
+                Getter leftGetter = stack.pop();
+                stack.push(compareGetters(leftGetter, rightGetter, (TokenType.BinaryOperator) obj));
+            }
+        }
+        if(stack.size() != 1){
+            // TODO error
+            throw new RuntimeException("Unequal distribution of binary operators");
+        }
+
+        return stack.pop();
+    }
+
+    private List<Object> convertToInfix(List<Getter> getters, List<TokenType.BinaryOperator> operators){
+        List<Object> infixExpression = new ArrayList<>();
+        Iterator<Getter> getterListIterator = getters.listIterator();
+        Iterator<TokenType.BinaryOperator> operatorIterator = operators.listIterator();
+        infixExpression.add(getterListIterator.next());
+        while(getterListIterator.hasNext()){
+            infixExpression.add(operatorIterator.next());
+            infixExpression.add(getterListIterator.next());
+        }
+        return infixExpression;
     }
 
 }

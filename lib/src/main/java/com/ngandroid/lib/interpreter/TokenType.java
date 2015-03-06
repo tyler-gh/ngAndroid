@@ -30,11 +30,11 @@ public enum TokenType {
     COMMA,
     PERIOD,
     BINARY_OPERATOR,
-    NUMBER_CONSTANT,
+    INTEGER_CONSTANT,
     RUBBISH,
     EOF,
     STRING,
-    KNOT;
+    KNOT, LONG_CONSTANT, FLOAT_CONSTANT, DOUBLE_CONSTANT, OPEN_PARENTHESIS_EXP;
 
     public enum BinaryOperator {
         ADDITION,

@@ -38,7 +38,7 @@ public abstract class NgIf implements NgAttribute {
     public void typeCheck(Token[] tokens, Getter getter) throws Exception {
         // TODO - error
         if(getter.getType() != TypeUtils.BOOLEAN)
-            throw new Exception("NgInvisible requires a boolean type model");
+            throw new Exception(getClass().getSimpleName() + " requires a boolean type model");
 
     }
 
@@ -46,7 +46,7 @@ public abstract class NgIf implements NgAttribute {
     public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Exception {
         if(!observeModels(getter, getter, modelBuilderMap, view)){
             // TODO - error
-            throw new Exception("NgIf requires a model to observe. Try reformatting your ngif statement to include a model");
+            throw new Exception(getClass().getSimpleName() +" requires a model to observe. Try reformatting your statement to include a model");
         }
     }
 

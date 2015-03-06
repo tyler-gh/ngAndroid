@@ -22,6 +22,7 @@ import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ng.getters.MethodGetter;
 import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ngattributes.nglongclick.LongClickInvoker;
 import com.ngandroid.lib.utils.TypeUtils;
@@ -51,11 +52,11 @@ public class NgClick implements NgAttribute {
     }
 
     public void attach(Getter getter, View view, boolean isLongClick){
-        ClickInvoker invoker = (ClickInvoker) getter;
+        MethodGetter methodGetter = (MethodGetter) getter;
         if(!isLongClick)
-            view.setOnClickListener(invoker);
+            view.setOnClickListener(new ClickInvoker(methodGetter));
         else
-            view.setOnLongClickListener(new LongClickInvoker(invoker));
+            view.setOnLongClickListener(new LongClickInvoker(methodGetter));
     }
 
 }
