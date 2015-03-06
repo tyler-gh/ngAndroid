@@ -6,6 +6,9 @@ ngAndroid brings some of the angular directives to android xml attributes.
 ngandroid is still under heavy development. However, there is a build up on maven central for anyone who wants to start trying it out `compile 'com.github.davityle:ngandroid:0.0.1'`,
 Feedback and contributions are encouraged
 
+Also there are known issues with adding custom attributes to Android views while using the AppCompat libraries such as FragmentActivity. Please report any other known issues and we'll work to figure them out
+
+
 Currently supported angular directives.
 
 [NgModel](#ngmodel)<br>
