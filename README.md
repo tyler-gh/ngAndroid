@@ -241,6 +241,8 @@ public class Scope{
 
 With that scope, you could reference the model and the method like this: `model.field` `onClickMethod(model.field)`
 
+Your scope is usually just your activity. As it is in the examples above. If you use a seperate scope class than you must use `NgAndroid.setContentView(Object scope, Activity activity, int resourceId)` instead of `NgAndroid.setContentView(Activity activity, int resourceId)` which is shown in the examples
+
 
 --------
 
