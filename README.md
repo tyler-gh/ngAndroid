@@ -8,7 +8,6 @@ Feedback and contributions are encouraged
 
 Also there are known issues with adding custom attributes to Android views while using the AppCompat libraries such as FragmentActivity. Please report any other issues and we'll work to figure them out
 
-
 Currently supported angular directives.
 
 [NgModel](#ngmodel)<br>
@@ -20,6 +19,8 @@ Currently supported angular directives.
 [NgGone](#nggone)<br>
 [NgBlur](#ngblur)<br>
 [NgFocus](#ngfocus)<br>
+<br>
+[Common Gotchas](#a-couple-of-gotchas)<br>
 
 Directives that are on the road map
 ```
@@ -212,6 +213,34 @@ ngAndroid.buildModel(TestSubModel.class);
 ```java
 ngAndroid.buildScope(TestScope.class);
 ```
+
+--------
+
+##A couple of gotchas:
+
+Each view that has an ngangular attribute must also have an id
+
+Your model must be declared using an iterface.
+```java
+public interface Model{
+    public void setField(String field);
+    public String getField();
+}
+```
+You would then reference it in your xml attribute as `{name of model in scope}.field`
+
+Your scope is the parent or container of your models and methods and can be as broad as the Application or contained in a single view or even a single Scope class. To declare the above model in a scope you would use do something like this.
+
+```java
+public class Scope{
+    private Model model;
+    private void onClickMethod(String modelField){
+    }
+}
+```
+
+With that scope, you could reference the model and the method like this: `model.field` `onClickMethod(model.field)`
+
 
 --------
 
