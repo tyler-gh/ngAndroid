@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.ng.ModelBuilder;
@@ -49,7 +50,7 @@ public class NgModel implements NgAttribute {
 
     public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View bindView) throws Throwable {
         if(!(getter instanceof ModelGetter)){
-            throw new RuntimeException("You must only use models in ngModel");
+            throw new NgException("You must only use models in ngModel");
         }
         ModelGetter modelGetter = (ModelGetter) getter;
         ModelBuilder modelBuilder = modelBuilderMap.get(modelGetter.getModelName());
@@ -65,8 +66,7 @@ public class NgModel implements NgAttribute {
     }
     private void bindModelToCompoundButton(ModelGetter<Boolean> getter, final CompoundButton compoundButton, ModelBuilder builder) throws Throwable {
         if(getter.getType() != TypeUtils.BOOLEAN){
-            // TODO error
-            throw new RuntimeException("A compound button requires a boolean type model");
+            throw new NgException("A compound button requires a boolean type model");
         }
         boolean isChecked = compoundButton.isChecked();
         String fieldName = getter.getFieldName().toLowerCase();

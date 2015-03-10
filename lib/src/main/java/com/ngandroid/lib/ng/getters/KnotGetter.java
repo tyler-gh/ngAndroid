@@ -16,6 +16,7 @@
 
 package com.ngandroid.lib.ng.getters;
 
+import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.utils.TypeUtils;
 
 /**
@@ -28,8 +29,7 @@ public class KnotGetter implements Getter<Boolean>{
     public KnotGetter(Getter<Boolean> getter) {
         this.getter = getter;
         if(getter.getType() != TypeUtils.BOOLEAN){
-            // TODO error
-            throw new RuntimeException("A ! may only negate a boolean expression");
+            throw new NgException("A negation(!) may only negate a boolean expression");
         }
     }
 

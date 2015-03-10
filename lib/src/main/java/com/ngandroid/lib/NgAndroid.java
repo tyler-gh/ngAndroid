@@ -17,13 +17,15 @@
 package com.ngandroid.lib;
 
 import android.app.Activity;
+import android.os.Looper;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ngandroid.lib.attacher.AttributeAttacher;
 import com.ngandroid.lib.annotations.Ignore;
+import com.ngandroid.lib.binder.AttributeBinder;
+import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ngattributes.ngblur.NgBlur;
@@ -50,31 +52,61 @@ public class NgAndroid {
     private static NgAndroid instance;
 
     /**
-     * this method is not thread safe
-     * @return
+     * returns a default singleton instance of NgAndroid
+     * @return NgAndroid
+     *
+     * @throws NgException if not called on the main ui thread
      */
     public static NgAndroid getInstance(){
+        if(Looper.myLooper() != Looper.getMainLooper())
+            throw new NgException("NgAndroid should only be used on the main ui thread.");
         if(instance == null){
             instance = new Builder().build();
         }
         return instance;
     }
 
+    /**
+     * the ngAttributes used in binding to views
+     */
     private final SparseArray<NgAttribute> mAttributes;
 
+    /**
+     * private constructor
+     * @param attributes sets mAttributes
+     */
     private NgAndroid(SparseArray<NgAttribute> attributes){
         this.mAttributes = attributes;
     }
 
-
+    /**
+     * sets the content view of the Activity to the given resourceId
+     * @param activity used as the scope of the binding, contentView set
+     * @param resourceId xml layout resource to bind to scope and set contentView of Activity
+     */
     public void setContentView(Activity activity, int resourceId) {
         setContentView(activity, activity, resourceId);
     }
 
+    /**
+     * sets the content view of the Activity to the given resourceId
+     * binds the scope to the view
+     * @param scope scope of the binding
+     * @param activity contentView set
+     * @param resourceId xml layout resource to bind to scope and set contentView of Activity
+     */
     public void setContentView(Object scope, Activity activity, int resourceId) {
-        new AttributeAttacher(activity, scope, mAttributes).setContentView(activity, resourceId);
+        new AttributeBinder(activity, scope, mAttributes).setContentView(activity, resourceId);
     }
 
+    /**
+     * inflates and binds a view
+     * @param activity
+     * @param resourceId
+     * @param viewGroup
+     * @param attach
+     * @return
+     */
     public View inflate(Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
         return inflate(activity, activity, resourceId, viewGroup, attach);
     }
@@ -84,7 +116,7 @@ public class NgAndroid {
     }
 
     public View inflate(Object scope, Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
-        return new AttributeAttacher(activity, scope, mAttributes).inflate(resourceId, viewGroup, attach);
+        return new AttributeBinder(activity, scope, mAttributes).inflate(resourceId, viewGroup, attach);
     }
 
     public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
@@ -92,26 +124,11 @@ public class NgAndroid {
     }
 
     public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
-        return new AttributeAttacher(inflater, scope, mAttributes).inflate(resourceId, viewGroup, attach);
+        return new AttributeBinder(inflater, scope, mAttributes).inflate(resourceId, viewGroup, attach);
     }
 
     public <T> T buildModel(Class<T> clss){
         return  (T) new ModelBuilder(clss).create();
-    }
-
-    public <T> T buildModel(Object scope, String fieldName, Class<T> clss){
-        try {
-            Field f = scope.getClass().getDeclaredField(fieldName);
-            f.setAccessible(true);
-            T val = (T) new ModelBuilder(clss).create();
-            f.set(scope, val);
-            return val;
-        } catch (NoSuchFieldException e) {
-            //TODO
-            throw new RuntimeException("There is no such field '" + fieldName + "' found in " + scope.getClass().getSimpleName());
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Unable to access field '" + fieldName + "' in " + scope.getClass().getSimpleName());
-        }
     }
 
     public <T> T buildScope(Class<T> clss){
@@ -127,12 +144,29 @@ public class NgAndroid {
                 }
             }
         } catch (InstantiationException | IllegalAccessException e) {
-            // TODO
-            throw new RuntimeException("Error instantiating scope.", e);
+            throw new NgException("Error instantiating scope.", e);
         }
         return instance;
     }
 
+    /**
+     * builds a model, setting the values from the json object
+     *
+     * { "field" : 0 }
+     *
+     * would translate to
+     *
+     * interface Model {
+     *     public int getField();
+     *     public void setField(int field);
+     * }
+     *
+     * @param json the json object
+     * @param clss the class of the model interface
+     * @param <T> the type of the class
+     * @return the built model
+     * @throws JSONException
+     */
     public <T> T modelFromJson(String json, Class<T> clss) throws JSONException {
         return JsonUtils.buildModelFromJson(new JSONObject(json), clss);
     }

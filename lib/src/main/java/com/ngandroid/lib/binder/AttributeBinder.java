@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.attacher;
+package com.ngandroid.lib.binder;
 
 import android.app.Activity;
 import android.content.Context;
@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.SyntaxParser;
 import com.ngandroid.lib.interpreter.Token;
@@ -36,7 +37,7 @@ import com.ngandroid.lib.ng.getters.Getter;
 /**
  * Created by davityle on 1/13/15.
  */
-public class AttributeAttacher {
+public class AttributeBinder {
 
     private LayoutInflater mInflater;
     private Object mScope;
@@ -44,17 +45,17 @@ public class AttributeAttacher {
     private ModelBuilderMap mBuilders;
     private SparseArray<NgAttribute> attributes;
 
-    public AttributeAttacher(final Context context, Object scope, SparseArray<NgAttribute> customAttributes) {
+    public AttributeBinder(final Context context, Object scope, SparseArray<NgAttribute> customAttributes) {
         this((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE), scope, customAttributes);
     }
 
-    public AttributeAttacher(final LayoutInflater inflater, Object scope, SparseArray<NgAttribute> attributes) {
+    public AttributeBinder(final LayoutInflater inflater, Object scope, SparseArray<NgAttribute> attributes) {
         this.mScope = scope;
         this.mAttrArray = new SparseArray<>();
         this.mBuilders = new ModelBuilderMap(mScope);
         this.mInflater = inflater;
         this.attributes = attributes;
-        InflaterFactory.setFactory(mInflater, mAttrArray);
+        BindingInflaterFactory.setFactory(mInflater, mAttrArray);
     }
 
     private void apply(View v){
@@ -74,7 +75,7 @@ public class AttributeAttacher {
                     attribute.typeCheck(tokens, getter);
                     attribute.attach(getter, mBuilders, v.findViewById(id));
                 } catch (Throwable e) {
-                    throw new RuntimeException(e);
+                    throw new NgException(e);
                 }
             }
         }

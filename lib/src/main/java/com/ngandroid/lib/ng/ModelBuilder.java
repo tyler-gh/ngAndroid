@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.util.ArrayMap;
 
+import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 
@@ -64,7 +65,7 @@ public class ModelBuilder {
             if(name.startsWith("set")){
                 Class<?>[] parameters = method.getParameterTypes();
                 if(parameters.length != 1){
-                    throw new RuntimeException("method set" + name + " must have single parameter");
+                    throw new NgException("method set" + name + " must have single parameter");
                 }
                 createField(name.substring(3), parameters[0]);
             }
@@ -77,10 +78,10 @@ public class ModelBuilder {
                 if(hasField(field)) {
                     Class returnType = method.getReturnType();
                     if (TypeUtils.getType(returnType) != getFieldType(field)) {
-                        throw new RuntimeException("Getter and setter types do not match for field " + field);
+                        throw new NgException("Getter and setter types do not match for field " + field);
                     }
                 }else{
-                    throw new RuntimeException(field + " is missing it's setter");
+                    throw new NgException(field + " is missing it's setter");
                 }
             }
         }
@@ -140,8 +141,7 @@ public class ModelBuilder {
             f.setAccessible(true);
             f.set(scope, dynamicField);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            // TODO rename error
-            throw new RuntimeException("There is not a field in scope '" + scope.getClass().getSimpleName() + "' called " + modelName);
+            throw new NgException("There is not a field in scope '" + scope.getClass().getSimpleName() + "' called " + modelName);
         }
     }
 
@@ -151,12 +151,12 @@ public class ModelBuilder {
             if(name.toLowerCase().equals("set" + keyLower)){
                 Class<?>[] parameters = method.getParameterTypes();
                 if(parameters.length != 1){
-                    throw new RuntimeException("method 'set" + keyLower + "' must have single parameter");
+                    throw new NgException("method 'set" + keyLower + "' must have single parameter");
                 }
                 return parameters[0];
             }
         }
-        throw new RuntimeException("method 'set" + keyLower + "' does not exist");
+        throw new NgException("method 'set" + keyLower + "' does not exist");
     }
 
     public void pullDefaults(Object model){
@@ -192,10 +192,9 @@ public class ModelBuilder {
             }
             return builder;
         } catch (NoSuchFieldException e) {
-            // TODO rename error
-            throw new RuntimeException("There is not a model in scope '" + scope.getClass().getSimpleName() + "' called " + modelName);
+            throw new NgException("There is not a model in scope '" + scope.getClass().getSimpleName() + "' called " + modelName);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new NgException(e);
         }
     }
 

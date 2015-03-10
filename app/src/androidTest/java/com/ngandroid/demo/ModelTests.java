@@ -70,10 +70,6 @@ public class ModelTests extends ApplicationTestCase<Application> {
     }
 
     public void testSetterRequired(){
-        try{
-            ngAndroid.buildModel(new TestScope(), "testSetterRequired", TestSetterRequired.class);
-            fail();
-        }catch (Exception e){}
 
         try{
             ngAndroid.buildModel(TestSetterRequired.class);
@@ -88,11 +84,6 @@ public class ModelTests extends ApplicationTestCase<Application> {
     public void testGetterNotRequired(){
         try{
             ngAndroid.buildModel(TestGetterNotRequired.class);
-        }catch (Exception e){
-            fail();
-        }
-        try{
-            ngAndroid.buildModel(new TestScope(), "testGetterNotRequired", TestGetterNotRequired.class);
         }catch (Exception e){
             fail();
         }
@@ -124,13 +115,6 @@ public class ModelTests extends ApplicationTestCase<Application> {
 
         TestSubModel testSubModel =  ngAndroid.buildModel(TestSubModel.class);
         assertNotNull(testSubModel.getJsonModel());
-
-        TestScope scope = new TestScope();
-        ngAndroid.buildModel(scope, "testJsonModel", TestJsonModel.class);
-        assertNull(scope.testJsonModel.getJsonModel());
-
-        ngAndroid.buildModel(scope, "testSubModel", TestSubModel.class);
-        assertNotNull(scope.testSubModel.getJsonModel());
     }
 
 
@@ -193,22 +177,10 @@ public class ModelTests extends ApplicationTestCase<Application> {
     public void testDefaults() throws NoSuchFieldException, IllegalAccessException {
         TestScope tc = new TestScope();
         ModelBuilderMap map = new ModelBuilderMap(tc);
-        NgAndroid.getInstance().buildModel(tc, "testJsonModel", TestJsonModel.class);
-        tc.testJsonModel.setInt(300);
-        new ExpressionBuilder("testJsonModel.int").build(tc, map);
-        Field f = tc.getClass().getDeclaredField("testJsonModel");
-        f.setAccessible(true);
-        assertNotNull(f.get(tc));
-        assertTrue(tc.testJsonModel == f.get(tc));
-        ModelBuilder.buildModel(tc, map);
-        assertEquals(300, tc.testJsonModel.getInt());
-
-        tc = new TestScope();
-        map = new ModelBuilderMap(tc);
         tc.testJsonModel = NgAndroid.getInstance().buildModel(TestJsonModel.class);
         tc.testJsonModel.setInt(300);
         new ExpressionBuilder("testJsonModel.int").build(tc, map);
-        f = tc.getClass().getDeclaredField("testJsonModel");
+        Field f = tc.getClass().getDeclaredField("testJsonModel");
         f.setAccessible(true);
         assertNotNull(f.get(tc));
         assertTrue(tc.testJsonModel == f.get(tc));

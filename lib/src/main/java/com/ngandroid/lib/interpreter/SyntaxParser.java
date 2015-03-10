@@ -16,6 +16,8 @@
 
 package com.ngandroid.lib.interpreter;
 
+import com.ngandroid.lib.exceptions.NgException;
+
 import java.util.Queue;
 import java.util.Stack;
 
@@ -46,17 +48,14 @@ public class SyntaxParser {
                     offerPop(TokenType.EOF)
                 )
         ) {
-            // TODO error
-            throw new RuntimeException();
+            throw new NgException("Invalid start of expression " + mTokens.peek());
         }
         if(mTokens.size() > 0){
-            //TODO
-            throw new RuntimeException("Dangling tokens " + mTokens.toString());
+            throw new NgException("Dangling tokens " + mTokens.toString());
         }
 
         if(parenthesisStack.size() > 0){
-            //TODO
-            throw new RuntimeException("Unclosed nested expression");
+            throw new NgException("Unclosed nested expression");
         }
         return mTokenArray;
     }
@@ -127,8 +126,7 @@ public class SyntaxParser {
                 offerPop(TokenType.OPEN_PARENTHESIS_EXP)
             )
         ){
-            // TODO
-            throw new RuntimeException();
+            throw new NgException("Invalid token in expression " + mTokens.peek());
         }
         emit(TokenType.CLOSE_PARENTHESIS);
     }
@@ -136,7 +134,7 @@ public class SyntaxParser {
     private void emit(TokenType tokenType){
         if(mTokens.peek().getTokenType() != tokenType){
             Token token = mTokens.peek();
-            throw new RuntimeException(token.getScript() + " is invalid. " + token.getTokenType() + " != " + tokenType);
+            throw new NgException(token.getScript() + " is invalid. " + token.getTokenType() + " != " + tokenType);
         }
         popToken();
     }
@@ -148,8 +146,7 @@ public class SyntaxParser {
                 offerPop(TokenType.MODEL_NAME)
             )
         ){
-            // TODO error
-            throw new RuntimeException();
+            throw new NgException("Parse error was expecting MODEL_NAME or FUNCTION_NAME after negation (!)");
         }
     }
 
@@ -166,8 +163,7 @@ public class SyntaxParser {
                 offerPop(TokenType.OPEN_PARENTHESIS_EXP)
             )
         ){
-            // TODO error
-            throw new RuntimeException();
+            throw new NgException("Invalid token after binary operator " + mTokens.peek());
         }
     }
 
@@ -186,8 +182,7 @@ public class SyntaxParser {
                     topIs(TokenType.CLOSE_PARENTHESIS)
                 )
             ) {
-                // TODO error
-                throw new RuntimeException();
+                throw new NgException("Invalid token after model "  + mTokens.peek());
             }
         }
     }
@@ -213,8 +208,7 @@ public class SyntaxParser {
                 topIs(TokenType.CLOSE_PARENTHESIS)
             )
         ){
-            // TODO error
-            throw new RuntimeException();
+            throw new NgException("Invalid token after function close " + mTokens.peek());
         }
     }
 
@@ -234,9 +228,8 @@ public class SyntaxParser {
                 offerPop(TokenType.FUNCTION_NAME)
             )
         ){
-            // TODO error
             if(!offerPop(TokenType.CLOSE_PARENTHESIS))
-                throw new RuntimeException();
+                throw new NgException("Invalid token in method parameter " + mTokens.peek());
             else
                 return;
         }
@@ -246,8 +239,7 @@ public class SyntaxParser {
                 offerPop(TokenType.CLOSE_PARENTHESIS)
             )
         ){
-            // TODO error
-            throw new RuntimeException();
+            throw new NgException("Invalid token in method parameter " + mTokens.peek());
         }
     }
 
@@ -264,8 +256,7 @@ public class SyntaxParser {
                 offerPop(TokenType.STRING)
             )
         ){
-            // TODO error
-            throw new RuntimeException();
+            throw new NgException("Invalid token in ternary operator " + mTokens.peek());
         }
     }
 }

@@ -16,6 +16,8 @@
 
 package com.ngandroid.lib.interpreter;
 
+import com.ngandroid.lib.exceptions.NgException;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -245,7 +247,7 @@ public class Tokenizer {
                 result = getNextState();
                 break;
             default:
-                throw new RuntimeException("This shouldn't happen");
+                throw new NgException("This shouldn't happen. Please submit an issue at github.com/davityle/ngAndroid/issues");
         }
         return result;
     }
@@ -294,8 +296,7 @@ public class Tokenizer {
                     case NESTED_EXPRESSION:
                         return State.IN_NUMBER_CONSTANT;
                     default:
-                        // TODO error
-                        throw new RuntimeException("Invalid character '" + currentCharacter + "' at state " + state.toString());
+                        throw new NgException("Invalid character '" + currentCharacter + "' at state " + state.toString());
                 }
             }
 
@@ -329,8 +330,7 @@ public class Tokenizer {
                         if(currentCharacter == 'f' || currentCharacter == 'F')
                             return State.FLOAT_F_END;
                     default:
-                        // TODO error
-                        throw new RuntimeException("Invalid character '" + currentCharacter + "' at state " + state.toString());
+                        throw new NgException("Invalid character '" + currentCharacter + "' at state " + state.toString());
                 }
             }
 
@@ -359,9 +359,7 @@ public class Tokenizer {
                 case '/':
                     return State.OPERATOR;
             }
-
-            //        TODO throw error
-            throw new RuntimeException("Invalid character : " + currentCharacter + " in state " + state);
+            throw new NgException("Invalid character : " + currentCharacter + " in state " + state);
         }finally {
             advance();
         }

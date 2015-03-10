@@ -21,8 +21,8 @@ import android.test.ApplicationTestCase;
 import android.view.LayoutInflater;
 
 import com.ngandroid.lib.NgAndroid;
-import com.ngandroid.lib.attacher.AttributeAttacher;
-import com.ngandroid.lib.attacher.InflaterFactory;
+import com.ngandroid.lib.binder.AttributeBinder;
+import com.ngandroid.lib.binder.BindingInflaterFactory;
 
 import java.lang.reflect.Field;
 
@@ -61,16 +61,16 @@ public class ViewBindTests  extends ApplicationTestCase<Application> {
     public void testInflaterFactoryNotReCreated() throws NoSuchFieldException, IllegalAccessException {
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
-        AttributeAttacher attributeAttacher = new AttributeAttacher(inflater, null, null);
-        Field f = AttributeAttacher.class.getDeclaredField("mInflater");
+        AttributeBinder attributeBinder = new AttributeBinder(inflater, null, null);
+        Field f = AttributeBinder.class.getDeclaredField("mInflater");
         f.setAccessible(true);
-        LayoutInflater i1 = (LayoutInflater) f.get(attributeAttacher);
+        LayoutInflater i1 = (LayoutInflater) f.get(attributeBinder);
         assertEquals(inflater, i1);
-        InflaterFactory factory1 = (InflaterFactory) i1.getFactory();
-        attributeAttacher = new AttributeAttacher(inflater, null, null);
-        LayoutInflater i2 = (LayoutInflater) f.get(attributeAttacher);
+        BindingInflaterFactory factory1 = (BindingInflaterFactory) i1.getFactory();
+        attributeBinder = new AttributeBinder(inflater, null, null);
+        LayoutInflater i2 = (LayoutInflater) f.get(attributeBinder);
         assertEquals(inflater, i2);
-        assertEquals(factory1, (InflaterFactory) i2.getFactory());
+        assertEquals(factory1, (BindingInflaterFactory) i2.getFactory());
 
     }
 

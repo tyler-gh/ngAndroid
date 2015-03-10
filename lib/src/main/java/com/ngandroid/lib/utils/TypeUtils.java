@@ -16,6 +16,7 @@
 
 package com.ngandroid.lib.utils;
 
+import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
 
@@ -113,15 +114,13 @@ public class TypeUtils {
 
     private static void assertEquals(Object actual, Object expected){
         if(!actual.equals(expected)){
-            // TODO error
-            throw new RuntimeException("Invalid syntax. Expected '" + expected + "' actual was '" + actual + '\'');
+            throw new NgException("Invalid syntax. Expected '" + expected + "' actual was '" + actual + '\'');
         }
     }
 
     public static void strictTypeCheck(Token[] tokens, TokenType ... types){
         if(tokens.length != types.length){
-            // TODO error
-            throw new RuntimeException("Invalid syntax. Expected " + types.length + " tokens; actual was " + tokens.length);
+            throw new NgException("Invalid syntax. Expected " + types.length + " tokens; actual was " + tokens.length);
         }
         for(int index = 0; index < tokens.length; index++)
             assertEquals(tokens[index].getTokenType(), types[index]);
@@ -142,13 +141,13 @@ public class TypeUtils {
 
     public static void startsWith(Token[] tokens, TokenType type){
         if(tokens.length == 0)
-            throw new RuntimeException("Empty string in attribute. Expecting " + type);
+            throw new NgException("Empty string in attribute. Expecting " + type);
         assertEquals(tokens[0].getTokenType(), type);
     }
 
     public static void endsWith(Token[] tokens, TokenType type){
         if(tokens.length < 2)
-            throw new RuntimeException("Empty string in attribute. Expecting " + type);
+            throw new NgException("Empty string in attribute. Expecting " + type);
         // assuming last token is EOF
         assertEquals(tokens[tokens.length - 2].getTokenType(), type);
     }
