@@ -37,7 +37,9 @@ public class MethodInvoker {
 
     public Object invoke(String methodName, Object ... objects) throws Throwable{
         String fieldName = methodName.substring(3).toLowerCase();
+        System.out.println(fieldName);
         Tuple<Integer, Object> value = fieldMap.get(fieldName);
+        System.out.println(value);
         if(value == null)
             return null;
         if(methodName.startsWith("get")){

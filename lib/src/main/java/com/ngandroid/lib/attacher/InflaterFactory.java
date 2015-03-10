@@ -38,7 +38,7 @@ public class InflaterFactory implements LayoutInflater.Factory2, LayoutInflater.
 
     private final LayoutInflater.Factory2 mFactory2;
     private final LayoutInflater.Factory mFactory;
-    private final SparseArray<TypedArray> mAttrArray;
+    private SparseArray<TypedArray> mAttrArray;
 
     private InflaterFactory(LayoutInflater.Factory factory, SparseArray<TypedArray> attrArray) {
         this(null, factory, attrArray);
@@ -99,7 +99,10 @@ public class InflaterFactory implements LayoutInflater.Factory2, LayoutInflater.
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     static void setFactory(LayoutInflater inflater,final  SparseArray<TypedArray> attrArray){
         final LayoutInflater.Factory factory = inflater.getFactory();
-        if(factory == null && Build.VERSION.SDK_INT >= 11){
+        if(factory instanceof InflaterFactory){
+            InflaterFactory inflaterFactory = (InflaterFactory) factory;
+            inflaterFactory.mAttrArray = attrArray;
+        }else if(factory == null && Build.VERSION.SDK_INT >= 11){
             final LayoutInflater.Factory2 factory2 = inflater.getFactory2();
             inflater.setFactory2(new InflaterFactory(factory2, attrArray));
         }else if(factory != null){

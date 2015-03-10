@@ -44,8 +44,8 @@ public class AttributeAttacher {
     private final ModelBuilderMap mBuilders;
     private final SparseArray<NgAttribute> attributes;
 
-    public AttributeAttacher(final Context context, Object model, SparseArray<NgAttribute> customAttributes) {
-        this((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE), model, customAttributes);
+    public AttributeAttacher(final Context context, Object scope, SparseArray<NgAttribute> customAttributes) {
+        this((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE), scope, customAttributes);
     }
 
     public AttributeAttacher(final LayoutInflater inflater, Object scope, SparseArray<NgAttribute> attributes) {
