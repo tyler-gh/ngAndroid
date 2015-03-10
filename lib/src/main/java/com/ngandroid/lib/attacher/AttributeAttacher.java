@@ -38,11 +38,11 @@ import com.ngandroid.lib.ng.getters.Getter;
  */
 public class AttributeAttacher {
 
-    private final LayoutInflater mInflater;
-    private final Object mScope;
-    private final SparseArray<TypedArray> mAttrArray;
-    private final ModelBuilderMap mBuilders;
-    private final SparseArray<NgAttribute> attributes;
+    private LayoutInflater mInflater;
+    private Object mScope;
+    private SparseArray<TypedArray> mAttrArray;
+    private ModelBuilderMap mBuilders;
+    private SparseArray<NgAttribute> attributes;
 
     public AttributeAttacher(final Context context, Object scope, SparseArray<NgAttribute> customAttributes) {
         this((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE), scope, customAttributes);
@@ -84,11 +84,21 @@ public class AttributeAttacher {
         View v = mInflater.inflate(resourceId, null);
         apply(v);
         activity.setContentView(v);
+        kill();
     }
 
     public View inflate(int resourceId, ViewGroup viewGroup, boolean attach){
         View v = mInflater.inflate(resourceId, viewGroup, attach);
         apply(v);
+        kill();
         return v;
+    }
+
+    private void kill(){
+        mInflater = null;
+        mScope = null;
+        mBuilders = null;
+        mAttrArray = null;
+        attributes = null;
     }
 }

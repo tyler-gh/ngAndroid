@@ -34,32 +34,20 @@ import java.lang.reflect.Field;
  * Created by davityle on 1/12/15.
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class InflaterFactory implements LayoutInflater.Factory2, LayoutInflater.Factory {
+public class InflaterFactory implements LayoutInflater.Factory2 {
 
     private final LayoutInflater.Factory2 mFactory2;
-    private final LayoutInflater.Factory mFactory;
     private SparseArray<TypedArray> mAttrArray;
 
-    private InflaterFactory(LayoutInflater.Factory factory, SparseArray<TypedArray> attrArray) {
-        this(null, factory, attrArray);
-    }
 
     private InflaterFactory(LayoutInflater.Factory2 factory2, SparseArray<TypedArray> attrArray) {
-        this(factory2, null, attrArray);
-    }
-
-    private InflaterFactory(LayoutInflater.Factory2 factory2, LayoutInflater.Factory factory, SparseArray<TypedArray> attrArray) {
         this.mFactory2 = factory2;
-        this.mFactory = factory;
         this.mAttrArray = attrArray;
     }
 
     @Override
     public View onCreateView(String s, Context context, AttributeSet attributeSet) {
         parseAttributes(context, attributeSet);
-        if(mFactory != null){
-            return mFactory.onCreateView(s, context, attributeSet);
-        }
         if(mFactory2 == null){
             return null;
         }
@@ -98,20 +86,21 @@ public class InflaterFactory implements LayoutInflater.Factory2, LayoutInflater.
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     static void setFactory(LayoutInflater inflater,final  SparseArray<TypedArray> attrArray){
-        final LayoutInflater.Factory factory = inflater.getFactory();
-        if(factory instanceof InflaterFactory){
-            InflaterFactory inflaterFactory = (InflaterFactory) factory;
+        final LayoutInflater.Factory2 factory2 = inflater.getFactory2();
+        if(factory2 instanceof InflaterFactory){
+            InflaterFactory inflaterFactory = (InflaterFactory) factory2;
             inflaterFactory.mAttrArray = attrArray;
-        }else if(factory == null && Build.VERSION.SDK_INT >= 11){
-            final LayoutInflater.Factory2 factory2 = inflater.getFactory2();
-            inflater.setFactory2(new InflaterFactory(factory2, attrArray));
-        }else if(factory != null){
+        }else {
             setSettable(inflater);
-            inflater.setFactory(new InflaterFactory(factory, attrArray));
-        }else{
-            throw new RuntimeException();
-            // TODO throw error
+            inflater.setFactory2(new InflaterFactory(factory2, attrArray));
         }
+//        else if(factory != null){
+//            setSettable(inflater);
+//            inflater.setFactory(new InflaterFactory(factory, attrArray));
+//        }else{
+//            throw new RuntimeException();
+//            // TODO throw error
+//        }
 
     }
 }
