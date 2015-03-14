@@ -57,15 +57,12 @@ public interface Input {
 <EditText
     android:id="@+id/editText"
     ngAndroid:ngModel="input.input"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+    ... />
     
 <TextView
     android:id="@+id/textView"
-    android:layout_alignParentRight="true"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    ngAndroid:ngModel="input.input"/>
+    ngAndroid:ngModel="input.input"
+    .../>
 ```
 ```java
 // create a field with your model (no need to instantiate it)
@@ -93,12 +90,8 @@ With those lines of code, your view is now bound to your data model and vice ver
 ```xml
 <Button
     android:id="@+id/stringClickEvent"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_below="@+id/editText"
-    android:layout_marginTop="20dp"
     ngAndroid:ngClick="stringClickEvent()"
-    android:text="stringClickEvent()"/>
+    .../>
 ```
 ```java
 private void stringClickEvent(){
@@ -112,13 +105,9 @@ private void stringClickEvent(){
 ```xml
 <Button
     android:id="@+id/multiplyButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_below="@+id/really2"
-    android:layout_marginTop="20dp"
     ngAndroid:ngClick="multiply(input.integer,2)"
     ngAndroid:ngLongClick="multiply(3,input.integer)"
-    android:text="multiply(input.integer,2) onClick \n multiply(3,input.integer) onLongClick"/>
+    .../>
 
 ```
 ```java
@@ -133,10 +122,7 @@ private void multiply(int num1, int num2){
 <EditText
     android:id="@+id/ngChangeEditText"
     ngAndroid:ngChange="onChange()"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
-    android:layout_below="@id/multiplyButton"/>
+    .../>
 ```
 ```java
 private void onChange(){
@@ -151,15 +137,12 @@ private void onChange(){
 <CheckBox
     android:id="@+id/ngdisabledcheckbox"
     ngAndroid:ngModel="input.disabled"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+    ... />
 
 <Button
     android:id="@+id/ineedthisid"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
     ngAndroid:ngDisabled="input.disabled"
-    android:text="button"/>
+    .../>
 ```
 ![NgDisabled Demonstration](/../pictures/images/ngdisable.gif?raw=true "ngdisabled demonstration")
 --------
@@ -168,16 +151,13 @@ private void onChange(){
 ```xml
 <Button
     android:id="@+id/nginvisible"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
     ngAndroid:ngInvisible="input.invisible"
-    android:text="button"/>
+    .../>
 
 <CheckBox
     android:id="@+id/ngvisiblecb"
     ngAndroid:ngModel="input.invisible"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+    .../>
 ```
 ![NgInvisible Demonstration](/../pictures/images/nginvisible.gif?raw=true "nginvisible demonstration")
 --------
@@ -186,16 +166,13 @@ private void onChange(){
 ```xml
 <Button
     android:id="@+id/nggone"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
     ngAndroid:ngGone="input.gone"
-    android:text="button"/>
+    .../>
 
 <CheckBox
     android:id="@+id/nggonedb"
     ngAndroid:ngModel="input.gone"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+    ... />
 ```
 ![NgGone Demonstration](/../pictures/images/nggone.gif?raw=true "nggone demonstration")
 --------
