@@ -20,10 +20,11 @@ import android.view.View;
 
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
-import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.ng.getters.MethodGetter;
 import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.ng.getters.MethodGetter;
+import com.ngandroid.lib.ng.getters.ModelGetter;
 import com.ngandroid.lib.ngattributes.nglongclick.LongClickInvoker;
 import com.ngandroid.lib.utils.TypeUtils;
 
@@ -47,7 +48,7 @@ public class NgClick implements NgAttribute {
     }
 
     @Override
-    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) {
+    public void attach(Getter getter, ModelGetter[] modelGetters, ModelBuilder[] modelBuilders, View view) throws Throwable {
         attach(getter, view, false);
     }
 

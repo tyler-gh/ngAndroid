@@ -18,6 +18,8 @@ package com.ngandroid.lib.ng.getters;
 
 import com.ngandroid.lib.utils.TypeUtils;
 
+import java.util.List;
+
 /**
  * Created by davityle on 1/24/15.
  */
@@ -42,6 +44,9 @@ public class StaticGetter<T> implements Getter<T>{
     public int getType(){
         return type;
     }
+
+    @Override
+    public void getModelGetter(List<ModelGetter> modelGetters) {}
 
     @Override
     public String toString() {

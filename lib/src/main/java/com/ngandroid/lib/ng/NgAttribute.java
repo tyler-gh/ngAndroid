@@ -20,11 +20,12 @@ import android.view.View;
 
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.ng.getters.ModelGetter;
 
 /**
  * Created by davityle on 1/23/15.
  */
 public interface NgAttribute {
     public void typeCheck(Token[] tokens, Getter getter) throws Exception;
-    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Throwable;
+    public void attach(Getter getter, ModelGetter[] modelGetters, ModelBuilder[] modelBuilders, View view) throws Throwable;
 }

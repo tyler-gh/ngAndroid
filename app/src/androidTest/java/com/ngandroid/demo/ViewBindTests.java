@@ -71,6 +71,10 @@ public class ViewBindTests  extends ApplicationTestCase<Application> {
         LayoutInflater i2 = (LayoutInflater) f.get(attributeAttacher);
         assertEquals(inflater, i2);
         assertEquals(factory1, (InflaterFactory) i2.getFactory());
+    }
+
+    public void testNgText(){
+        LayoutInflater inflater = LayoutInflater.from(getContext());
 
     }
 

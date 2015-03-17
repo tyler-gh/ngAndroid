@@ -3,6 +3,7 @@ package com.ngandroid.demo;
 import android.app.Application;
 import android.test.ApplicationTestCase;
 import android.view.View;
+import android.widget.TextView;
 
 import com.ngandroid.demo.models.Input;
 import com.ngandroid.lib.NgAndroid;
@@ -17,9 +18,11 @@ import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
 import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ng.getters.KnotGetter;
 import com.ngandroid.lib.ng.getters.MethodGetter;
+import com.ngandroid.lib.ng.getters.ModelGetter;
 import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
 import com.ngandroid.lib.ngattributes.ngif.NgGone;
 import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
+import com.ngandroid.lib.ngattributes.ngtext.NgText;
 
 import java.lang.reflect.Field;
 import java.util.Queue;
@@ -1236,12 +1239,14 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         }
     }
 
-    public void testNgVisible() throws Exception {
+    public void testNgVisible() throws Throwable {
         View v = new View(testApplication);
         TestScope tc = new TestScope();
         ModelBuilderMap map = new ModelBuilderMap(tc);
         Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
-        NgInvisible.getInstance().attach(getter, map, v);
+        ModelGetter[] modelGetters = ModelGetter.getModelGetters(getter);
+        ModelBuilder[] modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        NgInvisible.getInstance().attach(getter, modelGetters, modelBuilders, v);
         ModelBuilder.buildModel(tc, map);
         tc.modelName.setIsInvisible(false);
         assertEquals(View.VISIBLE, v.getVisibility());
@@ -1249,12 +1254,27 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(View.INVISIBLE, v.getVisibility());
     }
 
-    public void testNgGone() throws Exception {
+    public void testNgText() throws Throwable {
+        TextView v = new TextView(testApplication);
+        TestScope tc = new TestScope();
+        ModelBuilderMap map = new ModelBuilderMap(tc);
+        Getter<Boolean> getter = new ExpressionBuilder("modelName.joe").build(tc, map);
+        ModelGetter[] modelGetters = ModelGetter.getModelGetters(getter);
+        ModelBuilder[] modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        NgText.getInstance().attach(getter, modelGetters, modelBuilders, v);
+        ModelBuilder.buildModel(tc, map);
+        tc.modelName.setJoe("This is Joe");
+        assertEquals(v.getText(), "This is Joe");
+    }
+
+    public void testNgGone() throws Throwable {
         View v = new View(testApplication);
         TestScope tc = new TestScope();
         ModelBuilderMap map = new ModelBuilderMap(tc);
         Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
-        NgGone.getInstance().attach(getter, map, v);
+        ModelGetter[] modelGetters = ModelGetter.getModelGetters(getter);
+        ModelBuilder[] modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        NgGone.getInstance().attach(getter, modelGetters, modelBuilders, v);
         ModelBuilder.buildModel(tc, map);
         tc.modelName.setIsInvisible(false);
         assertEquals(View.VISIBLE, v.getVisibility());
@@ -1263,7 +1283,9 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
         map = new ModelBuilderMap(tc);
         getter = new ExpressionBuilder("!modelName.isInvisible").build(tc, map);
-        NgGone.getInstance().attach(getter, map, v);
+        modelGetters = ModelGetter.getModelGetters(getter);
+        modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        NgGone.getInstance().attach(getter, modelGetters, modelBuilders, v);
         ModelBuilder.buildModel(tc, map);
         tc.modelName.setIsInvisible(true);
         assertEquals(View.VISIBLE, v.getVisibility());
@@ -1272,7 +1294,9 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
         map = new ModelBuilderMap(tc);
         getter = new ExpressionBuilder("!modelName.isInvisible ? isTrue() : !isTrue()").build(tc, map);
-        NgGone.getInstance().attach(getter, map, v);
+        modelGetters = ModelGetter.getModelGetters(getter);
+        modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        NgGone.getInstance().attach(getter, modelGetters, modelBuilders, v);
         ModelBuilder.buildModel(tc, map);
         tc.modelName.setIsInvisible(true);
         assertEquals(View.VISIBLE, v.getVisibility());
@@ -1280,12 +1304,14 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(View.GONE, v.getVisibility());
     }
 
-    public void testNgDisable() throws Exception {
+    public void testNgDisable() throws Throwable {
         View v = new View(testApplication);
         TestScope tc = new TestScope();
         ModelBuilderMap map = new ModelBuilderMap(tc);
         Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
-        NgDisabled.getInstance().attach(getter, map, v);
+        ModelGetter[] modelGetters = ModelGetter.getModelGetters(getter);
+        ModelBuilder[] modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        NgDisabled.getInstance().attach(getter, modelGetters, modelBuilders, v);
         ModelBuilder.buildModel(tc, map);
         tc.modelName.setIsInvisible(false);
         assertTrue(v.isEnabled());

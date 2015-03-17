@@ -20,14 +20,10 @@ import android.view.View;
 
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.ng.ModelBuilder;
-import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.ModelMethod;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
 import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.ng.getters.KnotGetter;
 import com.ngandroid.lib.ng.getters.ModelGetter;
-import com.ngandroid.lib.ng.getters.TernaryGetter;
 import com.ngandroid.lib.utils.TypeUtils;
 
 /**
@@ -43,35 +39,22 @@ public abstract class NgIf implements NgAttribute {
     }
 
     @Override
-    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Exception {
-        if(!observeModels(getter, getter, modelBuilderMap, view)){
-            // TODO - error
+    public void attach(Getter getter, ModelGetter[] modelGetters, ModelBuilder[] modelBuilders, View view) throws Throwable {
+        if(modelGetters.length == 0)
             throw new Exception(getClass().getSimpleName() +" requires a model to observe. Try reformatting your statement to include a model");
+        for(int index = 0 ; index < modelGetters.length; index++){
+            ModelGetter modelGetter = modelGetters[index];
+            ModelBuilder modelBuilder = modelBuilders[index];
+            modelBuilder.addSetObserver(modelGetter.getFieldName(), getModelMethod(getter, view));
         }
     }
 
-    public boolean observeModels(Getter<Boolean> topGetter, Getter getter,  ModelBuilderMap modelBuilderMap, View view){
-        boolean modelObserved = false;
-
-        if(getter instanceof ModelGetter){
-            modelObserved = true;
-            ModelGetter modelGetter = (ModelGetter) getter;
-            ModelBuilder modelBuilder = modelBuilderMap.get(modelGetter.getModelName());
-            modelBuilder.addSetObserver(modelGetter.getFieldName(), getModelMethod(topGetter, view));
-        }else if(getter instanceof KnotGetter){
-            modelObserved = observeModels(topGetter, ((KnotGetter)getter).getBooleanGetter(), modelBuilderMap, view);
-        }else if(getter instanceof TernaryGetter){
-            TernaryGetter ternaryGetter = (TernaryGetter) getter;
-            modelObserved = observeModels(topGetter, ternaryGetter.getBooleanGetter(), modelBuilderMap, view);
-            modelObserved = modelObserved || observeModels(topGetter, ternaryGetter.getTrueGetter(), modelBuilderMap, view);
-            modelObserved = modelObserved || observeModels(topGetter, ternaryGetter.getFalseGetter(), modelBuilderMap, view);
-        }else if(getter instanceof BinaryOperatorGetter){
-            BinaryOperatorGetter operatorGetter = (BinaryOperatorGetter) getter;
-            modelObserved = observeModels(topGetter, operatorGetter.getLeftSide(), modelBuilderMap, view);
-            modelObserved = modelObserved || observeModels(topGetter, operatorGetter.getRightSide(), modelBuilderMap, view);
-        }
-        return modelObserved;
-    }
+//    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Exception {
+//        if(!observeModels(getter, getter, modelBuilderMap, view)){
+//            // TODO - error
+//            throw new Exception(getClass().getSimpleName() +" requires a model to observe. Try reformatting your statement to include a model");
+//        }
+//    }
 
     protected abstract ModelMethod getModelMethod(Getter<Boolean> getter, View view);
 

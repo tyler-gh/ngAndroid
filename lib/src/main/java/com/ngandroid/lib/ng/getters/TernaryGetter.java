@@ -16,10 +16,12 @@
 
 package com.ngandroid.lib.ng.getters;
 
+import java.util.List;
+
 /**
  * Created by tyler on 2/2/15.
  */
-public class TernaryGetter<T> implements Getter {
+public class TernaryGetter<T> implements Getter<T> {
 
     private final Getter<Boolean> booleanGetter;
     private final Getter<T> valTrue, valFalse;
@@ -38,6 +40,13 @@ public class TernaryGetter<T> implements Getter {
     @Override
     public int getType() {
         return valTrue.getType();
+    }
+
+    @Override
+    public void getModelGetter(List<ModelGetter> list) {
+        booleanGetter.getModelGetter(list);
+        valFalse.getModelGetter(list);
+        valTrue.getModelGetter(list);
     }
 
     public Getter<Boolean> getBooleanGetter(){

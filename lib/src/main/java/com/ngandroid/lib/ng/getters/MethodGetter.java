@@ -20,11 +20,12 @@ import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
 * Created by davityle on 1/24/15.
 */
-public class MethodGetter implements Getter {
+public class MethodGetter<T> implements Getter<T> {
 
     private final Method mMethod;
     private final Object mScope;
@@ -40,7 +41,7 @@ public class MethodGetter implements Getter {
     }
 
     @Override
-    public Object get() {
+    public T get() {
         Object[] parameters = new Object[mGetters.length];
         for(int index = 0; index < parameters.length; index++){
             try {
@@ -51,7 +52,7 @@ public class MethodGetter implements Getter {
             }
         }
         try {
-            return mMethod.invoke(mScope, parameters);
+            return (T) mMethod.invoke(mScope, parameters);
         } catch (IllegalAccessException | InvocationTargetException e) {
             // TODO error
             e.printStackTrace();
@@ -64,8 +65,19 @@ public class MethodGetter implements Getter {
         return type;
     }
 
+    @Override
+    public void getModelGetter(List<ModelGetter> modelGetters) {
+        for(Getter getter : mGetters){
+            getter.getModelGetter(modelGetters);
+        }
+    }
+
     public int getReturnType(){
         return type;
+    }
+
+    public Getter[] getParameters(){
+        return mGetters;
     }
 
     @Override

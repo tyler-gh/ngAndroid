@@ -23,7 +23,6 @@ import android.widget.TextView;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.ng.ModelBuilder;
-import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.ModelMethod;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.Getter;
@@ -47,14 +46,19 @@ public class NgModel implements NgAttribute {
         TypeUtils.strictTypeCheck(tokens, TokenType.MODEL_NAME, TokenType.PERIOD, TokenType.MODEL_FIELD, TokenType.EOF);
     }
 
-    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View bindView) throws Throwable {
-        if(!(getter instanceof ModelGetter)){
-            throw new RuntimeException("You must only use models in ngModel");
-        }
-        ModelGetter modelGetter = (ModelGetter) getter;
-        ModelBuilder modelBuilder = modelBuilderMap.get(modelGetter.getModelName());
-        bindModelView(modelGetter, bindView, modelBuilder);
+    @Override
+    public void attach(Getter getter, ModelGetter[] modelGetters, ModelBuilder[] modelBuilders, View view) throws Throwable {
+        bindModelView((ModelGetter) getter, view, modelBuilders[0]);
     }
+
+//    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View bindView) throws Throwable {
+//        if(!(getter instanceof ModelGetter)){
+//            throw new RuntimeException("You must only use models in ngModel");
+//        }
+//        ModelGetter modelGetter = (ModelGetter) getter;
+//        ModelBuilder modelBuilder = modelBuilderMap.get(modelGetter.getModelName());
+//        bindModelView(modelGetter, bindView, modelBuilder);
+//    }
 
     public void bindModelView(ModelGetter getter, View view, ModelBuilder builder) throws Throwable {
         if(view instanceof CompoundButton){

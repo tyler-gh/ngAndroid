@@ -18,7 +18,9 @@ package com.ngandroid.lib.ngattributes.ngif;
 
 import android.view.View;
 
+import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.ng.getters.ModelGetter;
 
 /**
  * Created by tyler on 2/10/15.

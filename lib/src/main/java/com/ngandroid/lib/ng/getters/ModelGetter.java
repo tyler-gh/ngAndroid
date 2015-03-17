@@ -17,6 +17,11 @@
 package com.ngandroid.lib.ng.getters;
 
 import com.ngandroid.lib.ng.MethodInvoker;
+import com.ngandroid.lib.ng.ModelBuilder;
+import com.ngandroid.lib.ng.ModelBuilderMap;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by davityle on 1/24/15.
@@ -41,9 +46,28 @@ public class ModelGetter<T> implements Getter<T> {
         return mMethodInvoker.getType(mFieldName);
     }
 
+    @Override
+    public void getModelGetter(List<ModelGetter> modelGetters) {
+        modelGetters.add(this);
+    }
+
     public String getFieldName(){
         return mFieldName;
     }
 
     public String getModelName() { return mModelName; }
+
+    public static ModelGetter[] getModelGetters(Getter getter){
+        List<ModelGetter> mgs = new ArrayList<>();
+        getter.getModelGetter(mgs);
+        return mgs.toArray(new ModelGetter[mgs.size()]);
+    }
+
+    public static ModelBuilder[] getModelBuilders(ModelGetter[] modelGetters, ModelBuilderMap modelBuilderMap){
+        ModelBuilder[] builders = new ModelBuilder[modelGetters.length];
+        for(int index = 0; index < modelGetters.length; index++){
+            builders[index] = modelBuilderMap.get(modelGetters[index].getModelName());
+        }
+        return builders;
+    }
 }

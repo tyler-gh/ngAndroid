@@ -19,6 +19,8 @@ package com.ngandroid.lib.ng.getters;
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.utils.TypeUtils;
 
+import java.util.List;
+
 /**
  * Created by tyler on 2/6/15.
  */
@@ -38,6 +40,12 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
 
     public int getType(){
         return type;
+    }
+
+    @Override
+    public void getModelGetter(List<ModelGetter> modelGetters) {
+        leftSide.getModelGetter(modelGetters);
+        rightSide.getModelGetter(modelGetters);
     }
 
     @Override

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.nglongclick;
+package com.ngandroid.lib.ngattributes.ngtext;
 
 import android.view.View;
 
@@ -23,28 +23,36 @@ import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ng.getters.ModelGetter;
-import com.ngandroid.lib.ngattributes.ngclick.NgClick;
+import com.ngandroid.lib.utils.TypeUtils;
+
+import java.lang.reflect.Method;
 
 /**
- * Created by tyler on 1/28/15.
+ * Created by tyler on 3/10/15.
  */
-public class NgLongClick implements NgAttribute {
-    private static NgLongClick ourInstance = new NgLongClick();
+public class NgText implements NgAttribute {
 
-    public static NgLongClick getInstance() {
-        return ourInstance;
+    private static NgText ngText = new NgText();
+    public static NgText getInstance(){
+        return ngText;
     }
 
-    private NgLongClick() {
-    }
+    private NgText(){}
 
     @Override
-    public void typeCheck(Token[] tokens, Getter getter) {
-
+    public void typeCheck(Token[] tokens, Getter getter) throws Exception {
+        if(getter.getType() != TypeUtils.STRING)
+            throw new RuntimeException("NgText type must be STRING");
     }
 
     @Override
     public void attach(Getter getter, ModelGetter[] modelGetters, ModelBuilder[] modelBuilders, View view) throws Throwable {
-        NgClick.getInstance().attach(getter, view, true);
+        Method method = view.getClass().getDeclaredMethod("setText", CharSequence.class);
+        for(int index = 0; index < modelGetters.length; index++){
+            ModelGetter modelGetter = modelGetters[index];
+            ModelBuilder builder = modelBuilders[index];
+            builder.addSetObserver(modelGetter.getFieldName(), new SetTextModelMethod(method, view, getter));
+        }
     }
+
 }

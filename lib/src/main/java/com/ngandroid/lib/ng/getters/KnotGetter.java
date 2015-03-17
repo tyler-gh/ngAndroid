@@ -18,6 +18,8 @@ package com.ngandroid.lib.ng.getters;
 
 import com.ngandroid.lib.utils.TypeUtils;
 
+import java.util.List;
+
 /**
  * Created by tyler on 2/10/15.
  */
@@ -42,6 +44,11 @@ public class KnotGetter implements Getter<Boolean>{
     @Override
     public int getType() {
         return TypeUtils.BOOLEAN;
+    }
+
+    @Override
+    public void getModelGetter(List<ModelGetter> modelGetters) {
+        getter.getModelGetter(modelGetters);
     }
 
     public Getter<Boolean> getBooleanGetter(){

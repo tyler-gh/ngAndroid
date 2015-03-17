@@ -25,10 +25,11 @@ import android.widget.TextView;
 
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
-import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ng.getters.MethodGetter;
+import com.ngandroid.lib.ng.getters.ModelGetter;
 import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
 import com.ngandroid.lib.utils.TypeUtils;
 
@@ -52,7 +53,7 @@ public class NgChange implements NgAttribute {
     }
 
     @Override
-    public void attach(Getter getter, ModelBuilderMap builders, View bindView) throws Exception {
+    public void attach(Getter getter, ModelGetter[] modelGetters, ModelBuilder[] modelBuilders, View bindView) throws Throwable {
         final MethodGetter invoker = (MethodGetter) getter;
         if(bindView instanceof CompoundButton){
             RadioButton button = (RadioButton) bindView;
@@ -68,5 +69,4 @@ public class NgChange implements NgAttribute {
             group.setOnCheckedChangeListener(new CheckChangeListener(invoker));
         }
     }
-
 }

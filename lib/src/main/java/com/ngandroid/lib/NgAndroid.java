@@ -35,6 +35,7 @@ import com.ngandroid.lib.ngattributes.ngif.NgGone;
 import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
 import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
 import com.ngandroid.lib.ngattributes.ngmodel.NgModel;
+import com.ngandroid.lib.ngattributes.ngtext.NgText;
 import com.ngandroid.lib.utils.JsonUtils;
 
 import org.json.JSONException;
@@ -156,6 +157,7 @@ public class NgAndroid {
             attributes.put(R.styleable.ngAndroid_ngDisabled, NgDisabled.getInstance());
             attributes.put(R.styleable.ngAndroid_ngBlur, NgBlur.getInstance());
             attributes.put(R.styleable.ngAndroid_ngFocus, NgFocus.getInstance());
+            attributes.put(R.styleable.ngAndroid_ngText, NgText.getInstance());
             return new NgAndroid(attributes);
         }
     }

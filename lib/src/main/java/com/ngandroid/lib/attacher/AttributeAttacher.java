@@ -32,6 +32,7 @@ import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.ng.getters.ModelGetter;
 
 /**
  * Created by davityle on 1/13/15.
@@ -70,9 +71,11 @@ public class AttributeAttacher {
                 NgAttribute attribute = attributes.get(attr);
                 if(attribute == null)
                     throw new UnsupportedOperationException("Attribute not currently implemented");
+                ModelGetter[] modelGetters = ModelGetter.getModelGetters(getter);
+                ModelBuilder[] modelBuilders = ModelGetter.getModelBuilders(modelGetters, mBuilders);
                 try {
                     attribute.typeCheck(tokens, getter);
-                    attribute.attach(getter, mBuilders, v.findViewById(id));
+                    attribute.attach(getter, modelGetters, modelBuilders, v.findViewById(id));
                 } catch (Throwable e) {
                     throw new RuntimeException(e);
                 }
@@ -80,6 +83,7 @@ public class AttributeAttacher {
         }
         ModelBuilder.buildModel(mScope, mBuilders);
     }
+
     public void setContentView(Activity activity, int resourceId){
         View v = mInflater.inflate(resourceId, null);
         apply(v);
