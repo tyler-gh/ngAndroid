@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.attacher;
+package com.ngandroid.lib.binder;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -27,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.ngandroid.lib.R;
+import com.ngandroid.lib.exceptions.NgException;
 
 import java.lang.reflect.Field;
 
@@ -34,13 +35,13 @@ import java.lang.reflect.Field;
  * Created by davityle on 1/12/15.
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class InflaterFactory implements LayoutInflater.Factory2 {
+public class BindingInflaterFactory implements LayoutInflater.Factory2 {
 
     private final LayoutInflater.Factory2 mFactory2;
     private SparseArray<TypedArray> mAttrArray;
 
 
-    private InflaterFactory(LayoutInflater.Factory2 factory2, SparseArray<TypedArray> attrArray) {
+    private BindingInflaterFactory(LayoutInflater.Factory2 factory2, SparseArray<TypedArray> attrArray) {
         this.mFactory2 = factory2;
         this.mAttrArray = attrArray;
     }
@@ -80,27 +81,19 @@ public class InflaterFactory implements LayoutInflater.Factory2 {
             field.setAccessible(true);
             field.setBoolean(inflater, false);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            // TODO throw error
+            throw new NgException("Unable to access mFactorySet in LayoutInflater. Please submit issue on at github.com/davityle/ngAndroid/issues");
         }
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     static void setFactory(LayoutInflater inflater,final  SparseArray<TypedArray> attrArray){
         final LayoutInflater.Factory2 factory2 = inflater.getFactory2();
-        if(factory2 instanceof InflaterFactory){
-            InflaterFactory inflaterFactory = (InflaterFactory) factory2;
+        if(factory2 instanceof BindingInflaterFactory){
+            BindingInflaterFactory inflaterFactory = (BindingInflaterFactory) factory2;
             inflaterFactory.mAttrArray = attrArray;
         }else {
             setSettable(inflater);
-            inflater.setFactory2(new InflaterFactory(factory2, attrArray));
+            inflater.setFactory2(new BindingInflaterFactory(factory2, attrArray));
         }
-//        else if(factory != null){
-//            setSettable(inflater);
-//            inflater.setFactory(new InflaterFactory(factory, attrArray));
-//        }else{
-//            throw new RuntimeException();
-//            // TODO throw error
-//        }
-
     }
 }

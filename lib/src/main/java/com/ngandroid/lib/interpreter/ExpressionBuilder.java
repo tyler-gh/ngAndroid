@@ -16,6 +16,7 @@
 
 package com.ngandroid.lib.interpreter;
 
+import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
@@ -71,7 +72,8 @@ public class ExpressionBuilder<T> {
                 }
             }
         }
-        throw new RuntimeException(new NoSuchMethodException("There is no method " + functionName + " found in " + clss.getSimpleName()) + " with " + types.length + " matching types");
+        // TODO this could contain the method types
+        throw new NgException(new NoSuchMethodException("There is no method " + functionName + " found in " + clss.getSimpleName()) + " with " + types.length + " matching types");
 
     }
 
@@ -80,7 +82,7 @@ public class ExpressionBuilder<T> {
             if(tokens[index].getTokenType() == TokenType.CLOSE_PARENTHESIS)
                 return index;
         }
-        throw new RuntimeException("Function is not closed properly");
+        throw new NgException("Function is not closed properly");
     }
 
     private int findCloseParenthesis(int startIndex) {
@@ -94,7 +96,7 @@ public class ExpressionBuilder<T> {
                     return index;
             }
         }
-        throw new RuntimeException("Nested expression is not closed properly " + openCount);
+        throw new NgException("Nested expression is not closed properly " + openCount);
     }
 
     private int findEndOfParameter(Token[] tokens, int startIndex){
@@ -103,7 +105,7 @@ public class ExpressionBuilder<T> {
             if(token.getTokenType() == TokenType.CLOSE_PARENTHESIS || token.getTokenType() == TokenType.COMMA)
                 return index;
         }
-        throw new RuntimeException("Function is not closed properly");
+        throw new NgException("Function is not closed properly");
     }
 
     private int findColon(Token[] tokens, int startIndex){
@@ -111,7 +113,7 @@ public class ExpressionBuilder<T> {
             if(tokens[index].getTokenType() == TokenType.TERNARY_COLON)
                 return index;
         }
-        throw new RuntimeException("Ternary is not formed properly");
+        throw new NgException("Ternary is not formed properly");
     }
 
     public Tuple<Getter, Integer> createGetter(int startIndex, int endIndex, Object scope, Token[] tokens, ModelBuilderMap builders){
@@ -223,7 +225,7 @@ public class ExpressionBuilder<T> {
                     break;
                 }
                 default:
-                    throw new RuntimeException("Invalid token in expression: " + token.getTokenType());
+                    throw new NgException("Invalid token in expression: " + token.getTokenType());
             }
         }
 
@@ -232,7 +234,7 @@ public class ExpressionBuilder<T> {
         }
 
         if(getterList.size() != 1){
-            throw new RuntimeException("Each expression can only return one value instead found "+ getterList.size());
+            throw new NgException("Each expression can only return one value instead found "+ getterList.size());
         }
 
         return Tuple.of(getterList.get(0), index);
@@ -243,7 +245,7 @@ public class ExpressionBuilder<T> {
         int righttype = rightgetter.getType();
         int type;
         if((righttype == TypeUtils.BOOLEAN || righttype == TypeUtils.OBJECT) || (lefttype == TypeUtils.BOOLEAN || lefttype == TypeUtils.OBJECT))
-            throw new RuntimeException("Types " + lefttype + " and " + righttype + " cannot be compared");
+            throw new NgException("Types " + lefttype + " and " + righttype + " cannot be compared");
 
         if(lefttype == TypeUtils.STRING || righttype == TypeUtils.STRING){
             type = TypeUtils.STRING;
@@ -261,7 +263,7 @@ public class ExpressionBuilder<T> {
 
     private Getter getMostRecentGetter(List<Getter> getters, String error){
         if(getters.size() == 0){
-            throw new RuntimeException(error);
+            throw new NgException(error);
         }
         Getter getter =  getters.get(getters.size() - 1);
         getters.remove(getter);
@@ -281,8 +283,7 @@ public class ExpressionBuilder<T> {
             }
         }
         if(stack.size() != 1){
-            // TODO error
-            throw new RuntimeException("Unequal distribution of binary operators");
+            throw new NgException("Unequal distribution of binary operators");
         }
 
         return stack.pop();

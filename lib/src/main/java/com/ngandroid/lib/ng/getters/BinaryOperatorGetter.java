@@ -16,6 +16,7 @@
 
 package com.ngandroid.lib.ng.getters;
 
+import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.utils.TypeUtils;
 
@@ -75,7 +76,7 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
             case EQUALS_EQUALS:
                 return new EqualOperator(leftSide, rightSide, type, operator);
         }
-        throw new RuntimeException("No such operator" + operator);
+        throw new NgException("No such operator" + operator);
     }
 
 
@@ -96,12 +97,12 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
                 case TypeUtils.FLOAT:
                     return ((Number)leftSide.get()).floatValue() + ((Number)rightSide.get()).floatValue();
                 case TypeUtils.BOOLEAN:
-                    throw new RuntimeException("You cannot add a boolean");
+                    throw new NgException("You cannot add a boolean");
                 case TypeUtils.STRING:
                     return String.valueOf(leftSide.get()) + String.valueOf(rightSide.get());
                 case TypeUtils.OBJECT:
                 default:
-                    throw new RuntimeException("You cannot add an Object");
+                    throw new NgException("You cannot add an Object");
             }
         }
     }
@@ -123,12 +124,12 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
                 case TypeUtils.FLOAT:
                     return ((Number)leftSide.get()).floatValue() - ((Number)rightSide.get()).floatValue();
                 case TypeUtils.BOOLEAN:
-                    throw new RuntimeException("You cannot subtract a boolean");
+                    throw new NgException("You cannot subtract a boolean");
                 case TypeUtils.STRING:
-                    throw new RuntimeException("You cannot subtract a String");
+                    throw new NgException("You cannot subtract a String");
                 case TypeUtils.OBJECT:
                 default:
-                    throw new RuntimeException("You cannot subtract an Object");
+                    throw new NgException("You cannot subtract an Object");
             }
         }
     }
@@ -175,12 +176,12 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
                 case TypeUtils.FLOAT:
                     return ((Number)leftSide.get()).floatValue() * ((Number)rightSide.get()).floatValue();
                 case TypeUtils.BOOLEAN:
-                    throw new RuntimeException("You cannot multiply a boolean");
+                    throw new NgException("You cannot multiply a boolean");
                 case TypeUtils.STRING:
-                    throw new RuntimeException("You cannot multiply a String");
+                    throw new NgException("You cannot multiply a String");
                 case TypeUtils.OBJECT:
                 default:
-                    throw new RuntimeException("You cannot multiply an Object");
+                    throw new NgException("You cannot multiply an Object");
             }
         }
     }
@@ -202,12 +203,12 @@ public abstract class BinaryOperatorGetter<T> implements Getter<T> {
                 case TypeUtils.FLOAT:
                     return ((Number)leftSide.get()).floatValue() / ((Number)rightSide.get()).floatValue();
                 case TypeUtils.BOOLEAN:
-                    throw new RuntimeException("You cannot divide a boolean");
+                    throw new NgException("You cannot divide a boolean");
                 case TypeUtils.STRING:
-                    throw new RuntimeException("You cannot divide a String");
+                    throw new NgException("You cannot divide a String");
                 case TypeUtils.OBJECT:
                 default:
-                    throw new RuntimeException("You cannot divide an Object");
+                    throw new NgException("You cannot divide an Object");
             }
         }
     }

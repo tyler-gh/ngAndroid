@@ -16,22 +16,28 @@
 
 package com.ngandroid.demo;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
+import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.view.LayoutInflater;
 
 import com.ngandroid.lib.NgAndroid;
-import com.ngandroid.lib.attacher.AttributeAttacher;
-import com.ngandroid.lib.attacher.InflaterFactory;
+import com.ngandroid.lib.binder.AttributeBinder;
+import com.ngandroid.lib.binder.BindingInflaterFactory;
 
 import java.lang.reflect.Field;
 
 /**
  * Created by tyler on 3/9/15.
  */
-public class ViewBindTests  extends ApplicationTestCase<Application> {
+public class ViewBindTests  extends ActivityInstrumentationTestCase2<DemoActivity> {
     public ViewBindTests() {
-        super(Application.class);
+        super(DemoActivity.class);
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
     }
 
     public interface Note {
@@ -50,32 +56,27 @@ public class ViewBindTests  extends ApplicationTestCase<Application> {
     public static class ViewScope {
         Note note;
     }
-
+    @UiThreadTest
     public void testSettingValuesAfterInflation(){
         ViewScope scope = new ViewScope();
-        NgAndroid.getInstance().inflate(scope, LayoutInflater.from(getContext()), R.layout.test_view, null);
+        NgAndroid.getInstance().inflate(scope, LayoutInflater.from(getActivity()), R.layout.test_view, null);
         scope.note.setId(100);
         assertEquals(100, scope.note.getId());
     }
 
     public void testInflaterFactoryNotReCreated() throws NoSuchFieldException, IllegalAccessException {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-        AttributeAttacher attributeAttacher = new AttributeAttacher(inflater, null, null);
-        Field f = AttributeAttacher.class.getDeclaredField("mInflater");
+        AttributeBinder attributeBinder = new AttributeBinder(inflater, null, null);
+        Field f = AttributeBinder.class.getDeclaredField("mInflater");
         f.setAccessible(true);
-        LayoutInflater i1 = (LayoutInflater) f.get(attributeAttacher);
+        LayoutInflater i1 = (LayoutInflater) f.get(attributeBinder);
         assertEquals(inflater, i1);
-        InflaterFactory factory1 = (InflaterFactory) i1.getFactory();
-        attributeAttacher = new AttributeAttacher(inflater, null, null);
-        LayoutInflater i2 = (LayoutInflater) f.get(attributeAttacher);
+        BindingInflaterFactory factory1 = (BindingInflaterFactory) i1.getFactory();
+        attributeBinder = new AttributeBinder(inflater, null, null);
+        LayoutInflater i2 = (LayoutInflater) f.get(attributeBinder);
         assertEquals(inflater, i2);
-        assertEquals(factory1, (InflaterFactory) i2.getFactory());
-    }
-
-    public void testNgText(){
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-
+        assertEquals(factory1, i2.getFactory());
     }
 
 

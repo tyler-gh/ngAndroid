@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.ngandroid.demo.models.Input;
-import com.ngandroid.lib.NgAndroid;
 import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.SyntaxParser;
 import com.ngandroid.lib.interpreter.Token;
@@ -1318,13 +1317,5 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         tc.modelName.setIsInvisible(true);
         assertFalse(v.isEnabled());
     }
-
-    public void testModelBuild(){
-        TestScope tc = new TestScope();
-        NgAndroid.getInstance().buildModel(tc, "modelName", TestModel.class);
-        tc.modelName.setJoe("Frank");
-        assertEquals("Frank", tc.modelName.getJoe());
-    }
-
 
 }

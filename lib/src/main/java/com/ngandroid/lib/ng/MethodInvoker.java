@@ -16,6 +16,7 @@
 
 package com.ngandroid.lib.ng;
 
+import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 
@@ -37,9 +38,7 @@ public class MethodInvoker {
 
     public Object invoke(String methodName, Object ... objects) throws Throwable{
         String fieldName = methodName.substring(3).toLowerCase();
-        System.out.println(fieldName);
         Tuple<Integer, Object> value = fieldMap.get(fieldName);
-        System.out.println(value);
         if(value == null)
             return null;
         if(methodName.startsWith("get")){
@@ -56,14 +55,13 @@ public class MethodInvoker {
             }
             return null;
         }
-        // TODO throw error
         return null;
     }
 
     public int getType(String fieldName){
         Tuple<Integer, Object> tuple = fieldMap.get(fieldName.toLowerCase());
         if(tuple == null)
-            throw new RuntimeException("Field " + fieldName + " does not exist");
+            throw new NgException("Field '" + fieldName + "' does not exist");
         return tuple.getFirst();
     }
 }

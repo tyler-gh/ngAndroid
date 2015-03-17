@@ -74,4 +74,14 @@ public class JsonUtils {
         return (T) builder.create();
     }
 
+
+    public static String modelToJson(Object obj){
+        JSONObject jsonObject = new JSONObject();
+
+
+
+        return jsonObject.toString();
+    }
+
+
 }

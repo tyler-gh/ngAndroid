@@ -16,6 +16,8 @@
 
 package com.ngandroid.lib.interpreter;
 
+import com.ngandroid.lib.exceptions.NgException;
+
 /**
 * Created by davityle on 1/15/15.
 */
@@ -59,7 +61,7 @@ public enum TokenType {
                 case "!=":
                     return KNOT_EQUALS;
                 default:
-                    throw new RuntimeException("Unrecognized operator");
+                    throw new NgException("Unrecognized operator");
             }
         }
     }
