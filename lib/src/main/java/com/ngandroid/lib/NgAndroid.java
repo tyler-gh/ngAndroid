@@ -23,7 +23,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ngandroid.lib.annotations.Ignore;
 import com.ngandroid.lib.binder.AttributeBinder;
 import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.ng.ModelBuilder;
@@ -140,7 +139,7 @@ public class NgAndroid {
             for(Field f : fields){
                 f.setAccessible(true);
                 Class type = f.getType();
-                if(type.isInterface() && !f.isAnnotationPresent(Ignore.class)){
+                if(type.isInterface()){
                     f.set(instance, buildModel(type));
                 }
             }

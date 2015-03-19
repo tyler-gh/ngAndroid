@@ -16,8 +16,6 @@
 
 package com.github.davityle.ngprocessor;
 
-import com.ngandroid.lib.annotations.CompileMe;
-
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -25,19 +23,28 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 
-@SupportedAnnotationTypes("com.ngandroid.lib.annotations.CompileMe")
+@SupportedAnnotationTypes("com.ngandroid.lib.annotations.NgCompile")
 public class NgProcessor extends AbstractProcessor {
     @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        System.out.println("processing");
-
-        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(CompileMe.class);
-
-        for(Element element : elements){
+public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        System.out.println("\r\n\r\nNgAndroid:processing");
+        for (TypeElement annotation : annotations) {
+            Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
+            for(Element element : elements){
+                Element scopeClass = element.getEnclosingElement();
+                Name fieldName = element.getSimpleName();
+                TypeMirror fieldType = element.asType();
+                System.out.println("Processing '" + fieldName.toString() + "' in scope '" + scopeClass.getSimpleName() + "'");
+                System.out.println(fieldName.toString());
+                System.out.println(fieldType.toString());
+            }
         }
 
+        System.out.println("NgAndroid:successful");
         return false;
     }
 

@@ -7,13 +7,13 @@ import android.widget.Toast;
 
 import com.ngandroid.demo.models.Input;
 import com.ngandroid.lib.NgAndroid;
-import com.ngandroid.lib.annotations.CompileMe;
+import com.ngandroid.lib.annotations.NgCompile;
 
 
 public class DemoActivity extends Activity {
-    @CompileMe
+    @NgCompile
     private Input input;
-    @CompileMe
+
     private TextView stringClickEvent, really2;
 
     @Override
