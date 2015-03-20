@@ -7,12 +7,26 @@ import android.widget.Toast;
 
 import com.ngandroid.demo.models.Input;
 import com.ngandroid.lib.NgAndroid;
-import com.ngandroid.lib.annotations.NgCompile;
+import com.ngandroid.lib.annotations.NgModel;
 
 
 public class DemoActivity extends Activity {
-    @NgCompile
-    private Input input;
+    @NgModel
+    Input input;//, output;
+    @NgModel
+    TestCompileModel compile1, compileModel;
+
+    public static class TestCompileModel {
+        int x;
+
+        public void setX(int x){
+            this.x = x;
+        }
+
+        public int getX(){
+            return x;
+        }
+    }
 
     private TextView stringClickEvent, really2;
 
