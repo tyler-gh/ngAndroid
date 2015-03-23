@@ -96,7 +96,7 @@ public class ModelBuilder {
                 value.setSecond(((ModelBuilder)second).create());
             }
         }
-        return Proxy.newProxyInstance(mClass.getClassLoader(), new Class[]{mClass}, new Model(mInvocationHandler));
+        return Proxy.newProxyInstance(mClass.getClassLoader(), new Class[]{mClass}, new ModelInvokationHandler(mInvocationHandler));
     }
 
     public boolean hasField(String fieldNamelower){

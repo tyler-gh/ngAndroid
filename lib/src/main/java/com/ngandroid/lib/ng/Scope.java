@@ -19,8 +19,6 @@ package com.ngandroid.lib.ng;
 /**
  * Created by tyler on 3/20/15.
  */
-public interface Model {
-    public void addObserver(String field, ModelMethod modelMethod);
-    public <T> T getValue(String field);
-    public <T> void setValue(String field, T value);
+public interface Scope {
+    public <T> T getModel(String name, Class<T> typeClass);
 }

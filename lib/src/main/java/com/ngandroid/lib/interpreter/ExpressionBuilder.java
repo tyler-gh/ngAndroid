@@ -275,8 +275,7 @@ public class ExpressionBuilder<T> {
         for (Object obj : postfixExpression){
             if (obj instanceof Getter){
                 stack.push((Getter) obj);
-            }
-            else{
+            }else{
                 Getter rightGetter = stack.pop();
                 Getter leftGetter = stack.pop();
                 stack.push(compareGetters(leftGetter, rightGetter, (TokenType.BinaryOperator) obj));

@@ -32,8 +32,12 @@ import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.ModelBuilderMap;
 import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ng.Scope;
 import com.ngandroid.lib.ng.getters.Getter;
 import com.ngandroid.lib.ng.getters.ModelGetter;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by davityle on 1/13/15.
@@ -52,6 +56,16 @@ public class AttributeBinder {
 
     public AttributeBinder(final LayoutInflater inflater, Object scope, SparseArray<NgAttribute> attributes) {
         this.mScope = scope;
+
+        String scopeName = scope.getClass().getName();
+        try {
+            Class<?> generatedScopeClass = Class.forName(scopeName +"$$NgScope");
+            Constructor constructor = generatedScopeClass.getConstructor(scope.getClass());
+            Scope s = (Scope) constructor.newInstance(scope);
+        } catch (ClassNotFoundException | NoSuchMethodException |InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
         this.mAttrArray = new SparseArray<>();
         this.mBuilders = new ModelBuilderMap(mScope);
         this.mInflater = inflater;

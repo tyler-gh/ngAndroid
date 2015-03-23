@@ -12,7 +12,7 @@ import com.ngandroid.lib.annotations.NgModel;
 
 public class DemoActivity extends Activity {
     @NgModel
-    Input input;//, output;
+    Input input, output;
     @NgModel
     TestCompileModel compile1, compileModel;
 
