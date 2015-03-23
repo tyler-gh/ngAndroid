@@ -149,18 +149,23 @@ public class NgProcessor extends AbstractProcessor {
                 if(isMethod(enclosedElement)) {
                     ExecutableElement exElement = (ExecutableElement) enclosedElement;
                     String fName = exElement.getSimpleName().toString().replace("get", "").replace("set", "").toLowerCase();
+                    String varname;
+                    if(isInterface)
+                        varname = fName + "_";
+                    else
+                        varname = fName;
                     if (!returnsVoid(exElement)) {
-                        String type = exElement.getReturnType().toString();
-                        if(isInterface) {
-                            builder.append("\tprivate ")
-                                    .append(type)
-                                    .append(' ')
-                                    .append(fName)
-                                    .append(";\n");
-                        }
-                        builder.append("\tprivate java.util.List<com.ngandroid.lib.ng.ModelMethod> ")
-                                .append(fName)
-                                .append("Observers;\n");
+//                        String type = exElement.getReturnType().toString();
+//                        if(isInterface) {
+//                            builder.append("\tprivate ")
+//                                    .append(type)
+//                                    .append(' ')
+//                                    .append(fName)
+//                                    .append(";\n");
+//                        }
+//                        builder.append("\tprivate java.util.List<com.ngandroid.lib.ng.ModelMethod> ")
+//                                .append(fName)
+//                                .append("Observers;\n");
                         switchBuilder.append("\t\t\tcase \"")
                                 .append(fName)
                                 .append("\":\n\t\t\t\t")
@@ -174,15 +179,27 @@ public class NgProcessor extends AbstractProcessor {
                         getSwitchBuilder.append("\t\t\tcase \"")
                                 .append(fName)
                                 .append("\":\n\t\t\t\treturn ")
-                                .append(fName)
+                                .append(varname)
                                 .append(";\n");
                     }else{
+                        String type = exElement.getParameters().get(0).asType().toString();
+                        if(isInterface) {
+                            builder.append("\tprivate ")
+                                    .append(type)
+                                    .append(' ')
+                                    .append(varname)
+                                    .append(";\n");
+                        }
+                        builder.append("\tprivate java.util.List<com.ngandroid.lib.ng.ModelMethod> ")
+                                .append(fName)
+                                .append("Observers;\n");
+
                         setSwitchBuilder.append("\t\t\tcase \"")
                                 .append(fName)
                                 .append("\":\n\t\t\t\t")
                                 .append(exElement.getSimpleName())
                                 .append("((")
-                                .append(exElement.getParameters().get(0).asType().toString())
+                                .append(type)
                                 .append(") value);\n\t\t\t\treturn;\n");
                     }
                 }
@@ -212,6 +229,11 @@ public class NgProcessor extends AbstractProcessor {
                     List<? extends VariableElement> parameters = exElement.getParameters();
 
                     String fName = exElement.getSimpleName().toString().replace("get", "").replace("set","").toLowerCase();
+                    String varname;
+                    if(isInterface)
+                        varname = fName + "_";
+                    else
+                        varname = fName;
                     builder.append("\tpublic ")
                             .append(exElement.getReturnType().toString())
                             .append(' ')
@@ -221,7 +243,7 @@ public class NgProcessor extends AbstractProcessor {
                         VariableElement parameter = parameters.get(index);
                         builder.append(parameter.asType().toString())
                                 .append(' ')
-                                .append(fName);
+                                .append(varname);
                         if(index != parameters.size() - 1)
                             builder.append(',');
                     }
@@ -229,15 +251,15 @@ public class NgProcessor extends AbstractProcessor {
                     if(!returnsVoid(exElement)){
                         if(isInterface) {
                             builder.append("return ")
-                                    .append(fName)
+                                    .append(varname)
                                     .append(";\n");
                         }
                     }else{
                         if(isInterface) {
                             builder.append("this.")
-                                    .append(fName)
+                                    .append(varname)
                                     .append(" = ")
-                                    .append(fName)
+                                    .append(varname)
                                     .append(";\n");
                         }else{
                             builder.append("super.")
@@ -256,7 +278,7 @@ public class NgProcessor extends AbstractProcessor {
                                 .append("Observers){\n\t\t\t\tobserver.invoke(\"")
                                 .append(fName)
                                 .append("\", ")
-                                .append(fName)
+                                .append(varname)
                                 .append(");\n")
                                 .append("\t\t\t}\n\t\t}\n");
                     }

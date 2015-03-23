@@ -19,8 +19,8 @@ package com.ngandroid.demo;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 
+import com.ngandroid.demo.models.test.ModelTestScope;
 import com.ngandroid.lib.NgAndroid;
-import com.ngandroid.lib.annotations.NgModel;
 import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.ng.Scope;
 import com.ngandroid.lib.ng.ScopeBuilder;
@@ -43,22 +43,8 @@ public class ModelTests extends ActivityInstrumentationTestCase2<DemoActivity> {
         super.setUp();
     }
 
-    public static interface TestSetterRequired{
-        public int getX();
-    }
-
-    public static class TestScope {
-        private TestSetterRequired testSetterRequired;
-        @NgModel
-        private TestGetterNotRequired testGetterNotRequired;
-        @NgModel
-        private TestJsonModel testJsonModel;
-        @NgModel
-        private TestSubModel testSubModel;
-    }
-
     public void testBuildScope(){
-        TestScope scope = new TestScope();
+        ModelTestScope scope = new ModelTestScope();
         ngAndroid.buildScope(scope);
         assertNull(scope.testSetterRequired);
         assertNotNull(scope.testGetterNotRequired);
@@ -74,11 +60,7 @@ public class ModelTests extends ActivityInstrumentationTestCase2<DemoActivity> {
 //        }catch (Exception e){}
 //    }
 
-    public static interface TestGetterNotRequired{
-        public void setX(int x);
-    }
-
-//    public void testGetterNotRequired(){
+    //    public void testGetterNotRequired(){
 //        try{
 //            ngAndroid.buildModel(TestGetterNotRequired.class);
 //        }catch (Exception e){
@@ -86,27 +68,7 @@ public class ModelTests extends ActivityInstrumentationTestCase2<DemoActivity> {
 //        }
 //    }
 
-    public static interface TestJsonModel{
-        public int getInt();
-        public void setInt(int i);
-        public float getFloat();
-        public void setFloat(float f);
-        public double getDouble();
-        public void setDouble(double d);
-        public String getString();
-        public void setString(String s);
-        public boolean getBoolean();
-        public void setBoolean(boolean b);
-        public void setJsonModel(TestJsonModel tsm);
-        public TestJsonModel getJsonModel();
-    }
-
-    public static interface TestSubModel{
-        public void setJsonModel(TestJsonModel tsm);
-        public TestJsonModel getJsonModel();
-    }
-
-//    public void testBuildModelWithSubModels(){
+    //    public void testBuildModelWithSubModels(){
 //        TestJsonModel testJsonModel = ngAndroid.buildModel(TestJsonModel.class);
 //        assertNull(testJsonModel.getJsonModel());
 //
@@ -172,7 +134,7 @@ public class ModelTests extends ActivityInstrumentationTestCase2<DemoActivity> {
 //    }
     @UiThreadTest
     public void testDefaults() throws NoSuchFieldException, IllegalAccessException {
-        TestScope tc = new TestScope();
+        ModelTestScope tc = new ModelTestScope();
         Scope scope = ScopeBuilder.buildScope(tc);
         tc.testJsonModel.setInt(300);
         new ExpressionBuilder("testJsonModel.int").build(tc, scope);
