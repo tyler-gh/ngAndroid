@@ -18,7 +18,7 @@ package com.ngandroid.lib.ngattributes.ngclick;
 
 import android.view.View;
 
-import com.ngandroid.lib.ng.getters.MethodGetter;
+import com.ngandroid.lib.interpreter.getters.MethodGetter;
 
 /**
  * Created by tyler on 2/24/15.

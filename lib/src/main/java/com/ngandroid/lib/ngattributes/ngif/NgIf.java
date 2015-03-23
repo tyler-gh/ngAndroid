@@ -19,11 +19,11 @@ package com.ngandroid.lib.ngattributes.ngif;
 import android.view.View;
 
 import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.ng.ModelBuilder;
+import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelMethod;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.ng.getters.ModelGetter;
+import com.ngandroid.lib.interpreter.getters.Getter;
+import com.ngandroid.lib.interpreter.getters.ModelGetter;
 import com.ngandroid.lib.utils.TypeUtils;
 
 /**
@@ -39,13 +39,13 @@ public abstract class NgIf implements NgAttribute {
     }
 
     @Override
-    public void attach(Getter getter, ModelGetter[] modelGetters, ModelBuilder[] modelBuilders, View view) throws Throwable {
+    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] models, View view) throws Throwable {
         if(modelGetters.length == 0)
             throw new Exception(getClass().getSimpleName() +" requires a model to observe. Try reformatting your statement to include a model");
         for(int index = 0 ; index < modelGetters.length; index++){
             ModelGetter modelGetter = modelGetters[index];
-            ModelBuilder modelBuilder = modelBuilders[index];
-            modelBuilder.addSetObserver(modelGetter.getFieldName(), getModelMethod(getter, view));
+            Model model = models[index];
+            model.addObserver(modelGetter.getFieldName(), getModelMethod(getter, view));
         }
     }
 

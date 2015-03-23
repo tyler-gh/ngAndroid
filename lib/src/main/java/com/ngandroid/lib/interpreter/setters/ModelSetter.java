@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng.setters;
+package com.ngandroid.lib.interpreter.setters;
 
-import com.ngandroid.lib.ng.MethodInvoker;
+import com.ngandroid.lib.ng.Model;
 
 /**
  * Created by davityle on 1/24/15.
@@ -24,14 +24,14 @@ import com.ngandroid.lib.ng.MethodInvoker;
 public class ModelSetter implements Setter {
 
     private final String mFieldName;
-    private final MethodInvoker mMethodInvoker;
+    private final Model mMethodInvoker;
 
-    public ModelSetter(String mFieldName, MethodInvoker mMethodInvoker) {
+    public ModelSetter(String mFieldName, Model mMethodInvoker) {
         this.mFieldName = mFieldName;
         this.mMethodInvoker = mMethodInvoker;
     }
 
     public void set(Object ... parameters) throws Throwable {
-        mMethodInvoker.invoke("set" + mFieldName, parameters);
+        mMethodInvoker.setValue(mFieldName, parameters[0]);
     }
 }

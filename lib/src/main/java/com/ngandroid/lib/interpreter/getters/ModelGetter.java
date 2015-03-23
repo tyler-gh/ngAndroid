@@ -14,11 +14,11 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng.getters;
+package com.ngandroid.lib.interpreter.getters;
 
-import com.ngandroid.lib.ng.MethodInvoker;
-import com.ngandroid.lib.ng.ModelBuilder;
-import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.ng.Model;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.utils.TypeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,20 +30,26 @@ public class ModelGetter<T> implements Getter<T> {
 
     private final String mFieldName;
     private final String mModelName;
-    private final MethodInvoker mMethodInvoker;
+    private final Model mMethodInvoker;
 
-    public ModelGetter(String mFieldName, String mModelName, MethodInvoker mMethodInvoker) {
+    public ModelGetter(String mFieldName, String mModelName, Model mMethodInvoker) {
         this.mFieldName = mFieldName;
         this.mModelName = mModelName;
         this.mMethodInvoker = mMethodInvoker;
     }
 
     public T get() throws Throwable {
-        return (T) mMethodInvoker.invoke("get" + mFieldName);
+        return (T) mMethodInvoker.getValue(mFieldName);
     }
 
     public int getType(){
-        return mMethodInvoker.getType(mFieldName);
+        // TODO this will most likely throw a NPE
+        try {
+            return TypeUtils.getType(mMethodInvoker.getValue(mFieldName).getClass());
+        }catch (NullPointerException e){
+            // TODO this is bad  *shudder*
+            return TypeUtils.OBJECT;
+        }
     }
 
     @Override
@@ -63,10 +69,10 @@ public class ModelGetter<T> implements Getter<T> {
         return mgs.toArray(new ModelGetter[mgs.size()]);
     }
 
-    public static ModelBuilder[] getModelBuilders(ModelGetter[] modelGetters, ModelBuilderMap modelBuilderMap){
-        ModelBuilder[] builders = new ModelBuilder[modelGetters.length];
+    public static Model[] getModels(ModelGetter[] modelGetters, Scope modelBuilderMap){
+        Model[] builders = new Model[modelGetters.length];
         for(int index = 0; index < modelGetters.length; index++){
-            builders[index] = modelBuilderMap.get(modelGetters[index].getModelName());
+            builders[index] = modelBuilderMap.getModel(modelGetters[index].getModelName());
         }
         return builders;
     }

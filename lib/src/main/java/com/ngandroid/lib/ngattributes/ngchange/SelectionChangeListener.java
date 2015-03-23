@@ -19,7 +19,7 @@ package com.ngandroid.lib.ngattributes.ngchange;
 import android.view.View;
 import android.widget.AdapterView;
 
-import com.ngandroid.lib.ng.getters.MethodGetter;
+import com.ngandroid.lib.interpreter.getters.MethodGetter;
 
 /**
 * Created by tyler on 1/29/15.

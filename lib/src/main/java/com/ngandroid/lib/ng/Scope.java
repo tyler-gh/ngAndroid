@@ -20,5 +20,5 @@ package com.ngandroid.lib.ng;
  * Created by tyler on 3/20/15.
  */
 public interface Scope {
-    public <T> T getModel(String name, Class<T> typeClass);
+    public <T> T getModel(String name);
 }

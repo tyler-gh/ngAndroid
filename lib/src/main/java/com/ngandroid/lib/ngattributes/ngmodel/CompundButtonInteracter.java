@@ -19,7 +19,7 @@ package com.ngandroid.lib.ngattributes.ngmodel;
 import android.widget.CompoundButton;
 
 import com.ngandroid.lib.ng.ModelMethod;
-import com.ngandroid.lib.ng.setters.ModelSetter;
+import com.ngandroid.lib.interpreter.setters.ModelSetter;
 
 /**
 * Created by tyler on 2/24/15.

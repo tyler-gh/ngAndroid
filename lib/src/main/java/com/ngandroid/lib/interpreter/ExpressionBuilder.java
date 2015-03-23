@@ -17,15 +17,15 @@
 package com.ngandroid.lib.interpreter;
 
 import com.ngandroid.lib.exceptions.NgException;
-import com.ngandroid.lib.ng.ModelBuilder;
-import com.ngandroid.lib.ng.ModelBuilderMap;
-import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
-import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.ng.getters.KnotGetter;
-import com.ngandroid.lib.ng.getters.ModelGetter;
-import com.ngandroid.lib.ng.getters.StaticGetter;
-import com.ngandroid.lib.ng.getters.TernaryGetter;
-import com.ngandroid.lib.ng.getters.MethodGetter;
+import com.ngandroid.lib.ng.Model;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.interpreter.getters.BinaryOperatorGetter;
+import com.ngandroid.lib.interpreter.getters.Getter;
+import com.ngandroid.lib.interpreter.getters.KnotGetter;
+import com.ngandroid.lib.interpreter.getters.MethodGetter;
+import com.ngandroid.lib.interpreter.getters.ModelGetter;
+import com.ngandroid.lib.interpreter.getters.StaticGetter;
+import com.ngandroid.lib.interpreter.getters.TernaryGetter;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 
@@ -51,7 +51,7 @@ public class ExpressionBuilder<T> {
         this.tokens = tokens;
     }
 
-    public Getter<T> build(Object scope,ModelBuilderMap builders){
+    public Getter<T> build(Object scope, Scope builders){
         Getter getter = createGetter(0, tokens.length - 1, scope, tokens, builders).getFirst();
         return (Getter<T>) getter;
     }
@@ -116,7 +116,7 @@ public class ExpressionBuilder<T> {
         throw new NgException("Ternary is not formed properly");
     }
 
-    public Tuple<Getter, Integer> createGetter(int startIndex, int endIndex, Object scope, Token[] tokens, ModelBuilderMap builders){
+    public Tuple<Getter, Integer> createGetter(int startIndex, int endIndex, Object scope, Token[] tokens, Scope builders){
         List<Getter> getterList = new ArrayList<>();
         List<TokenType.BinaryOperator> operatorList = new ArrayList<>();
         int index = startIndex;
@@ -174,8 +174,8 @@ public class ExpressionBuilder<T> {
                 case MODEL_NAME: {
                     String modelName = token.getScript();
                     String fieldName = tokens[index + 2].getScript();
-                    ModelBuilder builder = builders.get(modelName);
-                    getterList.add(new ModelGetter(fieldName, modelName, builder.getMethodInvoker()));
+                    Model builder = builders.getModel(modelName);
+                    getterList.add(new ModelGetter(fieldName, modelName, builder));
                     index += 3;
                     break;
                 }

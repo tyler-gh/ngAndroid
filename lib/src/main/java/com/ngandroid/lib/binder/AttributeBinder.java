@@ -29,15 +29,12 @@ import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.SyntaxParser;
 import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.ng.ModelBuilder;
-import com.ngandroid.lib.ng.ModelBuilderMap;
+import com.ngandroid.lib.interpreter.getters.Getter;
+import com.ngandroid.lib.interpreter.getters.ModelGetter;
+import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
-import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.ng.getters.ModelGetter;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import com.ngandroid.lib.ng.ScopeBuilder;
 
 /**
  * Created by davityle on 1/13/15.
@@ -47,7 +44,7 @@ public class AttributeBinder {
     private LayoutInflater mInflater;
     private Object mScope;
     private SparseArray<TypedArray> mAttrArray;
-    private ModelBuilderMap mBuilders;
+    private Scope mBuilders;
     private SparseArray<NgAttribute> attributes;
 
     public AttributeBinder(final Context context, Object scope, SparseArray<NgAttribute> customAttributes) {
@@ -56,18 +53,8 @@ public class AttributeBinder {
 
     public AttributeBinder(final LayoutInflater inflater, Object scope, SparseArray<NgAttribute> attributes) {
         this.mScope = scope;
-
-        String scopeName = scope.getClass().getName();
-        try {
-            Class<?> generatedScopeClass = Class.forName(scopeName +"$$NgScope");
-            Constructor constructor = generatedScopeClass.getConstructor(scope.getClass());
-            Scope s = (Scope) constructor.newInstance(scope);
-        } catch (ClassNotFoundException | NoSuchMethodException |InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
+        this.mBuilders = ScopeBuilder.buildScope(scope);
         this.mAttrArray = new SparseArray<>();
-        this.mBuilders = new ModelBuilderMap(mScope);
         this.mInflater = inflater;
         this.attributes = attributes;
         BindingInflaterFactory.setFactory(mInflater, mAttrArray);
@@ -87,7 +74,7 @@ public class AttributeBinder {
                 if(attribute == null)
                     throw new UnsupportedOperationException("Attribute not currently implemented");
                 ModelGetter[] modelGetters = ModelGetter.getModelGetters(getter);
-                ModelBuilder[] modelBuilders = ModelGetter.getModelBuilders(modelGetters, mBuilders);
+                Model[] modelBuilders = ModelGetter.getModels(modelGetters, mBuilders);
                 try {
                     attribute.typeCheck(tokens, getter);
                     attribute.attach(getter, modelGetters, modelBuilders, v.findViewById(id));
@@ -96,7 +83,7 @@ public class AttributeBinder {
                 }
             }
         }
-        ModelBuilder.buildModel(mScope, mBuilders);
+//        ModelBuilder.buildModel(mScope, mBuilders);
     }
 
     public void setContentView(Activity activity, int resourceId){

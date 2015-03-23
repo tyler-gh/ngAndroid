@@ -6,24 +6,25 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.ngandroid.demo.models.Input;
+import com.ngandroid.lib.annotations.NgModel;
 import com.ngandroid.lib.interpreter.ExpressionBuilder;
 import com.ngandroid.lib.interpreter.SyntaxParser;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.interpreter.Tokenizer;
-import com.ngandroid.lib.ng.ModelBuilder;
-import com.ngandroid.lib.ng.ModelBuilderMap;
-import com.ngandroid.lib.ng.getters.BinaryOperatorGetter;
-import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.ng.getters.KnotGetter;
-import com.ngandroid.lib.ng.getters.MethodGetter;
-import com.ngandroid.lib.ng.getters.ModelGetter;
+import com.ngandroid.lib.interpreter.getters.BinaryOperatorGetter;
+import com.ngandroid.lib.interpreter.getters.Getter;
+import com.ngandroid.lib.interpreter.getters.KnotGetter;
+import com.ngandroid.lib.interpreter.getters.MethodGetter;
+import com.ngandroid.lib.interpreter.getters.ModelGetter;
+import com.ngandroid.lib.ng.Model;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.ng.ScopeBuilder;
 import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
 import com.ngandroid.lib.ngattributes.ngif.NgGone;
 import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
 import com.ngandroid.lib.ngattributes.ngtext.NgText;
 
-import java.lang.reflect.Field;
 import java.util.Queue;
 
 /**
@@ -942,41 +943,38 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
         ExpressionBuilder builder = new ExpressionBuilder("(3 + (2)) - 10/5");
         TestScope tc = new TestScope();
-        ModelBuilderMap map = new ModelBuilderMap(tc);
-        Getter<Integer> getter = builder.build(tc, map);
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<Integer> getter = builder.build(tc, scope);
         assertEquals(3, (int)getter.get());
 
         builder = new ExpressionBuilder("(3 - (2)) - 10/5");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        getter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        getter = builder.build(tc, scope);
         assertEquals(-1, (int)getter.get());
 
         builder = new ExpressionBuilder("(3 - (2+7)) - 10/5");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        getter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        getter = builder.build(tc, scope);
         assertEquals(-8, (int)getter.get());
 
         builder = new ExpressionBuilder("(3 - (2+7)) - 10/(5-3)");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        getter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        getter = builder.build(tc, scope);
         assertEquals(-11, (int)getter.get());
 
         builder = new ExpressionBuilder("(3 - (2+7)) - 10/(5-3)");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        getter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        getter = builder.build(tc, scope);
         assertEquals(-11, (int)getter.get());
 
         builder = new ExpressionBuilder("(modelName.num - (2*(7-1))) - 10/(modelName.num-3)");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        getter = builder.build(tc, map);
-        Field m = TestScope.class.getDeclaredField("modelName");
-        m.setAccessible(true);
-        m.set(tc, map.get("modelName").create());
+        scope = ScopeBuilder.buildScope(tc);
+        getter = builder.build(tc, scope);
         tc.modelName.setNum(1);
         assertEquals(-6, (int)getter.get());
         tc.modelName.setNum(-12);
@@ -989,6 +987,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public static class TestBugScope {
+        @NgModel
         private Input input;
         private void multiply(int x, int y){
 
@@ -997,8 +996,8 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testBug(){
         TestBugScope tc = new TestBugScope();
-        ModelBuilderMap map = new ModelBuilderMap(tc);
-        Getter getter = new ExpressionBuilder("multiply(input.integer,2)").build(tc, map);
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter getter = new ExpressionBuilder("multiply(input.integer,2)").build(tc, scope);
     }
 
 
@@ -1012,7 +1011,8 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public class TestScope {
-        private TestModel modelName;
+        @NgModel
+        TestModel modelName;
         private void method(){
         }
         private void method(String value){
@@ -1036,47 +1036,40 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void testNumericAdditions() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("getIntValue() + 2 - 10/5");
         TestScope tc = new TestScope();
-        ModelBuilderMap map = new ModelBuilderMap(tc);
-        Getter<Integer> getter = builder.build(tc, map);
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<Integer> getter = builder.build(tc, scope);
         assertEquals(42, (int)getter.get());
 
 
         builder = new ExpressionBuilder("getIntValue() + 2 - 10/5.0");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        Getter<Float> fgetter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        Getter<Float> fgetter = builder.build(tc, scope);
         assertEquals(42.0f, fgetter.get());
 
         builder = new ExpressionBuilder("getIntValue() + 10/5.0 - 2");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        fgetter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        fgetter = builder.build(tc, scope);
         assertEquals(42.0f, fgetter.get());
 
         builder = new ExpressionBuilder("getIntValue() + 1*5.0 - 2");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        fgetter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        fgetter = builder.build(tc, scope);
         assertEquals(45.0f, fgetter.get());
 
 
         builder = new ExpressionBuilder("10d + 25f/5 - getIntValue() + 1*5.0 - 2");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        Getter<Double> dgetter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        Getter<Double> dgetter = builder.build(tc, scope);
         assertEquals(-24d, dgetter.get());
 
         builder = new ExpressionBuilder("10d + 25f/5 - getIntValue() + 1*5.0 - 2*modelName.num");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        dgetter = builder.build(tc, map);
-        try {
-            Field m = TestScope.class.getDeclaredField("modelName");
-            m.setAccessible(true);
-            m.set(tc, map.get("modelName").create());
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            fail();
-        }
+        scope = ScopeBuilder.buildScope(tc);
+        dgetter = builder.build(tc, scope);
         tc.modelName.setNum(1);
         assertEquals(-24d, dgetter.get());
         tc.modelName.setNum(2);
@@ -1090,59 +1083,45 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void testStringAdditions() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("getStringValue() + 'orange ' + getIntValue()");
         TestScope tc = new TestScope();
-        ModelBuilderMap map = new ModelBuilderMap(tc);
-        Getter<String> getter = builder.build(tc, map);
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<String> getter = builder.build(tc, scope);
         assertEquals("This is a string value orange 42", getter.get());
 
         builder = new ExpressionBuilder("getStringValue() + getIntValue()");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        getter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        getter = builder.build(tc, scope);
         assertEquals("This is a string value 42", getter.get());
 
         builder = new ExpressionBuilder("getIntValue() + getStringValue()");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        getter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        getter = builder.build(tc, scope);
         assertEquals("42This is a string value ", getter.get());
 
         builder = new ExpressionBuilder("isTrue() ? 'abcdefg ' + getIntValue() : getStringValue()");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        getter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        getter = builder.build(tc, scope);
         assertEquals("abcdefg 42", getter.get());
 
         builder = new ExpressionBuilder("isTrue() ? getStringValue() + getIntValue() : getStringValue()");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        getter = builder.build(tc, map);
+        scope = ScopeBuilder.buildScope(tc);
+        getter = builder.build(tc, scope);
         assertEquals("This is a string value 42", getter.get());
 
         builder = new ExpressionBuilder("modelName.joe + 'orange'");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        getter = builder.build(tc, map);
-        try {
-            Field m = TestScope.class.getDeclaredField("modelName");
-            m.setAccessible(true);
-            m.set(tc, map.get("modelName").create());
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            fail();
-        }
+        scope = ScopeBuilder.buildScope(tc);
+        getter = builder.build(tc, scope);
         tc.modelName.setJoe("joe");
         assertEquals("joeorange", getter.get());
 
         builder = new ExpressionBuilder("modelName.joe + getIntValue()");
         tc = new TestScope();
-        map = new ModelBuilderMap(tc);
-        getter = builder.build(tc, map);
-        try {
-            Field m = TestScope.class.getDeclaredField("modelName");
-            m.setAccessible(true);
-            m.set(tc, map.get("modelName").create());
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            fail();
-        }
+        scope = ScopeBuilder.buildScope(tc);
+        getter = builder.build(tc, scope);
         tc.modelName.setJoe("joe");
         assertEquals("joe42", getter.get());
     }
@@ -1151,15 +1130,8 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void testExpressionBuilder() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("modelName.joe != 'orange'");
         TestScope tc = new TestScope();
-        ModelBuilderMap map = new ModelBuilderMap(tc);
-        try {
-            Field m = TestScope.class.getDeclaredField("modelName");
-            m.setAccessible(true);
-            m.set(tc, map.get("modelName").create());
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        Getter<Boolean> getter = builder.build(tc, map);
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<Boolean> getter = builder.build(tc, scope);
         System.out.println(getter.getClass().getSimpleName());
         assertTrue(getter instanceof BinaryOperatorGetter);
         tc.modelName.setJoe("Joe");
@@ -1174,7 +1146,8 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void testFunctionExpression() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("method()");
         TestScope tc = new TestScope();
-        Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<Boolean> getter = builder.build(tc, scope);
         assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
@@ -1187,7 +1160,8 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void testMethodTypeFinding() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("method('string')");
         TestScope tc = new TestScope();
-        Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<Boolean> getter = builder.build(tc, scope);
         assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
@@ -1196,7 +1170,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         }
 
         builder = new ExpressionBuilder("method(58)");
-        getter = builder.build(tc, new ModelBuilderMap(tc));
+        getter = builder.build(tc, scope);
         assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
@@ -1208,7 +1182,8 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void testMethodInMethod() throws Throwable {
         ExpressionBuilder builder = new ExpressionBuilder("method(getStringValue())");
         TestScope tc = new TestScope();
-        Getter<Boolean> getter = builder.build(tc, new ModelBuilderMap(tc));
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<Boolean> getter = builder.build(tc, scope);
         assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
@@ -1218,7 +1193,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
         builder = new ExpressionBuilder("method('Int value = ' + getIntValue())");
         tc = new TestScope();
-        getter = builder.build(tc, new ModelBuilderMap(tc));
+        getter = builder.build(tc, scope);
         assertTrue(getter instanceof MethodGetter);
         try {
             getter.get();
@@ -1229,7 +1204,8 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testKnotExpression(){
         TestScope tc = new TestScope();
-        Getter<Boolean> getter = new ExpressionBuilder("!isTrue()").build(tc, new ModelBuilderMap(tc));
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<Boolean> getter = new ExpressionBuilder("!isTrue()").build(tc, scope);
         assertTrue(getter instanceof KnotGetter);
         try {
             assertFalse(getter.get());
@@ -1241,12 +1217,11 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void testNgVisible() throws Throwable {
         View v = new View(testApplication);
         TestScope tc = new TestScope();
-        ModelBuilderMap map = new ModelBuilderMap(tc);
-        Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, scope);
         ModelGetter[] modelGetters = ModelGetter.getModelGetters(getter);
-        ModelBuilder[] modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        Model[] modelBuilders = ModelGetter.getModels(modelGetters, (com.ngandroid.lib.ng.Scope) tc);
         NgInvisible.getInstance().attach(getter, modelGetters, modelBuilders, v);
-        ModelBuilder.buildModel(tc, map);
         tc.modelName.setIsInvisible(false);
         assertEquals(View.VISIBLE, v.getVisibility());
         tc.modelName.setIsInvisible(true);
@@ -1256,12 +1231,11 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void testNgText() throws Throwable {
         TextView v = new TextView(testApplication);
         TestScope tc = new TestScope();
-        ModelBuilderMap map = new ModelBuilderMap(tc);
-        Getter<Boolean> getter = new ExpressionBuilder("modelName.joe").build(tc, map);
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<Boolean> getter = new ExpressionBuilder("modelName.joe").build(tc, scope);
         ModelGetter[] modelGetters = ModelGetter.getModelGetters(getter);
-        ModelBuilder[] modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        Model[] modelBuilders = ModelGetter.getModels(modelGetters, (com.ngandroid.lib.ng.Scope) tc);
         NgText.getInstance().attach(getter, modelGetters, modelBuilders, v);
-        ModelBuilder.buildModel(tc, map);
         tc.modelName.setJoe("This is Joe");
         assertEquals(v.getText(), "This is Joe");
     }
@@ -1269,34 +1243,33 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void testNgGone() throws Throwable {
         View v = new View(testApplication);
         TestScope tc = new TestScope();
-        ModelBuilderMap map = new ModelBuilderMap(tc);
-        Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, scope);
         ModelGetter[] modelGetters = ModelGetter.getModelGetters(getter);
-        ModelBuilder[] modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        Model[] modelBuilders = ModelGetter.getModels(modelGetters, (com.ngandroid.lib.ng.Scope) tc);
         NgGone.getInstance().attach(getter, modelGetters, modelBuilders, v);
-        ModelBuilder.buildModel(tc, map);
         tc.modelName.setIsInvisible(false);
         assertEquals(View.VISIBLE, v.getVisibility());
         tc.modelName.setIsInvisible(true);
         assertEquals(View.GONE, v.getVisibility());
 
-        map = new ModelBuilderMap(tc);
-        getter = new ExpressionBuilder("!modelName.isInvisible").build(tc, map);
+        tc = new TestScope();
+        scope = ScopeBuilder.buildScope(tc);
+        getter = new ExpressionBuilder("!modelName.isInvisible").build(tc, scope);
         modelGetters = ModelGetter.getModelGetters(getter);
-        modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        modelBuilders = ModelGetter.getModels(modelGetters, (com.ngandroid.lib.ng.Scope) tc);
         NgGone.getInstance().attach(getter, modelGetters, modelBuilders, v);
-        ModelBuilder.buildModel(tc, map);
         tc.modelName.setIsInvisible(true);
         assertEquals(View.VISIBLE, v.getVisibility());
         tc.modelName.setIsInvisible(false);
         assertEquals(View.GONE, v.getVisibility());
 
-        map = new ModelBuilderMap(tc);
-        getter = new ExpressionBuilder("!modelName.isInvisible ? isTrue() : !isTrue()").build(tc, map);
+        tc = new TestScope();
+        scope = ScopeBuilder.buildScope(tc);
+        getter = new ExpressionBuilder("!modelName.isInvisible ? isTrue() : !isTrue()").build(tc, scope);
         modelGetters = ModelGetter.getModelGetters(getter);
-        modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        modelBuilders = ModelGetter.getModels(modelGetters, scope);
         NgGone.getInstance().attach(getter, modelGetters, modelBuilders, v);
-        ModelBuilder.buildModel(tc, map);
         tc.modelName.setIsInvisible(true);
         assertEquals(View.VISIBLE, v.getVisibility());
         tc.modelName.setIsInvisible(false);
@@ -1306,12 +1279,11 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void testNgDisable() throws Throwable {
         View v = new View(testApplication);
         TestScope tc = new TestScope();
-        ModelBuilderMap map = new ModelBuilderMap(tc);
-        Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, map);
+        Scope scope = ScopeBuilder.buildScope(tc);
+        Getter<Boolean> getter = new ExpressionBuilder("modelName.isInvisible").build(tc, scope);
         ModelGetter[] modelGetters = ModelGetter.getModelGetters(getter);
-        ModelBuilder[] modelBuilders = ModelGetter.getModelBuilders(modelGetters, map);
+        Model[] modelBuilders = ModelGetter.getModels(modelGetters, (com.ngandroid.lib.ng.Scope) tc);
         NgDisabled.getInstance().attach(getter, modelGetters, modelBuilders, v);
-        ModelBuilder.buildModel(tc, map);
         tc.modelName.setIsInvisible(false);
         assertTrue(v.isEnabled());
         tc.modelName.setIsInvisible(true);

@@ -18,7 +18,7 @@ package com.ngandroid.lib.ngattributes.nglongclick;
 
 import android.view.View;
 
-import com.ngandroid.lib.ng.getters.MethodGetter;
+import com.ngandroid.lib.interpreter.getters.MethodGetter;
 
 /**
 * Created by tyler on 1/28/15.

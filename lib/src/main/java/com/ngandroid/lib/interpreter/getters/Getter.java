@@ -14,11 +14,15 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng.setters;
+package com.ngandroid.lib.interpreter.getters;
+
+import java.util.List;
 
 /**
  * Created by davityle on 1/24/15.
  */
-public interface Setter {
-    public void set(Object ... parameters) throws Throwable;
+public interface Getter<T> {
+    public T get() throws Throwable;
+    public int getType();
+    public void getModelGetter(List<ModelGetter> modelGetters);
 }

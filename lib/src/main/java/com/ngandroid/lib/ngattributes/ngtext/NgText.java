@@ -19,10 +19,10 @@ package com.ngandroid.lib.ngattributes.ngtext;
 import android.view.View;
 
 import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.ng.ModelBuilder;
+import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.ng.getters.ModelGetter;
+import com.ngandroid.lib.interpreter.getters.Getter;
+import com.ngandroid.lib.interpreter.getters.ModelGetter;
 import com.ngandroid.lib.utils.TypeUtils;
 
 import java.lang.reflect.Method;
@@ -46,12 +46,12 @@ public class NgText implements NgAttribute {
     }
 
     @Override
-    public void attach(Getter getter, ModelGetter[] modelGetters, ModelBuilder[] modelBuilders, View view) throws Throwable {
+    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] models, View view) throws Throwable {
         Method method = view.getClass().getDeclaredMethod("setText", CharSequence.class);
         for(int index = 0; index < modelGetters.length; index++){
             ModelGetter modelGetter = modelGetters[index];
-            ModelBuilder builder = modelBuilders[index];
-            builder.addSetObserver(modelGetter.getFieldName(), new SetTextModelMethod(method, view, getter));
+            Model model = models[index];
+            model.addObserver(modelGetter.getFieldName(), new SetTextModelMethod(method, view, getter));
         }
     }
 

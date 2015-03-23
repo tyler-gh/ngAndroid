@@ -23,12 +23,12 @@ import android.widget.TextView;
 import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.interpreter.Token;
 import com.ngandroid.lib.interpreter.TokenType;
-import com.ngandroid.lib.ng.ModelBuilder;
+import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelMethod;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.ng.getters.ModelGetter;
-import com.ngandroid.lib.ng.setters.ModelSetter;
+import com.ngandroid.lib.interpreter.getters.Getter;
+import com.ngandroid.lib.interpreter.getters.ModelGetter;
+import com.ngandroid.lib.interpreter.setters.ModelSetter;
 import com.ngandroid.lib.utils.TypeUtils;
 
 /**
@@ -48,7 +48,7 @@ public class NgModel implements NgAttribute {
     }
 
     @Override
-    public void attach(Getter getter, ModelGetter[] modelGetters, ModelBuilder[] modelBuilders, View view) throws Throwable {
+    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] modelBuilders, View view) throws Throwable {
         bindModelView((ModelGetter) getter, view, modelBuilders[0]);
     }
 
@@ -61,42 +61,42 @@ public class NgModel implements NgAttribute {
 //        bindModelView(modelGetter, bindView, modelBuilder);
 //    }
 
-    public void bindModelView(ModelGetter getter, View view, ModelBuilder builder) throws Throwable {
+    public void bindModelView(ModelGetter getter, View view, Model builder) throws Throwable {
         if(view instanceof CompoundButton){
             bindModelToCompoundButton(getter, (CompoundButton) view, builder);
         }else if(view instanceof  TextView){
             bindModelToTextView(getter, (TextView)view, builder);
         }
     }
-    private void bindModelToCompoundButton(ModelGetter<Boolean> getter, final CompoundButton compoundButton, ModelBuilder builder) throws Throwable {
+    private void bindModelToCompoundButton(ModelGetter<Boolean> getter, final CompoundButton compoundButton, Model model) throws Throwable {
         if(getter.getType() != TypeUtils.BOOLEAN){
             throw new NgException("A compound button requires a boolean type model");
         }
         boolean isChecked = compoundButton.isChecked();
         String fieldName = getter.getFieldName().toLowerCase();
-        final ModelSetter modelSetter = new ModelSetter(fieldName, builder.getMethodInvoker());
+        final ModelSetter modelSetter = new ModelSetter(fieldName, model);
         modelSetter.set(isChecked);
         CompundButtonInteracter compundButtonInteracter = new CompundButtonInteracter(modelSetter, compoundButton);
         compoundButton.setOnCheckedChangeListener(compundButtonInteracter);
-        builder.addSetObserver(fieldName, compundButtonInteracter);
+        model.addObserver(fieldName, compundButtonInteracter);
     }
 
 
-    private void bindModelToTextView(ModelGetter getter, final TextView textView, ModelBuilder builder) throws Throwable {
+    private void bindModelToTextView(ModelGetter getter, final TextView textView, Model model) throws Throwable {
         final String fieldNamelower = getter.getFieldName();
         String defaultText =  textView.getText().toString();
         int methodType = getter.getType();
-        ModelSetter setter = new ModelSetter(fieldNamelower, builder.getMethodInvoker());
+        ModelSetter setter = new ModelSetter(fieldNamelower, model);
         if(!defaultText.isEmpty())
             setter.set(TypeUtils.fromString(methodType, defaultText));
         final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(setter, methodType);
         textView.addTextChangedListener(setTextWhenChangedListener);
         // TODO clean this up
-        builder.addSetObserver(fieldNamelower, new ModelMethod(){
+        model.addObserver(fieldNamelower, new ModelMethod() {
             @Override
             public Object invoke(String fieldName, Object... args) {
                 String value = String.valueOf(args[0]);
-                if(!value.equals(textView.getText().toString())) {
+                if (!value.equals(textView.getText().toString())) {
                     textView.removeTextChangedListener(setTextWhenChangedListener);
                     textView.setText(value.equals("0") ? "" : value);
                     textView.addTextChangedListener(setTextWhenChangedListener);

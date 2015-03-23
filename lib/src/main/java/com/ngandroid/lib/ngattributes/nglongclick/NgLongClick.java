@@ -19,10 +19,10 @@ package com.ngandroid.lib.ngattributes.nglongclick;
 import android.view.View;
 
 import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.ng.ModelBuilder;
+import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.ng.getters.Getter;
-import com.ngandroid.lib.ng.getters.ModelGetter;
+import com.ngandroid.lib.interpreter.getters.Getter;
+import com.ngandroid.lib.interpreter.getters.ModelGetter;
 import com.ngandroid.lib.ngattributes.ngclick.NgClick;
 
 /**
@@ -44,7 +44,7 @@ public class NgLongClick implements NgAttribute {
     }
 
     @Override
-    public void attach(Getter getter, ModelGetter[] modelGetters, ModelBuilder[] modelBuilders, View view) throws Throwable {
+    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] models, View view) throws Throwable {
         NgClick.getInstance().attach(getter, view, true);
     }
 }

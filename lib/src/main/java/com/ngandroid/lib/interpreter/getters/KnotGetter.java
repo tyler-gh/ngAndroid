@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng.getters;
+package com.ngandroid.lib.interpreter.getters;
 
 import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.utils.TypeUtils;

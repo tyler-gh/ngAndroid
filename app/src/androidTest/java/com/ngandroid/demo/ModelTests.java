@@ -20,13 +20,10 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 
 import com.ngandroid.lib.NgAndroid;
-import com.ngandroid.lib.annotations.Ignore;
+import com.ngandroid.lib.annotations.NgModel;
 import com.ngandroid.lib.interpreter.ExpressionBuilder;
-import com.ngandroid.lib.ng.ModelBuilder;
-import com.ngandroid.lib.ng.ModelBuilderMap;
-import com.ngandroid.lib.utils.JsonUtils;
-
-import org.json.JSONException;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.ng.ScopeBuilder;
 
 import java.lang.reflect.Field;
 
@@ -51,40 +48,43 @@ public class ModelTests extends ActivityInstrumentationTestCase2<DemoActivity> {
     }
 
     public static class TestScope {
-        @Ignore
         private TestSetterRequired testSetterRequired;
+        @NgModel
         private TestGetterNotRequired testGetterNotRequired;
+        @NgModel
         private TestJsonModel testJsonModel;
+        @NgModel
         private TestSubModel testSubModel;
     }
 
     public void testBuildScope(){
-        TestScope scope = ngAndroid.buildScope(TestScope.class);
+        TestScope scope = new TestScope();
+        ngAndroid.buildScope(scope);
         assertNull(scope.testSetterRequired);
         assertNotNull(scope.testGetterNotRequired);
         assertNotNull(scope.testJsonModel);
         assertNotNull(scope.testSubModel);
     }
 
-    public void testSetterRequired(){
-
-        try{
-            ngAndroid.buildModel(TestSetterRequired.class);
-            fail();
-        }catch (Exception e){}
-    }
+//    public void testSetterRequired(){
+//
+//        try{
+//            ngAndroid.buildModel(TestSetterRequired.class);
+//            fail();
+//        }catch (Exception e){}
+//    }
 
     public static interface TestGetterNotRequired{
         public void setX(int x);
     }
 
-    public void testGetterNotRequired(){
-        try{
-            ngAndroid.buildModel(TestGetterNotRequired.class);
-        }catch (Exception e){
-            fail();
-        }
-    }
+//    public void testGetterNotRequired(){
+//        try{
+//            ngAndroid.buildModel(TestGetterNotRequired.class);
+//        }catch (Exception e){
+//            fail();
+//        }
+//    }
 
     public static interface TestJsonModel{
         public int getInt();
@@ -106,82 +106,80 @@ public class ModelTests extends ActivityInstrumentationTestCase2<DemoActivity> {
         public TestJsonModel getJsonModel();
     }
 
-    public void testBuildModelWithSubModels(){
-        TestJsonModel testJsonModel = ngAndroid.buildModel(TestJsonModel.class);
-        assertNull(testJsonModel.getJsonModel());
-
-        TestSubModel testSubModel =  ngAndroid.buildModel(TestSubModel.class);
-        assertNotNull(testSubModel.getJsonModel());
-    }
-
-
-    public void testBuildModelFromJson() throws JSONException {
-        String json = "{ \"joe\" : \"xyz\", \"isInvisible\" : false, \"num\" : 10 }";
-        ApplicationTest.TestModel model = JsonUtils.buildModelFromJson(json, ApplicationTest.TestModel.class);
-        assertEquals("xyz", model.getJoe());
-        assertEquals(false, model.getIsinvisible());
-        assertEquals(10, model.getNum());
-
-        json = "{ \"int\" : 25, \"float\" : 1.72, \"double\" : 0.0078 , \"string\" : \"string value\", \"boolean\" : false }";
-
-        TestJsonModel jsonmodel = JsonUtils.buildModelFromJson(json, TestJsonModel.class);
-        assertEquals(25, jsonmodel.getInt());
-        assertEquals(1.72f, jsonmodel.getFloat());
-        assertEquals(0.0078, jsonmodel.getDouble());
-        assertEquals("string value", jsonmodel.getString());
-        assertEquals(false, jsonmodel.getBoolean());
-
-        json = "{ " +
-                "\"int\" : 25, " +
-                "\"float\" : 1.72, " +
-                "\"double\" : 0.0078 , " +
-                "\"string\" : \"string value\", " +
-                "\"boolean\" : false, " +
-                "\"jsonModel\" : {" +
-                    "\"int\" : 25," +
-                    "\"float\" : 1.72," +
-                    "\"double\" : 894.378 ," +
-                    "\"string\" : \"xyc\"," +
-                    "\"boolean\" : false " +
-                "}" +
-        "}";
-
-        jsonmodel = JsonUtils.buildModelFromJson(json, TestJsonModel.class);
-        assertEquals(25, jsonmodel.getInt());
-        assertEquals(1.72f, jsonmodel.getFloat());
-        assertEquals(0.0078, jsonmodel.getDouble());
-        assertEquals("string value", jsonmodel.getString());
-        assertEquals(false, jsonmodel.getBoolean());
-        assertEquals(25, jsonmodel.getJsonModel().getInt());
-        assertEquals(1.72f, jsonmodel.getJsonModel().getFloat());
-        assertEquals(894.378, jsonmodel.getJsonModel().getDouble());
-        assertEquals("xyc", jsonmodel.getJsonModel().getString());
-        assertEquals(false, jsonmodel.getJsonModel().getBoolean());
-
-        jsonmodel = ngAndroid.modelFromJson(json, TestJsonModel.class);
-        assertEquals(25, jsonmodel.getInt());
-        assertEquals(1.72f, jsonmodel.getFloat());
-        assertEquals(0.0078, jsonmodel.getDouble());
-        assertEquals("string value", jsonmodel.getString());
-        assertEquals(false, jsonmodel.getBoolean());
-        assertEquals(25, jsonmodel.getJsonModel().getInt());
-        assertEquals(1.72f, jsonmodel.getJsonModel().getFloat());
-        assertEquals(894.378, jsonmodel.getJsonModel().getDouble());
-        assertEquals("xyc", jsonmodel.getJsonModel().getString());
-        assertEquals(false, jsonmodel.getJsonModel().getBoolean());
-    }
+//    public void testBuildModelWithSubModels(){
+//        TestJsonModel testJsonModel = ngAndroid.buildModel(TestJsonModel.class);
+//        assertNull(testJsonModel.getJsonModel());
+//
+//        TestSubModel testSubModel =  ngAndroid.buildModel(TestSubModel.class);
+//        assertNotNull(testSubModel.getJsonModel());
+//    }
+//
+//
+//    public void testBuildModelFromJson() throws JSONException {
+//        String json = "{ \"joe\" : \"xyz\", \"isInvisible\" : false, \"num\" : 10 }";
+//        ApplicationTest.TestModel model = JsonUtils.buildModelFromJson(json, ApplicationTest.TestModel.class);
+//        assertEquals("xyz", model.getJoe());
+//        assertEquals(false, model.getIsinvisible());
+//        assertEquals(10, model.getNum());
+//
+//        json = "{ \"int\" : 25, \"float\" : 1.72, \"double\" : 0.0078 , \"string\" : \"string value\", \"boolean\" : false }";
+//
+//        TestJsonModel jsonmodel = JsonUtils.buildModelFromJson(json, TestJsonModel.class);
+//        assertEquals(25, jsonmodel.getInt());
+//        assertEquals(1.72f, jsonmodel.getFloat());
+//        assertEquals(0.0078, jsonmodel.getDouble());
+//        assertEquals("string value", jsonmodel.getString());
+//        assertEquals(false, jsonmodel.getBoolean());
+//
+//        json = "{ " +
+//                "\"int\" : 25, " +
+//                "\"float\" : 1.72, " +
+//                "\"double\" : 0.0078 , " +
+//                "\"string\" : \"string value\", " +
+//                "\"boolean\" : false, " +
+//                "\"jsonModel\" : {" +
+//                    "\"int\" : 25," +
+//                    "\"float\" : 1.72," +
+//                    "\"double\" : 894.378 ," +
+//                    "\"string\" : \"xyc\"," +
+//                    "\"boolean\" : false " +
+//                "}" +
+//        "}";
+//
+//        jsonmodel = JsonUtils.buildModelFromJson(json, TestJsonModel.class);
+//        assertEquals(25, jsonmodel.getInt());
+//        assertEquals(1.72f, jsonmodel.getFloat());
+//        assertEquals(0.0078, jsonmodel.getDouble());
+//        assertEquals("string value", jsonmodel.getString());
+//        assertEquals(false, jsonmodel.getBoolean());
+//        assertEquals(25, jsonmodel.getJsonModel().getInt());
+//        assertEquals(1.72f, jsonmodel.getJsonModel().getFloat());
+//        assertEquals(894.378, jsonmodel.getJsonModel().getDouble());
+//        assertEquals("xyc", jsonmodel.getJsonModel().getString());
+//        assertEquals(false, jsonmodel.getJsonModel().getBoolean());
+//
+//        jsonmodel = ngAndroid.modelFromJson(json, TestJsonModel.class);
+//        assertEquals(25, jsonmodel.getInt());
+//        assertEquals(1.72f, jsonmodel.getFloat());
+//        assertEquals(0.0078, jsonmodel.getDouble());
+//        assertEquals("string value", jsonmodel.getString());
+//        assertEquals(false, jsonmodel.getBoolean());
+//        assertEquals(25, jsonmodel.getJsonModel().getInt());
+//        assertEquals(1.72f, jsonmodel.getJsonModel().getFloat());
+//        assertEquals(894.378, jsonmodel.getJsonModel().getDouble());
+//        assertEquals("xyc", jsonmodel.getJsonModel().getString());
+//        assertEquals(false, jsonmodel.getJsonModel().getBoolean());
+//    }
     @UiThreadTest
     public void testDefaults() throws NoSuchFieldException, IllegalAccessException {
         TestScope tc = new TestScope();
-        ModelBuilderMap map = new ModelBuilderMap(tc);
-        tc.testJsonModel = NgAndroid.getInstance().buildModel(TestJsonModel.class);
+        Scope scope = ScopeBuilder.buildScope(tc);
         tc.testJsonModel.setInt(300);
-        new ExpressionBuilder("testJsonModel.int").build(tc, map);
+        new ExpressionBuilder("testJsonModel.int").build(tc, scope);
         Field f = tc.getClass().getDeclaredField("testJsonModel");
         f.setAccessible(true);
         assertNotNull(f.get(tc));
         assertTrue(tc.testJsonModel == f.get(tc));
-        ModelBuilder.buildModel(tc, map);
         assertEquals(300, tc.testJsonModel.getInt());
     }
 

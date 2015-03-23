@@ -25,8 +25,9 @@ import android.view.ViewGroup;
 
 import com.ngandroid.lib.binder.AttributeBinder;
 import com.ngandroid.lib.exceptions.NgException;
-import com.ngandroid.lib.ng.ModelBuilder;
 import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.ng.ScopeBuilder;
 import com.ngandroid.lib.ngattributes.ngblur.NgBlur;
 import com.ngandroid.lib.ngattributes.ngchange.NgChange;
 import com.ngandroid.lib.ngattributes.ngclick.NgClick;
@@ -37,12 +38,6 @@ import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
 import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
 import com.ngandroid.lib.ngattributes.ngmodel.NgModel;
 import com.ngandroid.lib.ngattributes.ngtext.NgText;
-import com.ngandroid.lib.utils.JsonUtils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.lang.reflect.Field;
 
 /**
  * Created by davityle on 1/12/15.
@@ -127,50 +122,9 @@ public class NgAndroid {
         return new AttributeBinder(inflater, scope, mAttributes).inflate(resourceId, viewGroup, attach);
     }
 
-    public <T> T buildModel(Class<T> clss){
-        return  (T) new ModelBuilder(clss).create();
+    public Scope buildScope(Object scope) {
+        return ScopeBuilder.buildScope(scope);
     }
-
-    public <T> T buildScope(Class<T> clss){
-        T instance;
-        try {
-            instance = clss.newInstance();
-            Field[] fields = clss.getDeclaredFields();
-            for(Field f : fields){
-                f.setAccessible(true);
-                Class type = f.getType();
-                if(type.isInterface()){
-                    f.set(instance, buildModel(type));
-                }
-            }
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new NgException("Error instantiating scope.", e);
-        }
-        return instance;
-    }
-
-    /**
-     * builds a model, setting the values from the json object
-     *
-     * { "field" : 0 }
-     *
-     * would translate to
-     *
-     * interface Model {
-     *     public int getField();
-     *     public void setField(int field);
-     * }
-     *
-     * @param json the json object
-     * @param clss the class of the model interface
-     * @param <T> the type of the class
-     * @return the built model
-     * @throws JSONException
-     */
-    public <T> T modelFromJson(String json, Class<T> clss) throws JSONException {
-        return JsonUtils.buildModelFromJson(new JSONObject(json), clss);
-    }
-
 
     public static final class Builder {
         private SparseArray<NgAttribute> attributes = new SparseArray<>();

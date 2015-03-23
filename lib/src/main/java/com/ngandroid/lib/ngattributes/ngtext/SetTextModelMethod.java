@@ -19,7 +19,7 @@ package com.ngandroid.lib.ngattributes.ngtext;
 import android.view.View;
 
 import com.ngandroid.lib.ng.ModelMethod;
-import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.interpreter.getters.Getter;
 
 import java.lang.reflect.Method;
 

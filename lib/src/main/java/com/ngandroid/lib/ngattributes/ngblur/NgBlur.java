@@ -22,7 +22,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.ngandroid.lib.ng.ModelMethod;
-import com.ngandroid.lib.ng.getters.Getter;
+import com.ngandroid.lib.interpreter.getters.Getter;
 import com.ngandroid.lib.ngattributes.ngif.NgIf;
 import com.ngandroid.lib.utils.BlurUtils;
 

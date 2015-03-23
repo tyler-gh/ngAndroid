@@ -12,21 +12,7 @@ import com.ngandroid.lib.annotations.NgModel;
 
 public class DemoActivity extends Activity {
     @NgModel
-    Input input, output;
-    @NgModel
-    TestCompileModel compile1, compileModel;
-
-    public static class TestCompileModel {
-        int x;
-
-        public void setX(int x){
-            this.x = x;
-        }
-
-        public int getX(){
-            return x;
-        }
-    }
+    Input input;
 
     private TextView stringClickEvent, really2;
 
