@@ -36,7 +36,11 @@ public enum TokenType {
     RUBBISH,
     EOF,
     STRING,
-    KNOT, LONG_CONSTANT, FLOAT_CONSTANT, DOUBLE_CONSTANT, OPEN_PARENTHESIS_EXP;
+    KNOT,
+    LONG_CONSTANT,
+    FLOAT_CONSTANT,
+    DOUBLE_CONSTANT,
+    OPEN_PARENTHESIS_EXP;
 
     public enum BinaryOperator {
         ADDITION,

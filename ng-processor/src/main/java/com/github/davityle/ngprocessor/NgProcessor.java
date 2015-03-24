@@ -141,9 +141,10 @@ public class NgProcessor extends AbstractProcessor {
 
             builder.append(MODEL_INTERFACE_CLASS).append(" {\n\n");
 
-            StringBuilder switchBuilder = new StringBuilder("\t\tswitch(field){\n");
-            StringBuilder getSwitchBuilder = new StringBuilder("\t\tswitch(field){\n");
-            StringBuilder setSwitchBuilder = new StringBuilder("\t\tswitch(field){\n");
+            StringBuilder switchBuilder = new StringBuilder("\t\tswitch(field.toLowerCase()){\n");
+            StringBuilder getSwitchBuilder = new StringBuilder("\t\tswitch(field.toLowerCase()){\n");
+            StringBuilder setSwitchBuilder = new StringBuilder("\t\tswitch(field.toLowerCase()){\n");
+            StringBuilder typeSwitchBuilder = new StringBuilder("\t\tswitch(field.toLowerCase()){\n");
 
             for(Element enclosedElement : enclosedElements){
                 if(isMethod(enclosedElement)) {
@@ -155,17 +156,6 @@ public class NgProcessor extends AbstractProcessor {
                     else
                         varname = fName;
                     if (!returnsVoid(exElement)) {
-//                        String type = exElement.getReturnType().toString();
-//                        if(isInterface) {
-//                            builder.append("\tprivate ")
-//                                    .append(type)
-//                                    .append(' ')
-//                                    .append(fName)
-//                                    .append(";\n");
-//                        }
-//                        builder.append("\tprivate java.util.List<com.ngandroid.lib.ng.ModelMethod> ")
-//                                .append(fName)
-//                                .append("Observers;\n");
                         switchBuilder.append("\t\t\tcase \"")
                                 .append(fName)
                                 .append("\":\n\t\t\t\t")
@@ -175,7 +165,7 @@ public class NgProcessor extends AbstractProcessor {
                                 .append(fName)
                                 .append("Observers = new java.util.ArrayList<>();\n\t\t\t\t}\n\t\t\t\t")
                                 .append(fName)
-                                .append("Observers.add(modelMethod);\n\t\t\t\tSystem.out.println(\"Added observer\");\n\t\t\t\tbreak;\n");
+                                .append("Observers.add(modelMethod);\n\t\t\t\tSystem.out.println(\"Added observer\");\n\t\t\t\treturn;\n");
                         getSwitchBuilder.append("\t\t\tcase \"")
                                 .append(fName)
                                 .append("\":\n\t\t\t\treturn ")
@@ -201,15 +191,21 @@ public class NgProcessor extends AbstractProcessor {
                                 .append("((")
                                 .append(type)
                                 .append(") value);\n\t\t\t\treturn;\n");
+
+                        typeSwitchBuilder.append("\t\t\tcase \"")
+                                .append(fName)
+                                .append("\":\n\t\t\t\treturn ")
+                                .append(exElement.getParameters().get(0).asType().toString())
+                                .append(".class;\n");
                     }
                 }
             }
             builder.append('\n');
 
-            switchBuilder.append("\t\t}\n");
+            switchBuilder.append("\t\t}\n\t\tthrow new com.ngandroid.lib.exceptions.NgException(\"Field '\" + field + \"' was not found in \" + getClass().getSimpleName());\n");
             getSwitchBuilder.append("\t\t}\n\t\tthrow new com.ngandroid.lib.exceptions.NgException(\"Field '\" + field + \"' was not found in \" + getClass().getSimpleName());\n");
             setSwitchBuilder.append("\t\t}\n\t\tthrow new com.ngandroid.lib.exceptions.NgException(\"Field '\" + field + \"' was not found in \" + getClass().getSimpleName());\n");
-
+            typeSwitchBuilder.append("\t\t}\n\t\tthrow new com.ngandroid.lib.exceptions.NgException(\"Field '\" + field + \"' was not found in \" + getClass().getSimpleName());\n");
 
             builder.append("\tpublic void addObserver(String field, com.ngandroid.lib.ng.ModelMethod modelMethod){\n")
                     .append(switchBuilder)
@@ -219,7 +215,11 @@ public class NgProcessor extends AbstractProcessor {
                     .append("\t}\n\n")
                     .append("\tpublic void setValue(String field, Object value){\n")
                     .append(setSwitchBuilder)
+                    .append("\t}\n\n")
+                    .append("\tpublic Class<?> getType(String field){\n")
+                    .append(typeSwitchBuilder)
                     .append("\t}\n\n");
+
 
             for(Element enclosedElement : enclosedElements){
                 if(isMethod(enclosedElement)){

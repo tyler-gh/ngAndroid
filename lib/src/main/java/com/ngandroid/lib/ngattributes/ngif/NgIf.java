@@ -19,11 +19,11 @@ package com.ngandroid.lib.ngattributes.ngif;
 import android.view.View;
 
 import com.ngandroid.lib.interpreter.Token;
+import com.ngandroid.lib.interpreter.getters.Getter;
+import com.ngandroid.lib.interpreter.getters.ModelGetter;
 import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelMethod;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.interpreter.getters.Getter;
-import com.ngandroid.lib.interpreter.getters.ModelGetter;
 import com.ngandroid.lib.utils.TypeUtils;
 
 /**

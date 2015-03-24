@@ -73,7 +73,7 @@ public class NgModel implements NgAttribute {
             throw new NgException("A compound button requires a boolean type model");
         }
         boolean isChecked = compoundButton.isChecked();
-        String fieldName = getter.getFieldName().toLowerCase();
+        String fieldName = getter.getFieldName();
         final ModelSetter modelSetter = new ModelSetter(fieldName, model);
         modelSetter.set(isChecked);
         CompundButtonInteracter compundButtonInteracter = new CompundButtonInteracter(modelSetter, compoundButton);

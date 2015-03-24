@@ -23,15 +23,15 @@ import com.ngandroid.lib.ng.Model;
  */
 public class ModelSetter implements Setter {
 
-    private final String mFieldName;
-    private final Model mMethodInvoker;
+    private final String fieldName;
+    private final Model model;
 
-    public ModelSetter(String mFieldName, Model mMethodInvoker) {
-        this.mFieldName = mFieldName;
-        this.mMethodInvoker = mMethodInvoker;
+    public ModelSetter(String fieldName, Model model) {
+        this.fieldName = fieldName;
+        this.model = model;
     }
 
-    public void set(Object ... parameters) throws Throwable {
-        mMethodInvoker.setValue(mFieldName, parameters[0]);
+    public void set(Object parameter) throws Throwable {
+        model.setValue(fieldName, parameter);
     }
 }

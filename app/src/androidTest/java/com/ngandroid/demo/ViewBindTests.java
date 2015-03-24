@@ -20,6 +20,8 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.view.LayoutInflater;
 
+import com.ngandroid.demo.models.test.TestScope;
+import com.ngandroid.demo.models.test.ViewScope;
 import com.ngandroid.lib.NgAndroid;
 import com.ngandroid.lib.binder.AttributeBinder;
 import com.ngandroid.lib.binder.BindingInflaterFactory;
@@ -40,22 +42,6 @@ public class ViewBindTests  extends ActivityInstrumentationTestCase2<DemoActivit
 
     }
 
-    public interface Note {
-        public long getTime();
-        public void setTime(long time);
-        public int getId();
-        public void setId(int id);
-        public String getTimeString();
-        public void setTimeString(String timeString);
-        public String getTitle();
-        public void setTitle(String title);
-        public String getText();
-        public void setText(String text);
-    }
-
-    public static class ViewScope {
-        Note note;
-    }
     @UiThreadTest
     public void testSettingValuesAfterInflation(){
         ViewScope scope = new ViewScope();
@@ -67,13 +53,13 @@ public class ViewBindTests  extends ActivityInstrumentationTestCase2<DemoActivit
     public void testInflaterFactoryNotReCreated() throws NoSuchFieldException, IllegalAccessException {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-        AttributeBinder attributeBinder = new AttributeBinder(inflater, null, null);
+        AttributeBinder attributeBinder = new AttributeBinder(inflater, new TestScope(), null);
         Field f = AttributeBinder.class.getDeclaredField("mInflater");
         f.setAccessible(true);
         LayoutInflater i1 = (LayoutInflater) f.get(attributeBinder);
         assertEquals(inflater, i1);
         BindingInflaterFactory factory1 = (BindingInflaterFactory) i1.getFactory();
-        attributeBinder = new AttributeBinder(inflater, null, null);
+        attributeBinder = new AttributeBinder(inflater, new TestScope(), null);
         LayoutInflater i2 = (LayoutInflater) f.get(attributeBinder);
         assertEquals(inflater, i2);
         assertEquals(factory1, i2.getFactory());

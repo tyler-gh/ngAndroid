@@ -14,14 +14,20 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.demo.models.test;
 
 /**
- * Created by tyler on 3/20/15.
- */
-public interface Model {
-    public void addObserver(String field, ModelMethod modelMethod);
-    public <T> T getValue(String field);
-    public <T> void setValue(String field, T value);
-    public Class<?> getType(String field);
+* Created by tyler on 3/23/15.
+*/
+public interface Note {
+    public long getTime();
+    public void setTime(long time);
+    public int getId();
+    public void setId(int id);
+    public String getTimeString();
+    public void setTimeString(String timeString);
+    public String getTitle();
+    public void setTitle(String title);
+    public String getText();
+    public void setText(String text);
 }

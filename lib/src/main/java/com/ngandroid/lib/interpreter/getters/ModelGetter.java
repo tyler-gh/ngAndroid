@@ -28,28 +28,24 @@ import java.util.List;
  */
 public class ModelGetter<T> implements Getter<T> {
 
-    private final String mFieldName;
-    private final String mModelName;
-    private final Model mMethodInvoker;
+    private final String fieldName;
+    private final String modelName;
+    private final Model model;
+    private final int type;
 
-    public ModelGetter(String mFieldName, String mModelName, Model mMethodInvoker) {
-        this.mFieldName = mFieldName;
-        this.mModelName = mModelName;
-        this.mMethodInvoker = mMethodInvoker;
+    public ModelGetter(String fieldName, String modelName, Model model) {
+        this.fieldName = fieldName;
+        this.modelName = modelName;
+        this.model = model;
+        this.type = TypeUtils.getType(model.getType(fieldName));
     }
 
     public T get() throws Throwable {
-        return (T) mMethodInvoker.getValue(mFieldName);
+        return (T) model.getValue(fieldName);
     }
 
     public int getType(){
-        // TODO this will most likely throw a NPE
-        try {
-            return TypeUtils.getType(mMethodInvoker.getValue(mFieldName).getClass());
-        }catch (NullPointerException e){
-            // TODO this is bad  *shudder*
-            return TypeUtils.OBJECT;
-        }
+        return type;
     }
 
     @Override
@@ -58,10 +54,10 @@ public class ModelGetter<T> implements Getter<T> {
     }
 
     public String getFieldName(){
-        return mFieldName;
+        return fieldName;
     }
 
-    public String getModelName() { return mModelName; }
+    public String getModelName() { return modelName; }
 
     public static ModelGetter[] getModelGetters(Getter getter){
         List<ModelGetter> mgs = new ArrayList<>();

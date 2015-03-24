@@ -28,7 +28,7 @@ public class PostfixConverter {
         switch (op1) {
             case ADDITION:
             case SUBTRACTION:
-                return !(op2== TokenType.BinaryOperator.ADDITION || op2== TokenType.BinaryOperator.SUBTRACTION) ;
+                return !(op2 == TokenType.BinaryOperator.ADDITION || op2 == TokenType.BinaryOperator.SUBTRACTION) ;
             case MULTIPLICATION:
             case DIVISION:
             default:
