@@ -19,7 +19,13 @@ package com.github.davityle.ngprocessor;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URL;
@@ -29,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -48,6 +56,9 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.JavaFileObject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
 
@@ -59,9 +70,9 @@ import static javax.tools.Diagnostic.Kind.ERROR;
 @SupportedAnnotationTypes("com.ngandroid.lib.annotations.NgModel")
 public class NgProcessor extends AbstractProcessor {
 
-    private static final String MODEL_INTERFACE_CLASS = "com.ngandroid.lib.ng.Model";
-    private static final String MODEL_METHOD_INTERFACE_CLASS = "com.ngandroid.lib.ng.ModelMethod";
-    private static final String SCOPE_INTERFACE_CLASS = "com.ngandroid.lib.ng.Scope";
+    private static final Pattern NAME_SPACE_PATTERN = Pattern.compile("xmlns:(.+)=\"http://schemas.android.com/apk/res-auto\"");
+    private static final Pattern ID_ATTR_PATTERN = Pattern.compile("android:id=\"@\\+id/(.+)\"");
+    private static final String NAMESPACE_ATTRIBUTE_REG = "%s:(.+)=\"(.+)\"";
 
     private static final String MODEL_APPENDAGE = "$$NgModel";
     private static final String SCOPE_APPENDAGE = "$$NgScope";
@@ -85,6 +96,36 @@ public class NgProcessor extends AbstractProcessor {
         if(annotations.size() == 0)
             return false;
         System.out.println(":NgAndroid:processing");
+
+        List<File> layoutDirs = findLayouts();
+
+        for(File f : layoutDirs){
+            for(File kid : f.listFiles()){
+                if(kid.getName().endsWith(".xml")){
+                    System.out.println(kid);
+                    Document doc;
+                    try {
+                        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder db = dbf.newDocumentBuilder();
+                        doc = db.parse(kid);
+                    } catch (ParserConfigurationException | SAXException | IOException e) {
+                        error(null, e.getMessage());
+                        continue;
+                    }
+
+                    NodeList children = doc.getChildNodes();
+                    String nameSpace = getNameSpace(children);
+                    if(nameSpace != null){
+                        String pattern = String.format(NAMESPACE_ATTRIBUTE_REG, nameSpace);
+                        Pattern nameSpaceAttributePattern = Pattern.compile(pattern);
+                        List<XmlNode> nodeList = new ArrayList<>();
+                        getNgAttrNodes(doc, nameSpaceAttributePattern, nodeList, kid.getName());
+                        System.out.println(nodeList);
+                    }
+                }
+            }
+        }
+
         Map<String, List<Element>> scopeBuilderMap = new LinkedHashMap<>();
         Map<String, Element> modelBuilderMap = new LinkedHashMap<>();
 
@@ -234,36 +275,6 @@ public class NgProcessor extends AbstractProcessor {
         return true;
     }
 
-    public static final class SourceField {
-        private final String name, typeName;
-        private String getter, setter;
-
-        public SourceField(String name, String typeName) {
-            this.name = name;
-            this.typeName = typeName;
-        }
-
-        public String getName(){
-            return name;
-        }
-
-        public String getTypeName(){
-            return typeName;
-        }
-
-        public String getGetter() { return getter; }
-
-        public String getSetter() { return setter; }
-
-        public void setSetter(String setter) {
-            this.setter = setter;
-        }
-
-        public void setGetter(String getter) {
-            this.getter = getter;
-        }
-    }
-
     private void error(Element element, String message, Object... args) {
         if (args.length > 0) {
             message = String.format(message, args);
@@ -313,5 +324,98 @@ public class NgProcessor extends AbstractProcessor {
     @Override
     public SourceVersion getSupportedSourceVersion() {
         return SourceVersion.latestSupported();
+    }
+
+    private void getNgAttrNodes(Document doc, Pattern attributePattern, List<XmlNode> ngAttrNodes, String fileName){
+        NodeList children = doc.getChildNodes();
+        for(int index = 0; index < children.getLength(); index++) {
+            getNgAttrNodes(children.item(index), attributePattern, ngAttrNodes, fileName);
+        }
+    }
+
+    private void getNgAttrNodes(Node n, Pattern attributePattern, List<XmlNode> ngAttrNodes, String fileName){
+        if(n == null || !n.hasChildNodes())
+            return;
+
+        NodeList nodes = n.getChildNodes();
+        for(int index = 0; index < nodes.getLength(); index++) {
+            Node childNode = nodes.item(index);
+            NamedNodeMap nodeMap = childNode.getAttributes();
+            if(nodeMap != null){
+                List<XmlAttribute> attributeList = null;
+                String id = null;
+                for(int j = 0; j < nodeMap.getLength(); j++){
+                    Node node = nodeMap.item(j);
+                    Matcher idMatcher = ID_ATTR_PATTERN.matcher(node.toString());
+
+                    if(idMatcher.matches()){
+                        id = idMatcher.group(1);
+                       continue;
+                    }
+
+                    Matcher matcher = attributePattern.matcher(node.toString());
+                    if(matcher.matches()){
+                        if(attributeList == null)
+                            attributeList = new ArrayList<>();
+                        attributeList.add(new XmlAttribute(matcher.group(1), matcher.group(2)));
+                    }
+
+                }
+                if(attributeList != null){
+                    if(id == null){
+                        error(null, "xml attributes '%s' in node '%s' in layout file '%s' need an id", attributeList.toString(), childNode.toString(), fileName);
+                    }else {
+                        ngAttrNodes.add(new XmlNode(id, attributeList));
+                    }
+                }
+            }
+            getNgAttrNodes(childNode, attributePattern, ngAttrNodes, fileName);
+        }
+    }
+
+    private String getNameSpace(NodeList nodes){
+        for(int index = 0; index < nodes.getLength(); index++) {
+            NamedNodeMap nodeMap = nodes.item(index).getAttributes();
+            if(nodeMap != null){
+                for(int j = 0; j < nodeMap.getLength(); j++){
+                    Matcher matcher = NAME_SPACE_PATTERN.matcher(nodeMap.item(j).toString());
+                    if(matcher.matches()){
+                        return matcher.group(1);
+                    }
+                }
+            }
+        }
+        for(int index = 0; index < nodes.getLength(); index++) {
+            NodeList nodeList = nodes.item(index).getChildNodes();
+            if(nodeList != null){
+                String namespace = getNameSpace(nodeList);
+                if(namespace != null)
+                    return namespace;
+            }
+        }
+        return null;
+    }
+
+    private List<File> findLayouts(){
+        File root = new File(".");
+        List<File> files = new ArrayList<>();
+        findLayouts(root, files);
+        return files;
+    }
+
+    private void findLayouts(File f, List<File> files){
+        File[] kids = f.listFiles();
+        if(kids != null) {
+            for (File file : kids) {
+                String name = file.getName();
+                if (file.isDirectory() && !name.equals("build") && !name.equals("bin")) {
+                    if (file.getName().equals("layout")) {
+                        files.add(file);
+                    } else {
+                        findLayouts(file, files);
+                    }
+                }
+            }
+        }
     }
 }
