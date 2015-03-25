@@ -17,4 +17,5 @@
 apply plugin: 'java'
 
 dependencies {
+    compile 'org.apache.velocity:velocity:1.7'
 }

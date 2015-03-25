@@ -1,0 +1,22 @@
+package ${packageName};
+
+public class ${simpleClassName}$$NgScope <T extends ${className}> implements com.ngandroid.lib.ng.Scope {
+
+	private T scope;
+	public ${simpleClassName}$$NgScope(T scope){
+		this.scope = scope;
+		#foreach($field in $fields)
+            this.scope.${field.name} = new ${field.typeName}$$NgModel();
+        #end
+	}
+
+	public com.ngandroid.lib.ng.Model getModel(String field){
+		switch(field){
+		    #foreach($field in $fields)
+		        case "${field.name}":
+		            return (com.ngandroid.lib.ng.Model) scope.${field.name};
+            #end
+		}
+		throw new com.ngandroid.lib.exceptions.NgException("Field '" + field + "' was not found in ${simpleClassName}");
+	}
+}

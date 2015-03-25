@@ -12,7 +12,7 @@ import com.ngandroid.lib.annotations.NgModel;
 
 public class DemoActivity extends Activity {
     @NgModel
-    Input input;
+    Input input, output;
 
     private TextView stringClickEvent, really2;
 

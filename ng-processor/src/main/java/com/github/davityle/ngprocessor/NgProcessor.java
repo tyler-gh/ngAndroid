@@ -16,12 +16,18 @@
 
 package com.github.davityle.ngprocessor;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -37,7 +43,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
@@ -57,6 +62,9 @@ public class NgProcessor extends AbstractProcessor {
     private static final String MODEL_INTERFACE_CLASS = "com.ngandroid.lib.ng.Model";
     private static final String MODEL_METHOD_INTERFACE_CLASS = "com.ngandroid.lib.ng.ModelMethod";
     private static final String SCOPE_INTERFACE_CLASS = "com.ngandroid.lib.ng.Scope";
+
+    private static final String MODEL_APPENDAGE = "$$NgModel";
+    private static final String SCOPE_APPENDAGE = "$$NgScope";
 
 
     private Elements elementUtils;
@@ -84,6 +92,12 @@ public class NgProcessor extends AbstractProcessor {
             Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
             for(Element element : elements){
 
+                Set<Modifier> modifiers =  element.getModifiers();
+                if(modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)){
+                    error(element, "Unable to access field '%s' from scope '%s'. Must have default or public access", element.toString(), element.getEnclosingElement().toString());
+                    continue;
+                }
+
                 TypeMirror fieldType = element.asType();
                 String fieldTypeName = fieldType.toString();
                 modelBuilderMap.put(fieldTypeName, element);
@@ -91,7 +105,7 @@ public class NgProcessor extends AbstractProcessor {
                 Element scopeClass = element.getEnclosingElement();
                 String packageName = getPackageName((TypeElement) scopeClass);
                 String className = getClassName((TypeElement) scopeClass, packageName);
-                String scopeName = className + "$$NgScope";
+                String scopeName = className + SCOPE_APPENDAGE;
                 String key = packageName + "." + scopeName;
                 List<Element> els = scopeBuilderMap.get(key);
                 if(els == null){
@@ -101,198 +115,77 @@ public class NgProcessor extends AbstractProcessor {
                 els.add(element);
             }
         }
+
+        Properties props = new Properties();
+        URL url = this.getClass().getClassLoader().getResource("velocity.properties");
+        try {
+            props.load(url.openStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        VelocityEngine ve = new VelocityEngine(props);
+        ve.init();
+
         Set<Map.Entry<String, Element>> models = modelBuilderMap.entrySet();
         for(Map.Entry<String, Element> model : models){
             Element element = model.getValue();
-            Name fieldName = element.getSimpleName();
-            element.getModifiers().contains(Modifier.PRIVATE);
+
             TypeMirror fieldType = element.asType();
             String fieldTypeName = fieldType.toString();
             int periodindex = fieldTypeName.lastIndexOf('.');
             TypeElement typeElement = (TypeElement) typeUtils.asElement(fieldType);
             String packageName = getPackageName((TypeElement) typeUtils.asElement(fieldType));
-            String modelPackage;
-            if(periodindex != -1)
-                modelPackage = "package " + packageName + ";";
-            else
-                modelPackage = "";
+
+            List<SourceField> fields = new ArrayList<>();
 
             String modelName = fieldTypeName.substring(periodindex + 1);
 
             List<? extends Element> enclosedElements = typeElement.getEnclosedElements();
             boolean isInterface = typeElement.getKind().isInterface();
 
-            StringBuilder builder = new StringBuilder(modelPackage)
-                    .append("\n\npublic class ")
-                    .append(modelName)
-                    .append("$$NgModel ");
-            if(isInterface) {
-                builder.append("implements ");
-            } else {
-                builder.append("extends ");
-            }
-            builder.append(fieldTypeName);
-
-            if(isInterface){
-                builder.append(", ");
-            }else{
-                builder.append(" implements ");
-            }
-
-            builder.append(MODEL_INTERFACE_CLASS).append(" {\n\n");
-
-            StringBuilder switchBuilder = new StringBuilder("\t\tswitch(field.toLowerCase()){\n");
-            StringBuilder getSwitchBuilder = new StringBuilder("\t\tswitch(field.toLowerCase()){\n");
-            StringBuilder setSwitchBuilder = new StringBuilder("\t\tswitch(field.toLowerCase()){\n");
-            StringBuilder typeSwitchBuilder = new StringBuilder("\t\tswitch(field.toLowerCase()){\n");
-
-            for(Element enclosedElement : enclosedElements){
-                if(isMethod(enclosedElement)) {
-                    ExecutableElement exElement = (ExecutableElement) enclosedElement;
-                    String fName = exElement.getSimpleName().toString().replace("get", "").replace("set", "").toLowerCase();
-                    String varname;
-                    if(isInterface)
-                        varname = fName + "_";
-                    else
-                        varname = fName;
-                    if (!returnsVoid(exElement)) {
-                        switchBuilder.append("\t\t\tcase \"")
-                                .append(fName)
-                                .append("\":\n\t\t\t\t")
-                                .append("if(")
-                                .append(fName)
-                                .append("Observers == null){\n\t\t\t\t\t")
-                                .append(fName)
-                                .append("Observers = new java.util.ArrayList<>();\n\t\t\t\t}\n\t\t\t\t")
-                                .append(fName)
-                                .append("Observers.add(modelMethod);\n\t\t\t\tSystem.out.println(\"Added observer\");\n\t\t\t\treturn;\n");
-                        getSwitchBuilder.append("\t\t\tcase \"")
-                                .append(fName)
-                                .append("\":\n\t\t\t\treturn ")
-                                .append(varname)
-                                .append(";\n");
-                    }else{
-                        String type = exElement.getParameters().get(0).asType().toString();
-                        if(isInterface) {
-                            builder.append("\tprivate ")
-                                    .append(type)
-                                    .append(' ')
-                                    .append(varname)
-                                    .append(";\n");
-                        }
-                        builder.append("\tprivate java.util.List<com.ngandroid.lib.ng.ModelMethod> ")
-                                .append(fName)
-                                .append("Observers;\n");
-
-                        setSwitchBuilder.append("\t\t\tcase \"")
-                                .append(fName)
-                                .append("\":\n\t\t\t\t")
-                                .append(exElement.getSimpleName())
-                                .append("((")
-                                .append(type)
-                                .append(") value);\n\t\t\t\treturn;\n");
-
-                        typeSwitchBuilder.append("\t\t\tcase \"")
-                                .append(fName)
-                                .append("\":\n\t\t\t\treturn ")
-                                .append(exElement.getParameters().get(0).asType().toString())
-                                .append(".class;\n");
-                    }
-                }
-            }
-            builder.append('\n');
-
-            switchBuilder.append("\t\t}\n\t\tthrow new com.ngandroid.lib.exceptions.NgException(\"Field '\" + field + \"' was not found in \" + getClass().getSimpleName());\n");
-            getSwitchBuilder.append("\t\t}\n\t\tthrow new com.ngandroid.lib.exceptions.NgException(\"Field '\" + field + \"' was not found in \" + getClass().getSimpleName());\n");
-            setSwitchBuilder.append("\t\t}\n\t\tthrow new com.ngandroid.lib.exceptions.NgException(\"Field '\" + field + \"' was not found in \" + getClass().getSimpleName());\n");
-            typeSwitchBuilder.append("\t\t}\n\t\tthrow new com.ngandroid.lib.exceptions.NgException(\"Field '\" + field + \"' was not found in \" + getClass().getSimpleName());\n");
-
-            builder.append("\tpublic void addObserver(String field, com.ngandroid.lib.ng.ModelMethod modelMethod){\n")
-                    .append(switchBuilder)
-                    .append("\t}\n\n")
-                    .append("\tpublic Object getValue(String field){\n")
-                    .append(getSwitchBuilder)
-                    .append("\t}\n\n")
-                    .append("\tpublic void setValue(String field, Object value){\n")
-                    .append(setSwitchBuilder)
-                    .append("\t}\n\n")
-                    .append("\tpublic Class<?> getType(String field){\n")
-                    .append(typeSwitchBuilder)
-                    .append("\t}\n\n");
-
-
-            for(Element enclosedElement : enclosedElements){
-                if(isMethod(enclosedElement)){
-                    ExecutableElement exElement = (ExecutableElement) enclosedElement;
-                    if(!returnsVoid(exElement) && !isInterface)
+            for(int index = 0; index < enclosedElements.size(); index++){
+                Element enclosedElement = enclosedElements.get(index);
+                if(isSetter(enclosedElement)) {
+                    ExecutableElement setter = (ExecutableElement) enclosedElement;
+                    if (!returnsVoid(setter)) {
+                        error(element, "Setter '%s' must not return a value", element.toString());
                         continue;
-                    List<? extends VariableElement> parameters = exElement.getParameters();
-
-                    String fName = exElement.getSimpleName().toString().replace("get", "").replace("set","").toLowerCase();
-                    String varname;
-                    if(isInterface)
-                        varname = fName + "_";
-                    else
-                        varname = fName;
-                    builder.append("\tpublic ")
-                            .append(exElement.getReturnType().toString())
-                            .append(' ')
-                            .append(exElement.getSimpleName().toString())
-                            .append('(');
-                    for(int index = 0; index < parameters.size(); index++){
-                        VariableElement parameter = parameters.get(index);
-                        builder.append(parameter.asType().toString())
-                                .append(' ')
-                                .append(varname);
-                        if(index != parameters.size() - 1)
-                            builder.append(',');
                     }
-                    builder.append(") {\n\t\t");
-                    if(!returnsVoid(exElement)){
-                        if(isInterface) {
-                            builder.append("return ")
-                                    .append(varname)
-                                    .append(";\n");
-                        }
-                    }else{
-                        if(isInterface) {
-                            builder.append("this.")
-                                    .append(varname)
-                                    .append(" = ")
-                                    .append(varname)
-                                    .append(";\n");
-                        }else{
-                            builder.append("super.")
-                                    .append(exElement.getSimpleName().toString())
-                                    .append('(')
-                                    .append(fName)
-                                    .append(");\n");
-                        }
-                        builder.append("\n\t\tif(")
-                                .append(fName)
-                                .append("Observers != null){\n")
-                                .append("\t\t\tfor(")
-                                .append(MODEL_METHOD_INTERFACE_CLASS)
-                                .append(" observer : ")
-                                .append(fName)
-                                .append("Observers){\n\t\t\t\tobserver.invoke(\"")
-                                .append(fName)
-                                .append("\", ")
-                                .append(varname)
-                                .append(");\n")
-                                .append("\t\t\t}\n\t\t}\n");
+                    Set<Modifier> modifiers = setter.getModifiers();
+                    if(modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)){
+                        error(element, "Unable to access field '%s' from scope '%s'. Must have default or public access", element.toString(), element.getEnclosingElement().toString());
+                        continue;
                     }
-                    builder.append("\t}\n\n");
-                }else{
-                    System.out.println("Not Executable method");
+                    String fName = setter.getSimpleName().toString().substring(3).toLowerCase();
+                    TypeMirror typeMirror = setter.getParameters().get(0).asType();
+                    String type = typeMirror.toString();
+                    SourceField sourceField = new SourceField(fName, type);
+                    sourceField.setSetter(setter.getSimpleName().toString());
+                    // O(n^2) is the best
+                    for(Element possGetter : enclosedElements) {
+                        if(isGetterForField(possGetter, fName, typeMirror.getKind())){
+                            sourceField.setGetter(possGetter.getSimpleName().toString());
+                            break;
+                        }
+                    }
+                    fields.add(sourceField);
                 }
             }
-            builder.append("}");
+
+            VelocityContext vc = new VelocityContext();
+
+            vc.put("simpleClassName", modelName);
+            vc.put("className", packageName + '.' + modelName);
+            vc.put("packageName", packageName);
+            vc.put("isInterface", isInterface);
+            vc.put("fields", fields);
+
+            Template vt = ve.getTemplate("templates/ngmodel.vm");
 
             try {
-                JavaFileObject jfo = filer.createSourceFile(packageName + "." + modelName + "$$NgModel", element);
+                JavaFileObject jfo = filer.createSourceFile(packageName + "." + modelName + MODEL_APPENDAGE, element);
                 Writer writer = jfo.openWriter();
-                writer.write(builder.toString());
+                vt.merge(vc, writer);
                 writer.flush();
                 writer.close();
             }catch (IOException e){
@@ -308,78 +201,29 @@ public class NgProcessor extends AbstractProcessor {
             Element scopeClass = elements.get(0).getEnclosingElement();
             String packageName = getPackageName((TypeElement) scopeClass);
             String className = getClassName((TypeElement) scopeClass, packageName);
-            String scopeName = className + "$$NgScope";
 
-            StringBuilder getFieldSwitch = new StringBuilder("\t\tswitch(field){\n");
-            StringBuilder fieldGetters = new StringBuilder();
-            StringBuilder fieldInstantiations = new StringBuilder();
-
+            List<SourceField> fields = new ArrayList<>();
             for(Element element : elements){
                 Name fieldName = element.getSimpleName();
-                element.getModifiers().contains(Modifier.PRIVATE);
                 TypeMirror fieldType = element.asType();
-                String fieldTypeName = fieldType.toString();
-
-                fieldGetters.append("\tpublic ")
-                        .append(fieldType.toString())
-                        .append(" get")
-                        .append(fieldName)
-                        .append("(){\n\t\treturn scope.")
-                        .append(fieldName)
-                        .append(";\n\t}\n\n");
-
-
-                String modelpackageName = getPackageName((TypeElement) typeUtils.asElement(fieldType));
-                int periodIndex = fieldTypeName.lastIndexOf('.');
-
-                fieldInstantiations.append("\n\t\tthis.scope.")
-                        .append(fieldName)
-                        .append(" = new ")
-                        .append(modelpackageName)
-                        .append(".")
-                        .append(fieldTypeName.substring(periodIndex + 1))
-                        .append("$$NgModel();");
-
-                getFieldSwitch.append("\t\t\tcase \"")
-                        .append(fieldName)
-                        .append("\":\n\t\t\t\treturn (")
-                        .append(MODEL_INTERFACE_CLASS)
-                        .append(") scope.")
-                        .append(fieldName)
-                        .append(";\n");
+                fields.add(new SourceField(fieldName.toString(), fieldType.toString()));
             }
-            getFieldSwitch.append("\t\t}\n\t\tthrow new com.ngandroid.lib.exceptions.NgException(\"Field '\" + field + \"' was not found in \" + getClass().getSimpleName());\n");
+            VelocityContext vc = new VelocityContext();
+
+            vc.put("simpleClassName", className);
+            vc.put("className", packageName + '.' + className);
+            vc.put("packageName", packageName);
+            vc.put("fields", fields);
+
+            Template vt = ve.getTemplate("templates/ngscope.vm");
+
 
             try {
-                String s = new StringBuilder("package ")
-                        .append(packageName)
-                        .append(";\n\n")
-                        .append("public class ")
-                        .append(scopeName)
-                        .append(" <T extends ")
-                        .append(packageName)
-                        .append(".")
-                        .append(className)
-                        .append("> implements ")
-                        .append(SCOPE_INTERFACE_CLASS)
-                        .append(" {\n\n\tprivate T scope;\n")
-                        .append("\tpublic ")
-                        .append(scopeName)
-                        .append("(T scope){\n\t\tthis.scope = scope;")
-                        .append(fieldInstantiations)
-                        .append("\n\t}\n\n")
-                        .append("\tpublic ")
-                        .append(MODEL_INTERFACE_CLASS)
-                        .append(" getModel(String field){\n")
-                        .append(getFieldSwitch)
-                        .append("\t}\n\n")
-                        .append(fieldGetters)
-                        .append("}").toString();
                 Element[] els = elements.toArray(new Element[elements.size() + 1]);
                 els[elements.size()] = scopeClass;
-                JavaFileObject jfo = filer.createSourceFile(packageName + "." + scopeName, els);
+                JavaFileObject jfo = filer.createSourceFile(packageName + "." + className + SCOPE_APPENDAGE, els);
                 Writer writer = jfo.openWriter();
-                writer.write(s);
+                vt.merge(vc, writer);
                 writer.flush();
                 writer.close();
             }catch (IOException e){
@@ -390,6 +234,36 @@ public class NgProcessor extends AbstractProcessor {
         return true;
     }
 
+    public static final class SourceField {
+        private final String name, typeName;
+        private String getter, setter;
+
+        public SourceField(String name, String typeName) {
+            this.name = name;
+            this.typeName = typeName;
+        }
+
+        public String getName(){
+            return name;
+        }
+
+        public String getTypeName(){
+            return typeName;
+        }
+
+        public String getGetter() { return getter; }
+
+        public String getSetter() { return setter; }
+
+        public void setSetter(String setter) {
+            this.setter = setter;
+        }
+
+        public void setGetter(String getter) {
+            this.getter = getter;
+        }
+    }
+
     private void error(Element element, String message, Object... args) {
         if (args.length > 0) {
             message = String.format(message, args);
@@ -397,8 +271,19 @@ public class NgProcessor extends AbstractProcessor {
         processingEnv.getMessager().printMessage(ERROR, message, element);
     }
 
-    private static boolean isMethod(Element elem){
-        return elem != null && ExecutableElement.class.isInstance(elem) && elem.getKind() == ElementKind.METHOD;
+    private static boolean isSetter(Element elem){
+        return elem != null && ExecutableElement.class.isInstance(elem)
+                && elem.getKind() == ElementKind.METHOD
+                && elem.getSimpleName().toString().startsWith("set")
+                && ((ExecutableElement) elem).getParameters().size() == 1;
+    }
+
+    private static boolean isGetterForField(Element elem, String field, TypeKind typeKind){
+        return elem != null && ExecutableElement.class.isInstance(elem)
+                && elem.getKind() == ElementKind.METHOD
+                && elem.getSimpleName().toString().toLowerCase().equals("get" + field)
+                && ((ExecutableElement) elem).getReturnType().getKind() == typeKind
+                && ((ExecutableElement) elem).getParameters().size() == 0;
     }
 
     private static boolean returnsVoid(ExecutableElement method){
