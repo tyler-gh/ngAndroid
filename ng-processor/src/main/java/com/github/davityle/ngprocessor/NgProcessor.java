@@ -16,6 +16,9 @@
 
 package com.github.davityle.ngprocessor;
 
+import com.github.davityle.ngprocessor.attrcompiler.ExpressionBuilder;
+import com.github.davityle.ngprocessor.attrcompiler.getters.Getter;
+
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -65,6 +68,12 @@ import static javax.tools.Diagnostic.Kind.ERROR;
 /**
  * this class is currently experimental.
  * Looking at it too closely might make your eyes bleed....
+ *
+ * Parse xml
+ * valid syntax of attributes
+ * map models to scopes
+ * check to see if each xml file containing ngattributes matches at least 1 scope
+ *
  */
 
 @SupportedAnnotationTypes("com.ngandroid.lib.annotations.NgModel")
@@ -120,7 +129,23 @@ public class NgProcessor extends AbstractProcessor {
                         Pattern nameSpaceAttributePattern = Pattern.compile(pattern);
                         List<XmlNode> nodeList = new ArrayList<>();
                         getNgAttrNodes(doc, nameSpaceAttributePattern, nodeList, kid.getName());
-                        System.out.println(nodeList);
+                        for(XmlNode xmlNode : nodeList){
+                            for(XmlAttribute xmlAttribute : xmlNode.getAttributes()){
+                                try {
+                                    Getter getter = new ExpressionBuilder(xmlAttribute.getValue()).build();
+                                    System.out.println(getter.getSource());
+                                }catch(RuntimeException e){
+                                    error(null,
+                                            "Layout file '%s' has an invalid attribute '%s' in view '%s' with value '%s' because '%s'",
+                                            kid,
+                                            xmlAttribute.getName(),
+                                            xmlNode.getId(),
+                                            xmlAttribute.getValue(),
+                                            e.getMessage()
+                                    );
+                                }
+                            }
+                        }
                     }
                 }
             }
