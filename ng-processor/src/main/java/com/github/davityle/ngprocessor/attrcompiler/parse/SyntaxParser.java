@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.attrcompiler;
+package com.github.davityle.ngprocessor.attrcompiler.parse;
 
 
 import java.util.Queue;

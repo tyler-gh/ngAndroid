@@ -14,24 +14,17 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.attrcompiler.getters;
+package com.ngandroid.lib.annotations;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Created by tyler on 2/2/15.
+ * Created by tyler on 3/31/15.
  */
-public class TernarySource implements Source {
-
-    private final Source booleanSource;
-    private final Source valTrue, valFalse;
-
-    public TernarySource(Source booleanSource, Source valTrue, Source valFalse) {
-        this.booleanSource = booleanSource;
-        this.valTrue = valTrue;
-        this.valFalse = valFalse;
-    }
-
-    @Override
-    public String getSource() {
-        return booleanSource.getSource() + '?' + valTrue.getSource() + ':' + valFalse.getSource();
-    }
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.SOURCE)
+public @interface NgScope {
 }

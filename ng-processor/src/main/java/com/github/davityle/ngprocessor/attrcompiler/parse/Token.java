@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2015 Tyler Davis
  *
@@ -14,39 +15,30 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.attrcompiler;
+package com.github.davityle.ngprocessor.attrcompiler.parse;
 
 /**
- * Created by tyler on 1/28/15.
- */
-public class Tuple<T,K> {
+* Created by davityle on 1/15/15.
+*/
+public final class Token {
+    private final TokenType tokenType;
+    private final String script;
 
-
-    private T first;
-    private K second;
-
-    public Tuple(T first, K second) {
-        this.first = first;
-        this.second = second;
+    Token(TokenType tokenType, String script) {
+        this.tokenType = tokenType;
+        this.script = script;
     }
 
-    public T getFirst() {
-        return first;
+    @Override
+    public String toString() {
+        return tokenType.toString() + "::" + script;
     }
 
-    public void setFirst(T first) {
-        this.first = first;
+    public TokenType getTokenType() {
+        return tokenType;
     }
 
-    public K getSecond() {
-        return second;
-    }
-
-    public void setSecond(K second) {
-        this.second = second;
-    }
-
-    public static <T,K> Tuple<T,K> of(T t, K k){
-        return new Tuple<>(t,k);
+    public String getScript() {
+        return script;
     }
 }

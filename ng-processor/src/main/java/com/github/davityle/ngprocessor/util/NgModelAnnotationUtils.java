@@ -35,35 +35,40 @@ import javax.lang.model.type.TypeMirror;
  */
 public class NgModelAnnotationUtils {
 
+    public static final String NG_MODEL_ANNOTATION = "com.ngandroid.lib.annotations.NgModel";
+    public static final String MODEL_APPENDAGE = "$$NgModel";
+
     public static Map<String, Element> getModels(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv, Map<String, List<Element>> scopeBuilderMap){
 
         Map<String, Element> modelBuilderMap = new LinkedHashMap<>();
 
         for (TypeElement annotation : annotations) {
-            Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
-            for(Element element : elements){
+            if(NG_MODEL_ANNOTATION.equals(annotation.getQualifiedName().toString())) {
+                Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
+                for (Element element : elements) {
 
-                Set<Modifier> modifiers =  element.getModifiers();
-                if(modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)){
-                    MessageUtils.error(element, "Unable to access field '%s' from scope '%s'. Must have default or public access", element.toString(), element.getEnclosingElement().toString());
-                    continue;
+                    Set<Modifier> modifiers = element.getModifiers();
+                    if (modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)) {
+                        MessageUtils.error(element, "Unable to access field '%s' from scope '%s'. Must have default or public access", element.toString(), element.getEnclosingElement().toString());
+                        continue;
+                    }
+
+                    TypeMirror fieldType = element.asType();
+                    String fieldTypeName = fieldType.toString();
+                    modelBuilderMap.put(fieldTypeName, element);
+
+                    Element scopeClass = element.getEnclosingElement();
+                    String packageName = ElementUtils.getPackageName((TypeElement) scopeClass);
+                    String className = ElementUtils.getClassName((TypeElement) scopeClass, packageName);
+                    String scopeName = className + NgScopeAnnotationUtils.SCOPE_APPENDAGE;
+                    String key = packageName + "." + scopeName;
+                    List<Element> els = scopeBuilderMap.get(key);
+                    if (els == null) {
+                        els = new ArrayList<>();
+                        scopeBuilderMap.put(key, els);
+                    }
+                    els.add(element);
                 }
-
-                TypeMirror fieldType = element.asType();
-                String fieldTypeName = fieldType.toString();
-                modelBuilderMap.put(fieldTypeName, element);
-
-                Element scopeClass = element.getEnclosingElement();
-                String packageName = ElementUtils.getPackageName((TypeElement) scopeClass);
-                String className = ElementUtils.getClassName((TypeElement) scopeClass, packageName);
-                String scopeName = className + NgProcessor.SCOPE_APPENDAGE;
-                String key = packageName + "." + scopeName;
-                List<Element> els = scopeBuilderMap.get(key);
-                if(els == null){
-                    els = new ArrayList<>();
-                    scopeBuilderMap.put(key, els);
-                }
-                els.add(element);
             }
         }
 

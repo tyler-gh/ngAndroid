@@ -14,11 +14,22 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.attrcompiler;
+package com.github.davityle.ngprocessor.attrcompiler.sources;
+
 
 /**
- * Created by davityle on 1/12/15.
+ * Created by davityle on 1/24/15.
  */
-public interface ModelMethod {
-    public Object invoke(String fieldName, Object... args);
+public class StaticSource implements Source {
+    private final String source;
+
+    public StaticSource(String source) {
+        this.source = source;
+        System.out.println(source);
+    }
+
+    @Override
+    public String getSource() {
+        return source;
+    }
 }

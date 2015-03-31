@@ -16,7 +16,6 @@
 
 package com.github.davityle.ngprocessor.util.source;
 
-import com.github.davityle.ngprocessor.NgProcessor;
 import com.github.davityle.ngprocessor.sourcelinks.NgModelSourceLink;
 import com.github.davityle.ngprocessor.sourcelinks.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.MessageUtils;
@@ -60,14 +59,14 @@ public class SourceCreator {
         VelocityEngine ve = new VelocityEngine(props);
         ve.init();
 
-        Template vt = ve.getTemplate("templates/ngmodel.vm");
+        Template vtModel = ve.getTemplate("templates/ngmodel.vm");
         Template vtScope = ve.getTemplate("templates/ngscope.vm");
 
         for (NgModelSourceLink ms : modelSourceLinks){
             try {
-                JavaFileObject jfo = filer.createSourceFile(ms.getPackageName() + "." + ms.getClassName() + NgProcessor.MODEL_APPENDAGE, ms.getElements());
+                JavaFileObject jfo = filer.createSourceFile(ms.getSourceFileName(), ms.getElements());
                 Writer writer = jfo.openWriter();
-                vt.merge(ms.getVelocityContext(), writer);
+                vtModel.merge(ms.getVelocityContext(), writer);
                 writer.flush();
                 writer.close();
             }catch (IOException e){
@@ -77,7 +76,7 @@ public class SourceCreator {
 
         for(NgScopeSourceLink ns : scopeSourceLinks){
             try {
-                JavaFileObject jfo = filer.createSourceFile(ns.getPackageName() + "." + ns.getClassName() + NgProcessor.SCOPE_APPENDAGE, ns.getElements());
+                JavaFileObject jfo = filer.createSourceFile(ns.getSourceFileName(), ns.getElements());
                 Writer writer = jfo.openWriter();
                 vtScope.merge(ns.getVelocityContext(), writer);
                 writer.flush();

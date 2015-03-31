@@ -21,6 +21,7 @@ import com.github.davityle.ngprocessor.sourcelinks.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.NgModelAnnotationUtils;
+import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 import com.github.davityle.ngprocessor.util.TypeUtils;
 import com.github.davityle.ngprocessor.util.source.NgModelSourceUtils;
 import com.github.davityle.ngprocessor.util.source.NgScopeSourceUtils;
@@ -54,12 +55,11 @@ import javax.lang.model.element.TypeElement;
  *
  */
 
-@SupportedAnnotationTypes("com.ngandroid.lib.annotations.NgModel")
+@SupportedAnnotationTypes({
+    NgModelAnnotationUtils.NG_MODEL_ANNOTATION,
+    NgScopeAnnotationUtils.NG_SCOPE_ANNOTATION
+})
 public class NgProcessor extends AbstractProcessor {
-
-
-    public static final String MODEL_APPENDAGE = "$$NgModel";
-    public static final String SCOPE_APPENDAGE = "$$NgScope";
 
     private Filer filer;
 
@@ -87,6 +87,7 @@ public class NgProcessor extends AbstractProcessor {
 
         SourceCreator sourceCreator = new SourceCreator(filer, modelSourceLinks, scopeSourceLinks);
         sourceCreator.createSourceFiles();
+
 
         System.out.println(":NgAndroid:successful");
         return true;

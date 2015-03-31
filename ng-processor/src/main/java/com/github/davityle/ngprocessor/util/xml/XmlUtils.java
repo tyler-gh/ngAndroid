@@ -17,7 +17,7 @@
 package com.github.davityle.ngprocessor.util.xml;
 
 import com.github.davityle.ngprocessor.attrcompiler.AttributeCompiler;
-import com.github.davityle.ngprocessor.attrcompiler.getters.Source;
+import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import com.github.davityle.ngprocessor.util.LayoutsFinder;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 

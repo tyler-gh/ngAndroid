@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.attrcompiler.getters;
+package com.github.davityle.ngprocessor.attrcompiler.sources;
 
 
 /**

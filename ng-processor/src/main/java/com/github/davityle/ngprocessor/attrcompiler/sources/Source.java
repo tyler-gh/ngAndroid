@@ -14,22 +14,11 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.attrcompiler.getters;
-
+package com.github.davityle.ngprocessor.attrcompiler.sources;
 
 /**
- * Created by tyler on 2/10/15.
+ * Created by davityle on 1/24/15.
  */
-public class KnotSource implements Source {
-
-    private final Source source;
-
-    public KnotSource(Source source) {
-        this.source = source;
-    }
-
-    @Override
-    public String getSource() {
-        return '!' + source.getSource();
-    }
+public interface Source {
+    public String getSource();
 }

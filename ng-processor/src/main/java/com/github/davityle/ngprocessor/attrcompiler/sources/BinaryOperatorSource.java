@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.attrcompiler.getters;
+package com.github.davityle.ngprocessor.attrcompiler.sources;
 
-import com.github.davityle.ngprocessor.attrcompiler.TokenType;
+import com.github.davityle.ngprocessor.attrcompiler.parse.TokenType;
 
 /**
  * Created by tyler on 2/6/15.

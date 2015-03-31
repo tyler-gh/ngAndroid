@@ -25,7 +25,6 @@ import javax.lang.model.element.Element;
  */
 public interface SourceLink {
     public VelocityContext getVelocityContext();
-    public String getClassName();
-    public String getPackageName();
     public Element[] getElements();
+    public String getSourceFileName();
 }

@@ -14,11 +14,14 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.attrcompiler;
+package com.github.davityle.ngprocessor.util;
 
 /**
- * Created by tyler on 3/20/15.
+ * Created by tyler on 3/31/15.
  */
-public interface Scope {
-    public <T> T getModel(String name);
+public class NgScopeAnnotationUtils {
+
+    public static final String NG_SCOPE_ANNOTATION = "com.ngandroid.lib.annotations.NgScope";
+    public static final String SCOPE_APPENDAGE = "$$NgScope";
+
 }

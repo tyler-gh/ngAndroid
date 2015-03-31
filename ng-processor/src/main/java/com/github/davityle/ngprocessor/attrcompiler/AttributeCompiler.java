@@ -17,13 +17,17 @@
 package com.github.davityle.ngprocessor.attrcompiler;
 
 
-import com.github.davityle.ngprocessor.attrcompiler.getters.BinaryOperatorSource;
-import com.github.davityle.ngprocessor.attrcompiler.getters.KnotSource;
-import com.github.davityle.ngprocessor.attrcompiler.getters.MethodSource;
-import com.github.davityle.ngprocessor.attrcompiler.getters.Source;
-import com.github.davityle.ngprocessor.attrcompiler.getters.ModelSource;
-import com.github.davityle.ngprocessor.attrcompiler.getters.StaticSource;
-import com.github.davityle.ngprocessor.attrcompiler.getters.TernarySource;
+import com.github.davityle.ngprocessor.attrcompiler.parse.SyntaxParser;
+import com.github.davityle.ngprocessor.attrcompiler.parse.Token;
+import com.github.davityle.ngprocessor.attrcompiler.parse.TokenType;
+import com.github.davityle.ngprocessor.attrcompiler.sources.BinaryOperatorSource;
+import com.github.davityle.ngprocessor.attrcompiler.sources.KnotSource;
+import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
+import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
+import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
+import com.github.davityle.ngprocessor.attrcompiler.sources.StaticSource;
+import com.github.davityle.ngprocessor.attrcompiler.sources.TernarySource;
+import com.github.davityle.ngprocessor.util.Tuple;
 
 import java.util.ArrayList;
 import java.util.Iterator;

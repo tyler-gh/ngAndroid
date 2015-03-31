@@ -16,6 +16,8 @@
 
 package com.github.davityle.ngprocessor.attrcompiler;
 
+import com.github.davityle.ngprocessor.attrcompiler.parse.TokenType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;

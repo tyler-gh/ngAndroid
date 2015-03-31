@@ -16,7 +16,7 @@
 
 package com.github.davityle.ngprocessor.util.xml;
 
-import com.github.davityle.ngprocessor.attrcompiler.getters.Source;
+import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 
 /**
 * Created by tyler on 3/25/15.
