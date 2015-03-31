@@ -21,20 +21,20 @@ import com.github.davityle.ngprocessor.attrcompiler.TokenType;
 /**
  * Created by tyler on 2/6/15.
  */
-public class BinaryOperatorGetter implements Getter {
+public class BinaryOperatorSource implements Source {
 
-    protected final Getter leftSide;
-    protected final Getter rightSide;
+    protected final Source leftSide;
+    protected final Source rightSide;
     protected final TokenType.BinaryOperator operator;
 
-    public BinaryOperatorGetter(Getter leftSide, Getter rightSide, TokenType.BinaryOperator operator) {
+    public BinaryOperatorSource(Source leftSide, Source rightSide, TokenType.BinaryOperator operator) {
         this.leftSide = leftSide;
         this.rightSide = rightSide;
         this.operator = operator;
     }
 
-    public static  BinaryOperatorGetter getOperator(Getter leftSide, Getter rightSide, TokenType.BinaryOperator operator){
-        return new BinaryOperatorGetter(leftSide, rightSide, operator);
+    public static BinaryOperatorSource getOperator(Source leftSide, Source rightSide, TokenType.BinaryOperator operator){
+        return new BinaryOperatorSource(leftSide, rightSide, operator);
     }
 
 

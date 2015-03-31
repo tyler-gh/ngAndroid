@@ -16,22 +16,34 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.getters;
 
+
 /**
- * Created by tyler on 2/2/15.
+ * Created by davityle on 1/24/15.
  */
-public class TernaryGetter implements Getter {
+public class ModelSource implements Source {
 
-    private final Getter booleanGetter;
-    private final Getter valTrue, valFalse;
+    private final String modelName;
+    private final String fieldName;
+    private String method;
 
-    public TernaryGetter(Getter booleanGetter, Getter valTrue, Getter valFalse) {
-        this.booleanGetter = booleanGetter;
-        this.valTrue = valTrue;
-        this.valFalse = valFalse;
+    public ModelSource(String modelName, String fieldName) {
+        this.modelName = modelName;
+        this.fieldName = fieldName;
     }
 
     @Override
     public String getSource() {
-        return booleanGetter.getSource() + '?' + valTrue.getSource() + ':' + valFalse.getSource();
+        if(method == null){
+            throw new RuntimeException("Method not set for '" + modelName + '.' + fieldName + '\'');
+        }
+        return modelName + '.' + method;
+    }
+
+    public String getFieldName(){
+        return fieldName;
+    }
+
+    public void setMethod(String method){
+        this.method = method;
     }
 }

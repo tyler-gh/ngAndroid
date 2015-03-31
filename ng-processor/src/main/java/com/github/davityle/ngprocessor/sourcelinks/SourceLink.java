@@ -14,21 +14,18 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.attrcompiler.getters;
+package com.github.davityle.ngprocessor.sourcelinks;
 
+import org.apache.velocity.VelocityContext;
+
+import javax.lang.model.element.Element;
 
 /**
- * Created by davityle on 1/24/15.
+ * Created by tyler on 3/30/15.
  */
-public class StaticGetter implements Getter{
-    private final String source;
-
-    public StaticGetter(String source) {
-        this.source = source;
-    }
-
-    @Override
-    public String getSource() {
-        return source;
-    }
+public interface SourceLink {
+    public VelocityContext getVelocityContext();
+    public String getClassName();
+    public String getPackageName();
+    public Element[] getElements();
 }

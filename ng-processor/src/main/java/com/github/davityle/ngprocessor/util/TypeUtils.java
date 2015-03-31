@@ -14,9 +14,23 @@
  *    limitations under the License.
  */
 
-apply plugin: 'java'
+package com.github.davityle.ngprocessor.util;
 
-dependencies {
-    compile 'org.apache.velocity:velocity:1.7'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
+
+/**
+ * Created by tyler on 3/30/15.
+ */
+public class TypeUtils {
+    private static Types typeUtils;
+
+    public static void setTypeUtils(Types types){
+        typeUtils = types;
+    }
+
+    public static TypeElement asTypeElement(TypeMirror typeMirror){
+        return (TypeElement) typeUtils.asElement(typeMirror);
+    }
 }

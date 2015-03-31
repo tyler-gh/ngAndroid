@@ -22,13 +22,13 @@ import java.util.List;
 /**
 * Created by davityle on 1/24/15.
 */
-public class MethodGetter implements Getter {
+public class MethodSource implements Source {
 
     private final String methodName;
-    private final List<Getter> parameters;
+    private final List<Source> parameters;
     private String parametersSource;
 
-    public MethodGetter(String source, List<Getter> parameters) {
+    public MethodSource(String source, List<Source> parameters) {
         this.methodName = source;
         this.parameters = parameters;
     }
@@ -38,8 +38,8 @@ public class MethodGetter implements Getter {
         if(parametersSource == null){
             StringBuilder parametersSourceBuilder = new StringBuilder("(");
             for(int index = 0; index < parameters.size(); index++){
-                Getter getter = parameters.get(index);
-                parametersSourceBuilder.append(getter.getSource());
+                Source source = parameters.get(index);
+                parametersSourceBuilder.append(source.getSource());
                 if(index != parameters.size() -1)
                     parametersSourceBuilder.append(",");
             }

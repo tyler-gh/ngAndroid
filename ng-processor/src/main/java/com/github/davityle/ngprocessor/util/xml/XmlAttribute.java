@@ -14,22 +14,40 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.attrcompiler.getters;
+package com.github.davityle.ngprocessor.util.xml;
 
+import com.github.davityle.ngprocessor.attrcompiler.getters.Source;
 
 /**
- * Created by davityle on 1/24/15.
- */
-public class ModelGetter implements Getter {
+* Created by tyler on 3/25/15.
+*/
+class XmlAttribute {
+    private final String name, value;
+    private Source source;
 
-    private final String source;
+    XmlAttribute(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
 
-    public ModelGetter(String modelName, String fieldName) {
-        source = modelName + ".get" + fieldName + "()";
+    public String getName() {
+        return name;
+    }
+
+    public String getValue() {
+        return value;
     }
 
     @Override
-    public String getSource() {
+    public String toString() {
+        return '(' + name + ',' + value + ')';
+    }
+
+    public Source getSource() {
         return source;
+    }
+
+    public void setSource(Source source) {
+        this.source = source;
     }
 }

@@ -17,8 +17,21 @@
 package com.github.davityle.ngprocessor.attrcompiler.getters;
 
 /**
- * Created by davityle on 1/24/15.
+ * Created by tyler on 2/2/15.
  */
-public interface Getter {
-    public String getSource();
+public class TernarySource implements Source {
+
+    private final Source booleanSource;
+    private final Source valTrue, valFalse;
+
+    public TernarySource(Source booleanSource, Source valTrue, Source valFalse) {
+        this.booleanSource = booleanSource;
+        this.valTrue = valTrue;
+        this.valFalse = valFalse;
+    }
+
+    @Override
+    public String getSource() {
+        return booleanSource.getSource() + '?' + valTrue.getSource() + ':' + valFalse.getSource();
+    }
 }

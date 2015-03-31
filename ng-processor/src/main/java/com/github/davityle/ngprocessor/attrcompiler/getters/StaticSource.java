@@ -14,9 +14,22 @@
  *    limitations under the License.
  */
 
-apply plugin: 'java'
+package com.github.davityle.ngprocessor.attrcompiler.getters;
 
-dependencies {
-    compile 'org.apache.velocity:velocity:1.7'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+/**
+ * Created by davityle on 1/24/15.
+ */
+public class StaticSource implements Source {
+    private final String source;
+
+    public StaticSource(String source) {
+        this.source = source;
+        System.out.println(source);
+    }
+
+    @Override
+    public String getSource() {
+        return source;
+    }
 }

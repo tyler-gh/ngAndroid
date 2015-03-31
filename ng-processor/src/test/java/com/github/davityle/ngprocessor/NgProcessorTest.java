@@ -16,27 +16,6 @@
 
 package com.github.davityle.ngprocessor;
 
-/**
-* Created by tyler on 3/25/15.
-*/
-class XmlAttribute {
-    private final String name, value;
+public class NgProcessorTest {
 
-    XmlAttribute(String name, String value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return '(' + name + ',' + value + ')';
-    }
 }

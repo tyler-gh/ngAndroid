@@ -14,32 +14,22 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor;
+package com.github.davityle.ngprocessor.attrcompiler.getters;
 
-import java.util.List;
 
 /**
- * Created by tyler on 3/25/15.
+ * Created by tyler on 2/10/15.
  */
-public class XmlNode {
-    private final String id;
-    private final List<XmlAttribute> attributes;
+public class KnotSource implements Source {
 
-    public XmlNode(String id, List<XmlAttribute> attributes) {
-        this.id = id;
-        this.attributes = attributes;
-    }
+    private final Source source;
 
-    public List<XmlAttribute> getAttributes() {
-        return attributes;
-    }
-
-    public String getId() {
-        return id;
+    public KnotSource(Source source) {
+        this.source = source;
     }
 
     @Override
-    public String toString() {
-        return id + ':' + attributes.toString();
+    public String getSource() {
+        return '!' + source.getSource();
     }
 }
