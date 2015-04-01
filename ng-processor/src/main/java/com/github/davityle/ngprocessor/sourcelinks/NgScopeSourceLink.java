@@ -17,6 +17,7 @@
 package com.github.davityle.ngprocessor.sourcelinks;
 
 import com.github.davityle.ngprocessor.SourceField;
+import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 
 import org.apache.velocity.VelocityContext;
@@ -34,6 +35,7 @@ public class NgScopeSourceLink implements SourceLink{
     private final String packageName;
     private final List<SourceField> fields;
     private final Element[] elements;
+    private List<Source> sources;
 
     public NgScopeSourceLink(String className, String packageName, List<SourceField> fields, Element[] elements) {
         this.className = className;
@@ -53,6 +55,7 @@ public class NgScopeSourceLink implements SourceLink{
         return vc;
     }
 
+
     @Override
     public Element[] getElements() {
         return elements;
@@ -61,5 +64,13 @@ public class NgScopeSourceLink implements SourceLink{
     @Override
     public String getSourceFileName() {
         return packageName + "." + className + NgScopeAnnotationUtils.SCOPE_APPENDAGE;
+    }
+
+    public List<Source> getSources() {
+        return sources;
+    }
+
+    public void setSources(List<Source> sources) {
+        this.sources = sources;
     }
 }

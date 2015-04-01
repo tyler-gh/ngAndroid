@@ -8,8 +8,9 @@ import android.widget.Toast;
 import com.ngandroid.demo.models.Input;
 import com.ngandroid.lib.NgAndroid;
 import com.ngandroid.lib.annotations.NgModel;
+import com.ngandroid.lib.annotations.NgScope;
 
-
+@NgScope
 public class DemoActivity extends Activity {
     @NgModel
     Input input, output;

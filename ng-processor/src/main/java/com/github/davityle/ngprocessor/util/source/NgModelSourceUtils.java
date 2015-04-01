@@ -82,11 +82,16 @@ public class NgModelSourceUtils {
                 SourceField sourceField = new SourceField(fName, type);
                 sourceField.setSetter(setter.getSimpleName().toString());
                 // TODO O(n^2) is the best
+                boolean getterFound = false;
                 for(Element possGetter : enclosedElements) {
                     if(ElementUtils.isGetterForField(possGetter, fName, typeMirror.getKind())){
                         sourceField.setGetter(possGetter.getSimpleName().toString());
+                        getterFound = true;
                         break;
                     }
+                }
+                if(!getterFound){
+                    MessageUtils.warning(enclosedElement, "Field '%s' is missing a corresponding getter", fName);
                 }
                 fields.add(sourceField);
             }

@@ -17,10 +17,12 @@
 package com.ngandroid.demo.models.test;
 
 import com.ngandroid.lib.annotations.NgModel;
+import com.ngandroid.lib.annotations.NgScope;
 
 /**
 * Created by tyler on 3/23/15.
 */
+@NgScope
 public class ViewScope {
     @NgModel
     public Note note;

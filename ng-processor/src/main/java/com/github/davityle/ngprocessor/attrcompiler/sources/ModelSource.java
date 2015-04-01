@@ -17,6 +17,8 @@
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
 
+import java.util.List;
+
 /**
  * Created by davityle on 1/24/15.
  */
@@ -37,6 +39,18 @@ public class ModelSource implements Source {
             throw new RuntimeException("Method not set for '" + modelName + '.' + fieldName + '\'');
         }
         return modelName + '.' + method;
+    }
+
+    @Override
+    public void getModelSource(List<ModelSource> models) {
+        models.add(this);
+    }
+
+    @Override
+    public void getMethodSource(List<MethodSource> methods) {}
+
+    public String getModelName(){
+        return modelName;
     }
 
     public String getFieldName(){

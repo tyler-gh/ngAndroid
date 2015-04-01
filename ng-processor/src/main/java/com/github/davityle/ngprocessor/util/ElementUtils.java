@@ -50,6 +50,22 @@ public class ElementUtils {
                 && ((ExecutableElement) elem).getParameters().size() == 0;
     }
 
+    public static boolean hasGetterAndSetter(TypeElement model, String field){
+        boolean hasGetter = false, hasSetter = false;
+        for(Element f : model.getEnclosedElements()){
+            if(f.getSimpleName().toString().toLowerCase().equals("set" + field)){
+                hasSetter = true;
+                if(hasGetter)
+                    break;
+            }else if(f.getSimpleName().toString().toLowerCase().equals("get" + field)){
+                hasGetter = true;
+                if(hasSetter)
+                    break;
+            }
+        }
+        return hasGetter && hasSetter;
+    }
+
     public static boolean returnsVoid(ExecutableElement method){
         TypeMirror type = method.getReturnType();
         return (type != null && type.getKind() == TypeKind.VOID);

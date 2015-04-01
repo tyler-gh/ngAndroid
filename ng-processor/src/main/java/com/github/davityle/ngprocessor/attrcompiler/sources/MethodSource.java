@@ -47,6 +47,24 @@ public class MethodSource implements Source {
             parametersSource = parametersSourceBuilder.toString();
         }
         return methodName + parametersSource;
+    }
 
+    public String getMethodName(){
+        return methodName;
+    }
+
+    @Override
+    public void getModelSource(List<ModelSource> models) {
+        for(Source source : parameters){
+            source.getModelSource(models);
+        }
+    }
+
+    @Override
+    public void getMethodSource(List<MethodSource> methods) {
+        methods.add(this);
+        for(Source source : parameters){
+            source.getMethodSource(methods);
+        }
     }
 }

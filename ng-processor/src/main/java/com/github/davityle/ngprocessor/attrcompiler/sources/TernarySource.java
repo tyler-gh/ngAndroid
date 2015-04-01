@@ -16,6 +16,8 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
+import java.util.List;
+
 /**
  * Created by tyler on 2/2/15.
  */
@@ -33,5 +35,19 @@ public class TernarySource implements Source {
     @Override
     public String getSource() {
         return booleanSource.getSource() + '?' + valTrue.getSource() + ':' + valFalse.getSource();
+    }
+
+    @Override
+    public void getModelSource(List<ModelSource> models) {
+        booleanSource.getModelSource(models);
+        valFalse.getModelSource(models);
+        valTrue.getModelSource(models);
+    }
+
+    @Override
+    public void getMethodSource(List<MethodSource> methods) {
+        booleanSource.getMethodSource(methods);
+        valFalse.getMethodSource(methods);
+        valTrue.getMethodSource(methods);
     }
 }

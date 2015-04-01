@@ -42,5 +42,10 @@ public class XmlNode {
     public String toString() {
         return id + ':' + attributes.toString();
     }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode() * 7 + attributes.hashCode() * 31;
+    }
 }
 

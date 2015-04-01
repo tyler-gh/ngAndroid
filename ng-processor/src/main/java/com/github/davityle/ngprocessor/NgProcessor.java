@@ -16,6 +16,8 @@
 
 package com.github.davityle.ngprocessor;
 
+import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
+import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
 import com.github.davityle.ngprocessor.sourcelinks.NgModelSourceLink;
 import com.github.davityle.ngprocessor.sourcelinks.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
@@ -26,11 +28,14 @@ import com.github.davityle.ngprocessor.util.TypeUtils;
 import com.github.davityle.ngprocessor.util.source.NgModelSourceUtils;
 import com.github.davityle.ngprocessor.util.source.NgScopeSourceUtils;
 import com.github.davityle.ngprocessor.util.source.SourceCreator;
+import com.github.davityle.ngprocessor.util.xml.XmlAttribute;
 import com.github.davityle.ngprocessor.util.xml.XmlNode;
 import com.github.davityle.ngprocessor.util.xml.XmlUtils;
 
 import java.io.File;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,14 +85,80 @@ public class NgProcessor extends AbstractProcessor {
 
         Map<File, List<XmlNode>> xmlAttrMap = XmlUtils.getAttributes();
 
-        Map<String, List<Element>> scopeBuilderMap = new LinkedHashMap<>();
+        List<Element> scopes = NgScopeAnnotationUtils.getScopes(annotations, roundEnv);
+        Map<String, List<Element>> scopeBuilderMap = NgScopeAnnotationUtils.getScopeMap(scopes);
         Map<String, Element> modelBuilderMap = NgModelAnnotationUtils.getModels(annotations, roundEnv, scopeBuilderMap);
+
         List<NgModelSourceLink> modelSourceLinks = NgModelSourceUtils.getSourceLinks(modelBuilderMap);
         List<NgScopeSourceLink> scopeSourceLinks = NgScopeSourceUtils.getSourceLinks(scopeBuilderMap);
 
+        Set<Map.Entry<File, List<XmlNode>>> xmlLayouts = xmlAttrMap.entrySet();
+        Map<XmlNode, List<Element>> viewScopeMap = new HashMap<>();
+
+        for (Map.Entry<File, List<XmlNode>> layout : xmlLayouts) {
+            List<XmlNode> views = layout.getValue();
+
+            for (XmlNode view : views) {
+                List<Element> matchingScopes = new ArrayList<>(scopes);
+                Iterator<Element> it = matchingScopes.listIterator();
+                for (;it.hasNext();) {
+                    Element scope = it.next();
+                    boolean match = true;
+                    for (XmlAttribute attribute : view.getAttributes()) {
+                        List<MethodSource> methodSources = attribute.getMethodSource();
+
+                        for (MethodSource methodSource : methodSources) {
+                            boolean found = false;
+                            for (Element child : scope.getEnclosedElements()) {
+                                if (child.getSimpleName().toString().equals(methodSource.getMethodName())) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                // TODO list attribute as not found
+                                match = false;
+                                break;
+                            }
+                        }
+                        List<ModelSource> modelSources = attribute.getModelSource();
+                        for (ModelSource modelSource : modelSources) {
+                            boolean found = false;
+                            for (Element child : scope.getEnclosedElements()) {
+                                if (child.getSimpleName().toString().equals(modelSource.getModelName())) {
+                                    if(ElementUtils.hasGetterAndSetter(TypeUtils.asTypeElement(child.asType()), modelSource.getFieldName())) {
+                                        found = true;
+                                        break;
+                                    }else{
+                                        //TODO field was found but model did not have getter and setter
+                                    }
+                                }
+                            }
+                            if (!found) {
+                                // TODO list attribute as not found
+                                match = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (!match) {
+                        it.remove();
+                    }
+                }
+                viewScopeMap.put(view, matchingScopes);
+            }
+        }
+
+        Set<Map.Entry<XmlNode, List<Element>>> entries = viewScopeMap.entrySet();
+        for(Map.Entry<XmlNode, List<Element>> entry : entries){
+            if(entry.getValue().size() == 0){
+                MessageUtils.error(null, "This view does not match any scope specifically this element did not match");
+            }
+        }
+
+
         SourceCreator sourceCreator = new SourceCreator(filer, modelSourceLinks, scopeSourceLinks);
         sourceCreator.createSourceFiles();
-
 
         System.out.println(":NgAndroid:successful");
         return true;

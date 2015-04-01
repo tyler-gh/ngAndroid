@@ -16,9 +16,6 @@
 
 package com.github.davityle.ngprocessor.util;
 
-import com.github.davityle.ngprocessor.NgProcessor;
-
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +35,7 @@ public class NgModelAnnotationUtils {
     public static final String NG_MODEL_ANNOTATION = "com.ngandroid.lib.annotations.NgModel";
     public static final String MODEL_APPENDAGE = "$$NgModel";
 
-    public static Map<String, Element> getModels(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv, Map<String, List<Element>> scopeBuilderMap){
+    public static Map<String, Element> getModels(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv, Map<String, List<Element>> scopeMap){
 
         Map<String, Element> modelBuilderMap = new LinkedHashMap<>();
 
@@ -62,12 +59,12 @@ public class NgModelAnnotationUtils {
                     String className = ElementUtils.getClassName((TypeElement) scopeClass, packageName);
                     String scopeName = className + NgScopeAnnotationUtils.SCOPE_APPENDAGE;
                     String key = packageName + "." + scopeName;
-                    List<Element> els = scopeBuilderMap.get(key);
+                    List<Element> els = scopeMap.get(key);
                     if (els == null) {
-                        els = new ArrayList<>();
-                        scopeBuilderMap.put(key, els);
+                        MessageUtils.error(scopeClass, "Missing NgScope annotation on Scope '%s'.", scopeClass.toString());
+                    }else {
+                        els.add(element);
                     }
-                    els.add(element);
                 }
             }
         }

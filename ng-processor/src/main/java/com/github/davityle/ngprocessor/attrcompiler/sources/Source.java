@@ -16,9 +16,13 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
+import java.util.List;
+
 /**
  * Created by davityle on 1/24/15.
  */
 public interface Source {
     public String getSource();
+    public void getModelSource(List<ModelSource> models);
+    public void getMethodSource(List<MethodSource> methods);
 }

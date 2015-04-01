@@ -18,6 +18,8 @@ package com.github.davityle.ngprocessor.attrcompiler.sources;
 
 import com.github.davityle.ngprocessor.attrcompiler.parse.TokenType;
 
+import java.util.List;
+
 /**
  * Created by tyler on 2/6/15.
  */
@@ -41,5 +43,15 @@ public class BinaryOperatorSource implements Source {
     @Override
     public String getSource() {
         return '(' + leftSide.getSource() + operator.toString() + rightSide.getSource() + ')';
+    }
+
+    @Override
+    public void getModelSource(List<ModelSource> models) {
+        leftSide.getModelSource(models);
+    }
+
+    @Override
+    public void getMethodSource(List<MethodSource> methods) {
+        rightSide.getMethodSource(methods);
     }
 }

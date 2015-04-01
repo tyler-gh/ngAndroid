@@ -16,12 +16,17 @@
 
 package com.github.davityle.ngprocessor.util.xml;
 
+import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
+import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * Created by tyler on 3/25/15.
 */
-class XmlAttribute {
+public class XmlAttribute {
     private final String name, value;
     private Source source;
 
@@ -45,6 +50,18 @@ class XmlAttribute {
 
     public Source getSource() {
         return source;
+    }
+
+    public List<ModelSource> getModelSource() {
+        List<ModelSource> models = new ArrayList<>();
+        source.getModelSource(models);
+        return models;
+    }
+
+    public List<MethodSource> getMethodSource() {
+        List<MethodSource> methods = new ArrayList<>();
+        source.getMethodSource(methods);
+        return methods;
     }
 
     public void setSource(Source source) {

@@ -18,10 +18,12 @@ package com.ngandroid.demo.models.test;
 
 import com.ngandroid.demo.models.Input;
 import com.ngandroid.lib.annotations.NgModel;
+import com.ngandroid.lib.annotations.NgScope;
 
 /**
 * Created by tyler on 3/23/15.
 */
+@NgScope
 public class TestBugScope {
     @NgModel
     public Input input;

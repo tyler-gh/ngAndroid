@@ -17,10 +17,12 @@
 package com.ngandroid.demo.models.test;
 
 import com.ngandroid.lib.annotations.NgModel;
+import com.ngandroid.lib.annotations.NgScope;
 
 /**
 * Created by tyler on 3/23/15.
 */
+@NgScope
 public class ModelTestScope {
     public TestSetterRequired testSetterRequired;
     @NgModel
@@ -29,4 +31,6 @@ public class ModelTestScope {
     public TestJsonModel testJsonModel;
     @NgModel
     public TestSubModel testSubModel;
+    @NgModel
+    public TestClass TestClass;
 }

@@ -14,34 +14,19 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.attrcompiler.sources;
-
-
-import java.util.List;
+package com.ngandroid.demo.models.test;
 
 /**
- * Created by tyler on 2/10/15.
+ * Created by tyler on 4/1/15.
  */
-public class KnotSource implements Source {
+public class TestClass {
+    private int x;
 
-    private final Source source;
-
-    public KnotSource(Source source) {
-        this.source = source;
+    public void setX(int x) {
+        this.x = x;
     }
 
-    @Override
-    public String getSource() {
-        return '!' + source.getSource();
-    }
-
-    @Override
-    public void getModelSource(List<ModelSource> models) {
-        source.getModelSource(models);
-    }
-
-    @Override
-    public void getMethodSource(List<MethodSource> methods) {
-        source.getMethodSource(methods);
+    public int getX(){
+        return x;
     }
 }

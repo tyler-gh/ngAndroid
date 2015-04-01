@@ -17,6 +17,8 @@
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
 
+import java.util.List;
+
 /**
  * Created by davityle on 1/24/15.
  */
@@ -25,11 +27,13 @@ public class StaticSource implements Source {
 
     public StaticSource(String source) {
         this.source = source;
-        System.out.println(source);
     }
 
     @Override
     public String getSource() {
         return source;
     }
+
+    @Override public void getModelSource(List<ModelSource> models) {}
+    @Override public void getMethodSource(List<MethodSource> methods) {}
 }

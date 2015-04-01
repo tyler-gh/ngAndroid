@@ -19,7 +19,7 @@ package com.github.davityle.ngprocessor.util;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 
-import static javax.tools.Diagnostic.Kind.ERROR;
+import static javax.tools.Diagnostic.Kind;
 
 /**
  * Created by tyler on 3/30/15.
@@ -33,9 +33,17 @@ public class MessageUtils {
     }
 
     public static void error(Element element, String message, Object... args) {
+        printMessage(Kind.ERROR, element, message, args);
+    }
+
+    public static void warning(Element element, String message, Object... args) {
+        printMessage(Kind.WARNING, element, message, args);
+    }
+
+    private static void printMessage(Kind kind, Element element, String message, Object... args){
         if (args.length > 0) {
             message = String.format(message, args);
         }
-        processingEnv.getMessager().printMessage(ERROR, message, element);
+        processingEnv.getMessager().printMessage(kind, message, element);
     }
 }
