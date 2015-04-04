@@ -48,10 +48,12 @@ public class BinaryOperatorSource implements Source {
     @Override
     public void getModelSource(List<ModelSource> models) {
         leftSide.getModelSource(models);
+        rightSide.getModelSource(models);
     }
 
     @Override
     public void getMethodSource(List<MethodSource> methods) {
         rightSide.getMethodSource(methods);
+        leftSide.getMethodSource(methods);
     }
 }

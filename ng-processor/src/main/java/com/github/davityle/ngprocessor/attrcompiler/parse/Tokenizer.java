@@ -60,7 +60,7 @@ public class Tokenizer {
         NESTED_EXPRESSION,
         IN_STRING_SLASH,
         STRING_SLASH_END,
-        FLOAT_F_END
+        WHITESPACE, FLOAT_F_END
     }
 
     private int index, readIndex;
@@ -69,7 +69,7 @@ public class Tokenizer {
     private State state;
 
     public Tokenizer(String script) {
-        this.script = script.replaceAll("\\s+(?=([^']*'[^']*')*[^']*$)", "");
+        this.script = script;
     }
 
     public Queue<Token> getTokens() {
@@ -245,6 +245,10 @@ public class Tokenizer {
                 emit(TokenType.BINARY_OPERATOR);
                 result = getNextState();
                 break;
+            case WHITESPACE:
+                emit(TokenType.WHITESPACE);
+                result = getNextState();
+                break;
             default:
                 throw new RuntimeException("This shouldn't happen. Please submit an issue at github.com/davityle/ngAndroid/issues");
         }
@@ -292,6 +296,7 @@ public class Tokenizer {
                     case FUNCTION_PARAMETER_DELIMINATOR:
                     case EQUALS:
                     case KNOT_EQUALS:
+                    case WHITESPACE:
                     case NESTED_EXPRESSION:
                         return State.IN_NUMBER_CONSTANT;
                     default:
@@ -317,6 +322,7 @@ public class Tokenizer {
                     case EQUALS:
                     case NESTED_EXPRESSION:
                     case KNOT_EQUALS:
+                    case WHITESPACE:
                         return State.IN_CHAR_SEQUENCE;
                     case KNOT_EQUALS_START:
                         return State.KNOT_VALUE;
@@ -358,6 +364,11 @@ public class Tokenizer {
                 case '/':
                     return State.OPERATOR;
             }
+
+            if(Character.isWhitespace(currentCharacter)){
+                return State.WHITESPACE;
+            }
+
             throw new RuntimeException("Invalid character : " + currentCharacter + " in state " + state);
         }finally {
             advance();
@@ -369,8 +380,10 @@ public class Tokenizer {
     }
 
     private void emit(TokenType tokenType) {
-        Token token = new Token(tokenType, script.substring(readIndex, index));
+        if(tokenType != TokenType.WHITESPACE) {
+            Token token = new Token(tokenType, script.substring(readIndex, index));
+            tokens.add(token);
+        }
         readIndex = index;
-        tokens.add(token);
     }
 }

@@ -84,13 +84,7 @@ public class NgProcessor extends AbstractProcessor {
         System.out.println(":NgAndroid:processing");
 
         Map<File, List<XmlNode>> xmlAttrMap = XmlUtils.getAttributes();
-
         List<Element> scopes = NgScopeAnnotationUtils.getScopes(annotations, roundEnv);
-        Map<String, List<Element>> scopeBuilderMap = NgScopeAnnotationUtils.getScopeMap(scopes);
-        Map<String, Element> modelBuilderMap = NgModelAnnotationUtils.getModels(annotations, roundEnv, scopeBuilderMap);
-
-        List<NgModelSourceLink> modelSourceLinks = NgModelSourceUtils.getSourceLinks(modelBuilderMap);
-        List<NgScopeSourceLink> scopeSourceLinks = NgScopeSourceUtils.getSourceLinks(scopeBuilderMap);
 
         Set<Map.Entry<File, List<XmlNode>>> xmlLayouts = xmlAttrMap.entrySet();
         Map<XmlNode, List<Element>> viewScopeMap = new HashMap<>();
@@ -156,6 +150,10 @@ public class NgProcessor extends AbstractProcessor {
             }
         }
 
+        Map<String, List<Element>> scopeBuilderMap = NgScopeAnnotationUtils.getScopeMap(scopes);
+        Map<String, Element> modelBuilderMap = NgModelAnnotationUtils.getModels(annotations, roundEnv, scopeBuilderMap);
+        List<NgModelSourceLink> modelSourceLinks = NgModelSourceUtils.getSourceLinks(modelBuilderMap);
+        List<NgScopeSourceLink> scopeSourceLinks = NgScopeSourceUtils.getSourceLinks(scopeBuilderMap);
 
         SourceCreator sourceCreator = new SourceCreator(filer, modelSourceLinks, scopeSourceLinks);
         sourceCreator.createSourceFiles();

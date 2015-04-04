@@ -39,7 +39,7 @@ public enum TokenType {
     LONG_CONSTANT,
     FLOAT_CONSTANT,
     DOUBLE_CONSTANT,
-    OPEN_PARENTHESIS_EXP;
+    OPEN_PARENTHESIS_EXP, WHITESPACE;
 
     public enum BinaryOperator {
         ADDITION("+"),

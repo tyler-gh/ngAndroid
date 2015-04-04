@@ -20,5 +20,6 @@ package com.ngandroid.demo.models.test;
 * Created by tyler on 3/23/15.
 */
 public interface TestSetterRequired {
+
     public int getX();
 }

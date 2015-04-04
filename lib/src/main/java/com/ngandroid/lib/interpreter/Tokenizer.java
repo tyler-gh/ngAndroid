@@ -16,8 +16,6 @@
 
 package com.ngandroid.lib.interpreter;
 
-import com.ngandroid.lib.exceptions.NgException;
-
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -61,7 +59,7 @@ public class Tokenizer {
         NESTED_EXPRESSION,
         IN_STRING_SLASH,
         STRING_SLASH_END,
-        FLOAT_F_END
+        WHITESPACE, FLOAT_F_END
     }
 
     private int index, readIndex;
@@ -70,7 +68,7 @@ public class Tokenizer {
     private State state;
 
     public Tokenizer(String script) {
-        this.script = script.replaceAll("\\s+(?=([^']*'[^']*')*[^']*$)", "");
+        this.script = script;//.replaceAll("\\s+(?=([^']*'[^']*')*[^']*$)", "");
     }
 
     public Queue<Token> getTokens() {
@@ -246,8 +244,12 @@ public class Tokenizer {
                 emit(TokenType.BINARY_OPERATOR);
                 result = getNextState();
                 break;
+            case WHITESPACE:
+                emit(TokenType.WHITESPACE);
+                result = getNextState();
+                break;
             default:
-                throw new NgException("This shouldn't happen. Please submit an issue at github.com/davityle/ngAndroid/issues");
+                throw new RuntimeException("This shouldn't happen. Please submit an issue at github.com/davityle/ngAndroid/issues");
         }
         return result;
     }
@@ -293,10 +295,11 @@ public class Tokenizer {
                     case FUNCTION_PARAMETER_DELIMINATOR:
                     case EQUALS:
                     case KNOT_EQUALS:
+                    case WHITESPACE:
                     case NESTED_EXPRESSION:
                         return State.IN_NUMBER_CONSTANT;
                     default:
-                        throw new NgException("Invalid character '" + currentCharacter + "' at state " + state.toString());
+                        throw new RuntimeException("Invalid character '" + currentCharacter + "' at state " + state.toString());
                 }
             }
 
@@ -318,6 +321,7 @@ public class Tokenizer {
                     case EQUALS:
                     case NESTED_EXPRESSION:
                     case KNOT_EQUALS:
+                    case WHITESPACE:
                         return State.IN_CHAR_SEQUENCE;
                     case KNOT_EQUALS_START:
                         return State.KNOT_VALUE;
@@ -330,7 +334,7 @@ public class Tokenizer {
                         if(currentCharacter == 'f' || currentCharacter == 'F')
                             return State.FLOAT_F_END;
                     default:
-                        throw new NgException("Invalid character '" + currentCharacter + "' at state " + state.toString());
+                        throw new RuntimeException("Invalid character '" + currentCharacter + "' at state " + state.toString());
                 }
             }
 
@@ -359,7 +363,12 @@ public class Tokenizer {
                 case '/':
                     return State.OPERATOR;
             }
-            throw new NgException("Invalid character : " + currentCharacter + " in state " + state);
+
+            if(Character.isWhitespace(currentCharacter)){
+                return State.WHITESPACE;
+            }
+
+            throw new RuntimeException("Invalid character : " + currentCharacter + " in state " + state);
         }finally {
             advance();
         }
@@ -370,8 +379,11 @@ public class Tokenizer {
     }
 
     private void emit(TokenType tokenType) {
-        Token token = new Token(tokenType, script.substring(readIndex, index));
+        if(tokenType != TokenType.WHITESPACE) {
+            Token token = new Token(tokenType, script.substring(readIndex, index));
+            tokens.add(token);
+        }
         readIndex = index;
-        tokens.add(token);
     }
 }
+

@@ -38,7 +38,7 @@ public class ModelSource implements Source {
         if(method == null){
             throw new RuntimeException("Method not set for '" + modelName + '.' + fieldName + '\'');
         }
-        return modelName + '.' + method;
+        return modelName + '.' + method + "()";
     }
 
     @Override

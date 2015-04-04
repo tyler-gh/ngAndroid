@@ -91,7 +91,7 @@ public class NgModelSourceUtils {
                     }
                 }
                 if(!getterFound){
-                    MessageUtils.warning(enclosedElement, "Field '%s' is missing a corresponding getter", fName);
+                    MessageUtils.error(enclosedElement, "Field '%s' is missing a corresponding getter", fName);
                 }
                 fields.add(sourceField);
             }

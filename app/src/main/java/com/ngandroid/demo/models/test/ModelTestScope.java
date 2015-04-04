@@ -24,9 +24,8 @@ import com.ngandroid.lib.annotations.NgScope;
 */
 @NgScope
 public class ModelTestScope {
+//  TODO throw an error in this situation @NgModel
     public TestSetterRequired testSetterRequired;
-    @NgModel
-    public TestGetterNotRequired testGetterNotRequired, x;
     @NgModel
     public TestJsonModel testJsonModel;
     @NgModel
