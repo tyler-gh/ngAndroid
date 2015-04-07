@@ -70,6 +70,17 @@ public class XmlUtils {
         add("ngOnItemClickListener");
     }});
 
+    public static Document getDocumentFromFile(File file){
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            return db.parse(file);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            MessageUtils.error(null, e.getMessage());
+            return null;
+        }
+    }
+
     public static Map<File, List<XmlNode>> getAttributes(){
         List<File> layoutDirs = LayoutsFinder.findLayouts();
         Map<File, List<XmlNode>> xmlAttrMap = new HashMap<>();
@@ -77,14 +88,8 @@ public class XmlUtils {
         for(File f : layoutDirs){
             for(File kid : f.listFiles()){
                 if(kid.getName().endsWith(".xml")){
-                    System.out.println(kid);
-                    Document doc;
-                    try {
-                        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                        DocumentBuilder db = dbf.newDocumentBuilder();
-                        doc = db.parse(kid);
-                    } catch (ParserConfigurationException | SAXException | IOException e) {
-                        MessageUtils.error(null, e.getMessage());
+                    Document doc = getDocumentFromFile(kid);
+                    if(doc == null){
                         continue;
                     }
 

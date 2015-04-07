@@ -28,6 +28,7 @@ import com.github.davityle.ngprocessor.util.TypeUtils;
 import com.github.davityle.ngprocessor.util.source.NgModelSourceUtils;
 import com.github.davityle.ngprocessor.util.source.NgScopeSourceUtils;
 import com.github.davityle.ngprocessor.util.source.SourceCreator;
+import com.github.davityle.ngprocessor.util.xml.ManifestPackageUtils;
 import com.github.davityle.ngprocessor.util.xml.XmlAttribute;
 import com.github.davityle.ngprocessor.util.xml.XmlNode;
 import com.github.davityle.ngprocessor.util.xml.XmlUtils;
@@ -88,6 +89,7 @@ public class NgProcessor extends AbstractProcessor {
 
         Set<Map.Entry<File, List<XmlNode>>> xmlLayouts = xmlAttrMap.entrySet();
         Map<XmlNode, List<Element>> viewScopeMap = new HashMap<>();
+        Map<Element, List<XmlNode>> elementNodeMap = new HashMap<>();
 
         for (Map.Entry<File, List<XmlNode>> layout : xmlLayouts) {
             List<XmlNode> views = layout.getValue();
@@ -140,6 +142,14 @@ public class NgProcessor extends AbstractProcessor {
                     }
                 }
                 viewScopeMap.put(view, matchingScopes);
+                for(Element element : matchingScopes){
+                    List<XmlNode> nodes =  elementNodeMap.get(element);
+                    if(nodes == null){
+                        nodes = new ArrayList<>();
+                        elementNodeMap.put(element, nodes);
+                    }
+                    nodes.add(view);
+                }
             }
         }
 
@@ -150,10 +160,18 @@ public class NgProcessor extends AbstractProcessor {
             }
         }
 
+        String manifestPackageName = ManifestPackageUtils.getPackageName();
+
+        if(manifestPackageName == null) {
+            MessageUtils.error(null, "Unable to find android manifest.");
+            return false;
+        }
+
+
         Map<String, List<Element>> scopeBuilderMap = NgScopeAnnotationUtils.getScopeMap(scopes);
         Map<String, Element> modelBuilderMap = NgModelAnnotationUtils.getModels(annotations, roundEnv, scopeBuilderMap);
         List<NgModelSourceLink> modelSourceLinks = NgModelSourceUtils.getSourceLinks(modelBuilderMap);
-        List<NgScopeSourceLink> scopeSourceLinks = NgScopeSourceUtils.getSourceLinks(scopeBuilderMap);
+        List<NgScopeSourceLink> scopeSourceLinks = NgScopeSourceUtils.getSourceLinks(scopeBuilderMap, elementNodeMap, manifestPackageName);
 
         SourceCreator sourceCreator = new SourceCreator(filer, modelSourceLinks, scopeSourceLinks);
         sourceCreator.createSourceFiles();

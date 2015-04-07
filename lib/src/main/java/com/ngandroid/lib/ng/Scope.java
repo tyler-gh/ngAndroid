@@ -16,9 +16,13 @@
 
 package com.ngandroid.lib.ng;
 
+import android.view.View;
+
 /**
  * Created by tyler on 3/20/15.
  */
 public interface Scope {
-    public <T> T getModel(String name);
+    public <T extends Model> T getModel(String name);
+    public <T> T invokeMethod(String name, Object ... args);
+    public void attach(View __view__);
 }

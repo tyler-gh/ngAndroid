@@ -16,7 +16,7 @@
 
 package com.github.davityle.ngprocessor.sourcelinks;
 
-import com.github.davityle.ngprocessor.SourceField;
+import com.github.davityle.ngprocessor.util.source.SourceField;
 import com.github.davityle.ngprocessor.util.NgModelAnnotationUtils;
 
 import org.apache.velocity.VelocityContext;

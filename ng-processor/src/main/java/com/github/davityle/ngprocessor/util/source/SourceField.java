@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor;
+package com.github.davityle.ngprocessor.util.source;
 
 /**
 * Created by tyler on 3/25/15.

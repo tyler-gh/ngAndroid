@@ -10,6 +10,12 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
         #end
 	}
 
+	public void attach(android.view.View __view__){
+        #foreach($id in $ids)
+            android.view.View ${id} = __view__.findViewById(${manifestPackageName}.R.id.${id});
+        #end
+	}
+
 	public com.ngandroid.lib.ng.Model getModel(String field){
 		switch(field){
 		    #foreach($field in $fields)
@@ -19,4 +25,9 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
 		}
 		throw new com.ngandroid.lib.exceptions.NgException("Field '" + field + "' was not found in ${simpleClassName}");
 	}
+
+	public Object invokeMethod(String name, Object ... args){
+	    return null;
+	}
+
 }

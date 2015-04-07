@@ -16,7 +16,6 @@
 
 package com.github.davityle.ngprocessor.util.source;
 
-import com.github.davityle.ngprocessor.SourceField;
 import com.github.davityle.ngprocessor.sourcelinks.NgModelSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;

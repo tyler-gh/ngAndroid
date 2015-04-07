@@ -16,11 +16,12 @@
 
 package com.github.davityle.ngprocessor.util.source;
 
-import com.github.davityle.ngprocessor.SourceField;
 import com.github.davityle.ngprocessor.sourcelinks.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
+import com.github.davityle.ngprocessor.util.xml.XmlNode;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,17 +36,18 @@ import javax.lang.model.type.TypeMirror;
  */
 public class NgScopeSourceUtils {
 
-    public static List<NgScopeSourceLink> getSourceLinks(Map<String, List<Element>> scopeBuilderMap){
+    public static List<NgScopeSourceLink> getSourceLinks(Map<String, List<Element>> scopeBuilderMap, Map<Element, List<XmlNode>> elementNodeMap, String packageName){
         Set<Map.Entry<String, List<Element>>> entries = scopeBuilderMap.entrySet();
         List<NgScopeSourceLink> scopeSourceLinks = new ArrayList<>();
         for(Map.Entry<String, List<Element>> entry : entries){
             List<Element> elements = entry.getValue();
-            scopeSourceLinks.add(NgScopeSourceUtils.getSourceLink(elements));
+            scopeSourceLinks.add(NgScopeSourceUtils.getSourceLink(elements, elementNodeMap, packageName));
         }
         return scopeSourceLinks;
     }
 
-    private static NgScopeSourceLink getSourceLink(List<Element> elements){
+    private static NgScopeSourceLink getSourceLink(List<Element> elements, Map<Element, List<XmlNode>> elementNodeMap, String manifestPackageName){
+        // TODO do this better
         Element scopeClass = elements.get(0).getEnclosingElement();
         String packageName = ElementUtils.getPackageName((TypeElement) scopeClass);
         String className = ElementUtils.getClassName((TypeElement) scopeClass, packageName);
@@ -60,6 +62,13 @@ public class NgScopeSourceUtils {
         Element[] els = elements.toArray(new Element[elements.size() + 1]);
         els[elements.size()] = scopeClass;
 
-        return new NgScopeSourceLink(className, packageName, fields, els);
+        List<XmlNode> xmlNodes = elementNodeMap.get(scopeClass);
+        Set<String> ids = new HashSet<>();
+        if(xmlNodes != null){
+            for(XmlNode xmlNode : xmlNodes){
+                ids.add(xmlNode.getId());
+            }
+        }
+        return new NgScopeSourceLink(className, packageName, fields, els, ids, manifestPackageName);
     }
 }
