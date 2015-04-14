@@ -17,18 +17,27 @@
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import javax.lang.model.type.TypeMirror;
 
 /**
 * Created by davityle on 1/24/15.
 */
-public class MethodSource implements Source {
+public class MethodSource extends Source<MethodSource> {
 
     private final String methodName;
     private final List<Source> parameters;
     private String parametersSource;
 
     public MethodSource(String source, List<Source> parameters) {
+        this(source, parameters, null);
+    }
+
+    public MethodSource(String source, List<Source> parameters, TypeMirror typeMirror) {
+        super(typeMirror);
         this.methodName = source;
         this.parameters = parameters;
     }
@@ -46,7 +55,8 @@ public class MethodSource implements Source {
             parametersSourceBuilder.append(")");
             parametersSource = parametersSourceBuilder.toString();
         }
-        return methodName + parametersSource;
+        // TODO put constant 'scope.' somewhere
+        return "scope." + methodName + parametersSource;
     }
 
     public String getMethodName(){
@@ -66,5 +76,14 @@ public class MethodSource implements Source {
         for(Source source : parameters){
             source.getMethodSource(methods);
         }
+    }
+
+    public List<Source> getParameters(){
+        return Collections.unmodifiableList(parameters);
+    }
+
+    @Override
+    protected MethodSource cp(TypeMirror typeMirror) {
+        return new MethodSource(methodName, new ArrayList<>(parameters), typeMirror);
     }
 }

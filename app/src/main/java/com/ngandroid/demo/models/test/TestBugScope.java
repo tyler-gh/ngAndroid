@@ -27,7 +27,7 @@ import com.ngandroid.lib.annotations.NgScope;
 public class TestBugScope {
     @NgModel
     public Input input;
-    private void multiply(int x, int y){
+    public void multiply(int x, int y){
 
     }
 }

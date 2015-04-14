@@ -28,6 +28,7 @@ import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.StaticSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.TernarySource;
 import com.github.davityle.ngprocessor.util.Tuple;
+import com.github.davityle.ngprocessor.util.TypeUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -122,22 +123,26 @@ public class AttributeCompiler {
                     break;
                 }
                 case INTEGER_CONSTANT: {
-                    sourceList.add(new StaticSource(token.getScript()));
+                    sourceList.add(new StaticSource(token.getScript(), TypeUtils.getIntegerType()));
                     index++;
                     break;
                 }
                 case LONG_CONSTANT: {
-                    sourceList.add(new StaticSource(token.getScript()));
+                    sourceList.add(new StaticSource(token.getScript(), TypeUtils.getLongType()));
                     index++;
                     break;
                 }
                 case FLOAT_CONSTANT: {
-                    sourceList.add(new StaticSource(token.getScript()));
+                    // TODO test all the number constants
+                    String script = token.getScript();
+                    if(!script.endsWith("f") && !script.endsWith("F"))
+                        script += "f";
+                    sourceList.add(new StaticSource(script, TypeUtils.getFloatType()));
                     index++;
                     break;
                 }
                 case DOUBLE_CONSTANT: {
-                    sourceList.add(new StaticSource(token.getScript()));
+                    sourceList.add(new StaticSource(token.getScript(), TypeUtils.getDoubleType()));
                     index++;
                     break;
                 }
@@ -150,7 +155,7 @@ public class AttributeCompiler {
                 }
                 case STRING: {
                     String script = token.getScript().replace("\"", "\\\"").replace("\\'","'");
-                    sourceList.add(new StaticSource('"' + script.substring(1, script.length() - 1) + '"'));
+                    sourceList.add(new StaticSource('"' + script.substring(1, script.length() - 1) + '"', TypeUtils.getStringType()));
                     index++;
                     break;
                 }

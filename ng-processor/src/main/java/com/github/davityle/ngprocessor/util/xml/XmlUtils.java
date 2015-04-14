@@ -81,7 +81,7 @@ public class XmlUtils {
         }
     }
 
-    public static Map<File, List<XmlNode>> getAttributes(){
+    public static Map<File, List<XmlNode>> getFileNodeMap(){
         List<File> layoutDirs = LayoutsFinder.findLayouts();
         Map<File, List<XmlNode>> xmlAttrMap = new HashMap<>();
 
@@ -160,7 +160,7 @@ public class XmlUtils {
                     if(id == null){
                         MessageUtils.error(null, "xml attributes '%s' in node '%s' in layout file '%s' need an id", attributeList.toString(), childNode.toString(), fileName);
                     }else {
-                        ngAttrNodes.add(new XmlNode(id, attributeList));
+                        ngAttrNodes.add(new XmlNode(id, attributeList, fileName, childNode.getNodeName()));
                     }
                 }
             }

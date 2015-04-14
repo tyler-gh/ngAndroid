@@ -1,5 +1,8 @@
 package ${packageName};
 
+import android.view.View;
+import android.widget.*;
+
 public class ${simpleClassName}$$NgScope <T extends ${className}> implements com.ngandroid.lib.ng.Scope {
 
 	private T scope;
@@ -10,10 +13,20 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
         #end
 	}
 
-	public void attach(android.view.View __view__){
-        #foreach($id in $ids)
-            android.view.View ${id} = __view__.findViewById(${manifestPackageName}.R.id.${id});
-        #end
+	public void attach(int layoutId, android.view.View __view__){
+	    switch(layoutId){
+            #foreach ($mapEntry in $layouts.entrySet())
+                case ${manifestPackageName}.R.layout.${mapEntry.key}:{
+                    #foreach($v in $mapEntry.value)
+                        ${v.elementType} ${v.id} = (${v.elementType}) __view__.findViewById(${manifestPackageName}.R.id.${v.id});
+                        #foreach($attr in $v.attributes)
+                            ${attr.source};
+                        #end
+                    #end
+                    break;
+                }
+            #end
+        }
 	}
 
 	public com.ngandroid.lib.ng.Model getModel(String field){

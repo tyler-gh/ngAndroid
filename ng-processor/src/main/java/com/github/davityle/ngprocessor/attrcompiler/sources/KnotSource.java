@@ -17,16 +17,21 @@
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
 
+import com.github.davityle.ngprocessor.util.TypeUtils;
+
 import java.util.List;
+
+import javax.lang.model.type.TypeMirror;
 
 /**
  * Created by tyler on 2/10/15.
  */
-public class KnotSource implements Source {
+public class KnotSource extends Source<KnotSource> {
 
     private final Source source;
 
     public KnotSource(Source source) {
+        super(TypeUtils.getBooleanType());
         this.source = source;
     }
 
@@ -43,5 +48,10 @@ public class KnotSource implements Source {
     @Override
     public void getMethodSource(List<MethodSource> methods) {
         source.getMethodSource(methods);
+    }
+
+    @Override
+    protected KnotSource cp(TypeMirror typeMirror) throws IllegalArgumentException {
+        return new KnotSource(source);
     }
 }

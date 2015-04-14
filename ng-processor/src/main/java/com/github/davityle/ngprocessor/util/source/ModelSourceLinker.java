@@ -35,14 +35,20 @@ import javax.lang.model.type.TypeMirror;
 /**
  * Created by tyler on 3/30/15.
  */
-public class NgModelSourceUtils {
+public class ModelSourceLinker {
 
-    public static List<NgModelSourceLink> getSourceLinks(Map<String, Element> modelBuilderMap){
+    private final Map<String, Element> modelBuilderMap;
+
+    public ModelSourceLinker(Map<String, Element> modelBuilderMap) {
+        this.modelBuilderMap = modelBuilderMap;
+    }
+
+    public List<NgModelSourceLink> getSourceLinks(){
         Set<Map.Entry<String, Element>> models = modelBuilderMap.entrySet();
         List<NgModelSourceLink> modelSourceLinks = new ArrayList<>();
         for(Map.Entry<String, Element> model : models){
             Element element = model.getValue();
-            modelSourceLinks.add(NgModelSourceUtils.getSourceLink(element));
+            modelSourceLinks.add(ModelSourceLinker.getSourceLink(element));
         }
         return modelSourceLinks;
     }

@@ -19,10 +19,12 @@ package com.github.davityle.ngprocessor.sourcelinks;
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 import com.github.davityle.ngprocessor.util.source.SourceField;
+import com.github.davityle.ngprocessor.util.xml.XmlNode;
 
 import org.apache.velocity.VelocityContext;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.lang.model.element.Element;
@@ -36,16 +38,16 @@ public class NgScopeSourceLink implements SourceLink{
     private final String packageName;
     private final List<SourceField> fields;
     private final Element[] elements;
-    private final Set<String> ids;
+    private final Map<String, Set<XmlNode>> layouts;
     private final String manifestPackageName;
     private List<Source> sources;
 
-    public NgScopeSourceLink(String className, String packageName, List<SourceField> fields, Element[] elements, Set<String> ids, String manifestPackageName) {
+    public NgScopeSourceLink(String className, String packageName, List<SourceField> fields, Element[] elements, Map<String, Set<XmlNode>> layouts, String manifestPackageName) {
         this.className = className;
         this.packageName = packageName;
         this.fields = fields;
         this.elements = elements;
-        this.ids = ids;
+        this.layouts = layouts;
         this.manifestPackageName = manifestPackageName;
     }
 
@@ -57,7 +59,7 @@ public class NgScopeSourceLink implements SourceLink{
         vc.put("className", packageName + '.' + className);
         vc.put("packageName", packageName);
         vc.put("fields", fields);
-        vc.put("ids", ids);
+        vc.put("layouts", layouts);
         vc.put("manifestPackageName", manifestPackageName);
         return vc;
     }

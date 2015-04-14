@@ -49,4 +49,9 @@ public class Tuple<T,K> {
     public static <T,K> Tuple<T,K> of(T t, K k){
         return new Tuple<>(t,k);
     }
+
+    @Override
+    public int hashCode() {
+        return first.hashCode() * 7 + second.hashCode() * 17;
+    }
 }

@@ -14,15 +14,17 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.annotations;
 
-import android.view.View;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Created by tyler on 3/20/15.
+ * Created by tyler on 3/18/15.
  */
-public interface Scope {
-    public <T extends Model> T getModel(String name);
-    public <T> T invokeMethod(String name, Object ... args);
-    public void attach(int layoutId, View __view__);
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.SOURCE)
+public @interface NgModel {
 }

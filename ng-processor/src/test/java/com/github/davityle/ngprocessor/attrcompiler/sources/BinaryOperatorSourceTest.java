@@ -14,15 +14,25 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.github.davityle.ngprocessor.attrcompiler.sources;
 
-import android.view.View;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-/**
- * Created by tyler on 3/20/15.
- */
-public interface Scope {
-    public <T extends Model> T getModel(String name);
-    public <T> T invokeMethod(String name, Object ... args);
-    public void attach(int layoutId, View __view__);
+public class BinaryOperatorSourceTest {
+
+    @Test
+    public void testOperatorTypeResults(){
+
+        Object a = 1l + 1;
+        assertTrue(a instanceof Long);
+        assertNotEquals(2, a);
+        assertEquals(2l, a);
+
+        Object b = "" + 3.14159;
+
+        assertTrue(b instanceof String);
+        assertEquals("3.14159", b);
+    }
+
 }

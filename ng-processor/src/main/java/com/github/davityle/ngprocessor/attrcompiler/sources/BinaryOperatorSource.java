@@ -17,28 +17,31 @@
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
 import com.github.davityle.ngprocessor.attrcompiler.parse.TokenType;
+import com.github.davityle.ngprocessor.util.TypeUtils;
 
 import java.util.List;
+
+import javax.lang.model.type.TypeMirror;
 
 /**
  * Created by tyler on 2/6/15.
  */
-public class BinaryOperatorSource implements Source {
+public class BinaryOperatorSource extends Source<BinaryOperatorSource> {
 
     protected final Source leftSide;
     protected final Source rightSide;
     protected final TokenType.BinaryOperator operator;
 
-    public BinaryOperatorSource(Source leftSide, Source rightSide, TokenType.BinaryOperator operator) {
+    private BinaryOperatorSource(Source leftSide, Source rightSide, TokenType.BinaryOperator operator, TypeMirror typeMirror) {
+        super(typeMirror);
         this.leftSide = leftSide;
         this.rightSide = rightSide;
         this.operator = operator;
     }
 
     public static BinaryOperatorSource getOperator(Source leftSide, Source rightSide, TokenType.BinaryOperator operator){
-        return new BinaryOperatorSource(leftSide, rightSide, operator);
+        return new BinaryOperatorSource(leftSide, rightSide, operator, TypeUtils.getOperatorKind(leftSide, rightSide, operator));
     }
-
 
     @Override
     public String getSource() {
@@ -55,5 +58,10 @@ public class BinaryOperatorSource implements Source {
     public void getMethodSource(List<MethodSource> methods) {
         rightSide.getMethodSource(methods);
         leftSide.getMethodSource(methods);
+    }
+
+    @Override
+    protected BinaryOperatorSource cp(TypeMirror typeMirror) throws IllegalArgumentException {
+        return new BinaryOperatorSource(leftSide, rightSide, operator, typeMirror);
     }
 }

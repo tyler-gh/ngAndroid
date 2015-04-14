@@ -14,15 +14,39 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.github.davityle.ngprocessor.util;
 
-import android.view.View;
+import org.junit.Test;
 
-/**
- * Created by tyler on 3/20/15.
- */
-public interface Scope {
-    public <T extends Model> T getModel(String name);
-    public <T> T invokeMethod(String name, Object ... args);
-    public void attach(int layoutId, View __view__);
+public class TypeUtilsTest {
+
+    @Test
+    public void testGetOperatorKind() throws Exception {
+
+    }
+
+    @Test
+    public void testAssignable() throws Exception {
+
+    }
+
+    @Test
+    public void testMatchFirstPrecedence() throws Exception {
+
+    }
+
+    @Test
+    public void testMatch() throws Exception {
+
+    }
+
+    @Test
+    public void testIsString() throws Exception {
+
+    }
+
+    @Test
+    public void testEqualsOrHasPrecedence() throws Exception {
+
+    }
 }

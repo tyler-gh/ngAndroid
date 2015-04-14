@@ -29,26 +29,26 @@ public class DemoActivity extends Activity {
 
         input.setDisabled(true);
     }
-
-    private void multiply(float num1, int num2){
+// TODO private functions should throw erro
+    void multiply(float num1, int num2){
         Toast.makeText(this, String.valueOf(num1 * num2), Toast.LENGTH_SHORT).show();
     }
 
-    private void multiply(int num1, int num2){
+    void multiply(int num1, int num2){
         Toast.makeText(this, String.valueOf(num1 * num2), Toast.LENGTH_SHORT).show();
     }
 
 
-    private void stringClickEvent(){
+    void stringClickEvent(){
         stringClickEvent.setText(input.getInput());
     }
 
 
-    private void intClickEvent(int num){
+    void intClickEvent(int num){
         really2.setText(String.valueOf(num));
     }
 
-    private void onChange(){
+    void onChange(){
         Toast.makeText(this, "Text Changed", Toast.LENGTH_SHORT).show();
     }
 }

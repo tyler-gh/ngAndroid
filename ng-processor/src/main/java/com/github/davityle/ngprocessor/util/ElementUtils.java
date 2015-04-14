@@ -16,11 +16,19 @@
 
 package com.github.davityle.ngprocessor.util;
 
+import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
+import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
+
+import java.util.List;
+import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
@@ -35,6 +43,31 @@ public class ElementUtils {
     public static void setElements(Elements elements){
         elementUtils = elements;
     }
+
+    public static boolean methodsMatch(Element elem, MethodSource source){
+        if(elem == null || !(elem instanceof ExecutableElement) || elem.getKind() != ElementKind.METHOD)
+            return false;
+        ExecutableElement method = (ExecutableElement) elem;
+
+        List<Source> parameters = source.getParameters();
+        List<? extends VariableElement> methodParameters = method.getParameters();
+        if(methodParameters.size() != parameters.size())
+            return false;
+
+        for(int i = 0; i < parameters.size(); i++){
+            TypeMirror typeMirror = parameters.get(i).getTypeMirror();
+            // TODO get the model types from the models in the matching scope and see if they match by type
+            if(typeMirror != null){
+                VariableElement element = methodParameters.get(i);
+                TypeMirror eleType = element.asType();
+                if (!TypeUtils.matchFirstPrecedence(eleType, typeMirror))
+                    return false;
+            }
+        }
+
+        return elem.getSimpleName().toString().equals(source.getMethodName()) && ElementUtils.isAccessible(elem);
+    }
+
     public static boolean isSetter(Element elem){
         return elem != null && ExecutableElement.class.isInstance(elem)
                 && elem.getKind() == ElementKind.METHOD
@@ -88,5 +121,10 @@ public class ElementUtils {
 
     public static String getPackageName(TypeElement type) {
         return elementUtils.getPackageOf(type).getQualifiedName().toString();
+    }
+
+    public static boolean isAccessible(Element element) {
+        Set<Modifier> modifiers = element.getModifiers();
+        return !(modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED));
     }
 }

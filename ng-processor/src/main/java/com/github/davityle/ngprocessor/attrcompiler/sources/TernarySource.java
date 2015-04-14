@@ -16,17 +16,23 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
+import com.github.davityle.ngprocessor.util.TypeUtils;
+
 import java.util.List;
+
+import javax.lang.model.type.TypeMirror;
 
 /**
  * Created by tyler on 2/2/15.
  */
-public class TernarySource implements Source {
+public class TernarySource extends Source<TernarySource> {
 
     private final Source booleanSource;
     private final Source valTrue, valFalse;
 
     public TernarySource(Source booleanSource, Source valTrue, Source valFalse) {
+        // TODO binaryoperator equals equals doesn't make a whole lot of sense for ternary operator
+        super(TypeUtils.getOperatorKind(valTrue, valFalse));
         this.booleanSource = booleanSource;
         this.valTrue = valTrue;
         this.valFalse = valFalse;
@@ -49,5 +55,10 @@ public class TernarySource implements Source {
         booleanSource.getMethodSource(methods);
         valFalse.getMethodSource(methods);
         valTrue.getMethodSource(methods);
+    }
+
+    @Override
+    protected TernarySource cp(TypeMirror typeMirror) throws IllegalArgumentException {
+        return new TernarySource(booleanSource, valTrue, valFalse);
     }
 }

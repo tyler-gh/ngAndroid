@@ -17,7 +17,7 @@
 package com.github.davityle.ngprocessor.sourcelinks;
 
 import com.github.davityle.ngprocessor.util.source.SourceField;
-import com.github.davityle.ngprocessor.util.NgModelAnnotationUtils;
+import com.github.davityle.ngprocessor.util.ModelScopeMapper;
 
 import org.apache.velocity.VelocityContext;
 
@@ -62,6 +62,6 @@ public class NgModelSourceLink implements SourceLink {
 
     @Override
     public String getSourceFileName() {
-        return packageName + "." + modelName + NgModelAnnotationUtils.MODEL_APPENDAGE;
+        return packageName + "." + modelName + ModelScopeMapper.MODEL_APPENDAGE;
     }
 }

@@ -16,27 +16,22 @@
 
 package com.github.davityle.ngprocessor;
 
-import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
 import com.github.davityle.ngprocessor.sourcelinks.NgModelSourceLink;
 import com.github.davityle.ngprocessor.sourcelinks.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
+import com.github.davityle.ngprocessor.util.LayoutScopeMapper;
 import com.github.davityle.ngprocessor.util.MessageUtils;
-import com.github.davityle.ngprocessor.util.NgModelAnnotationUtils;
+import com.github.davityle.ngprocessor.util.ModelScopeMapper;
 import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 import com.github.davityle.ngprocessor.util.TypeUtils;
-import com.github.davityle.ngprocessor.util.source.NgModelSourceUtils;
-import com.github.davityle.ngprocessor.util.source.NgScopeSourceUtils;
+import com.github.davityle.ngprocessor.util.source.ModelSourceLinker;
+import com.github.davityle.ngprocessor.util.source.ScopeSourceLinker;
 import com.github.davityle.ngprocessor.util.source.SourceCreator;
 import com.github.davityle.ngprocessor.util.xml.ManifestPackageUtils;
-import com.github.davityle.ngprocessor.util.xml.XmlAttribute;
 import com.github.davityle.ngprocessor.util.xml.XmlNode;
 import com.github.davityle.ngprocessor.util.xml.XmlUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,7 +57,7 @@ import javax.lang.model.element.TypeElement;
  */
 
 @SupportedAnnotationTypes({
-    NgModelAnnotationUtils.NG_MODEL_ANNOTATION,
+    ModelScopeMapper.NG_MODEL_ANNOTATION,
     NgScopeAnnotationUtils.NG_SCOPE_ANNOTATION
 })
 public class NgProcessor extends AbstractProcessor {
@@ -83,96 +78,35 @@ public class NgProcessor extends AbstractProcessor {
         if(annotations.size() == 0)
             return false;
         System.out.println(":NgAndroid:processing");
-
-        Map<File, List<XmlNode>> xmlAttrMap = XmlUtils.getAttributes();
-        List<Element> scopes = NgScopeAnnotationUtils.getScopes(annotations, roundEnv);
-
-        Set<Map.Entry<File, List<XmlNode>>> xmlLayouts = xmlAttrMap.entrySet();
-        Map<XmlNode, List<Element>> viewScopeMap = new HashMap<>();
-        Map<Element, List<XmlNode>> elementNodeMap = new HashMap<>();
-
-        for (Map.Entry<File, List<XmlNode>> layout : xmlLayouts) {
-            List<XmlNode> views = layout.getValue();
-
-            for (XmlNode view : views) {
-                List<Element> matchingScopes = new ArrayList<>(scopes);
-                Iterator<Element> it = matchingScopes.listIterator();
-                for (;it.hasNext();) {
-                    Element scope = it.next();
-                    boolean match = true;
-                    for (XmlAttribute attribute : view.getAttributes()) {
-                        List<MethodSource> methodSources = attribute.getMethodSource();
-
-                        for (MethodSource methodSource : methodSources) {
-                            boolean found = false;
-                            for (Element child : scope.getEnclosedElements()) {
-                                if (child.getSimpleName().toString().equals(methodSource.getMethodName())) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (!found) {
-                                // TODO list attribute as not found
-                                match = false;
-                                break;
-                            }
-                        }
-                        List<ModelSource> modelSources = attribute.getModelSource();
-                        for (ModelSource modelSource : modelSources) {
-                            boolean found = false;
-                            for (Element child : scope.getEnclosedElements()) {
-                                if (child.getSimpleName().toString().equals(modelSource.getModelName())) {
-                                    if(ElementUtils.hasGetterAndSetter(TypeUtils.asTypeElement(child.asType()), modelSource.getFieldName())) {
-                                        found = true;
-                                        break;
-                                    }else{
-                                        //TODO field was found but model did not have getter and setter
-                                    }
-                                }
-                            }
-                            if (!found) {
-                                // TODO list attribute as not found
-                                match = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (!match) {
-                        it.remove();
-                    }
-                }
-                viewScopeMap.put(view, matchingScopes);
-                for(Element element : matchingScopes){
-                    List<XmlNode> nodes =  elementNodeMap.get(element);
-                    if(nodes == null){
-                        nodes = new ArrayList<>();
-                        elementNodeMap.put(element, nodes);
-                    }
-                    nodes.add(view);
-                }
-            }
-        }
-
-        Set<Map.Entry<XmlNode, List<Element>>> entries = viewScopeMap.entrySet();
-        for(Map.Entry<XmlNode, List<Element>> entry : entries){
-            if(entry.getValue().size() == 0){
-                MessageUtils.error(null, "This view does not match any scope specifically this element did not match");
-            }
-        }
-
         String manifestPackageName = ManifestPackageUtils.getPackageName();
-
         if(manifestPackageName == null) {
             MessageUtils.error(null, "Unable to find android manifest.");
             return false;
         }
 
+        // get the elements annotated with NgScope
+        List<Element> scopes = NgScopeAnnotationUtils.getScopes(annotations, roundEnv);
+        // get the xml layouts/nodes with attributes
+        Map<File, List<XmlNode>> fileNodeMap = XmlUtils.getFileNodeMap();
 
-        Map<String, List<Element>> scopeBuilderMap = NgScopeAnnotationUtils.getScopeMap(scopes);
-        Map<String, Element> modelBuilderMap = NgModelAnnotationUtils.getModels(annotations, roundEnv, scopeBuilderMap);
-        List<NgModelSourceLink> modelSourceLinks = NgModelSourceUtils.getSourceLinks(modelBuilderMap);
-        List<NgScopeSourceLink> scopeSourceLinks = NgScopeSourceUtils.getSourceLinks(scopeBuilderMap, elementNodeMap, manifestPackageName);
+        LayoutScopeMapper layoutScopeMapper = new LayoutScopeMapper(scopes, fileNodeMap);
+        // check that all attributes match an existing scope
+        layoutScopeMapper.checkLayoutsValid();
 
+        ModelScopeMapper modelScopeMapper = new ModelScopeMapper(annotations, roundEnv, scopes);
+
+        // get the mapped models
+        Map<String, Element> modelMap = modelScopeMapper.getModels();
+        // get the mapped scopes
+        Map<String, List<Element>> scopeMap = modelScopeMapper.getScopeMap();
+
+        // get the model to source links
+        List<NgModelSourceLink> modelSourceLinks = new ModelSourceLinker(modelMap).getSourceLinks();
+        // get the scope to source links
+        ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopeMap, layoutScopeMapper.getElementNodeMap(), manifestPackageName);
+        List<NgScopeSourceLink> scopeSourceLinks = scopeSourceLinker.getSourceLinks();
+
+        // create the source files
         SourceCreator sourceCreator = new SourceCreator(filer, modelSourceLinks, scopeSourceLinks);
         sourceCreator.createSourceFiles();
 
