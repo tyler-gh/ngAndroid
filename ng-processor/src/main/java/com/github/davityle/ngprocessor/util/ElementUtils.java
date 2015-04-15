@@ -17,9 +17,11 @@
 package com.github.davityle.ngprocessor.util;
 
 import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
+import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -44,7 +46,7 @@ public class ElementUtils {
         elementUtils = elements;
     }
 
-    public static boolean methodsMatch(Element elem, MethodSource source){
+    public static boolean methodsMatch(Element elem, MethodSource source, Map<ModelSource,ModelSource> typedModels){
         if(elem == null || !(elem instanceof ExecutableElement) || elem.getKind() != ElementKind.METHOD)
             return false;
         ExecutableElement method = (ExecutableElement) elem;
@@ -55,13 +57,18 @@ public class ElementUtils {
             return false;
 
         for(int i = 0; i < parameters.size(); i++){
-            TypeMirror typeMirror = parameters.get(i).getTypeMirror();
+            Source parameter = parameters.get(i);
+            if(parameter instanceof ModelSource)
+                parameter = typedModels.get(parameter);
+            TypeMirror typeMirror = parameter.getTypeMirror();
             // TODO get the model types from the models in the matching scope and see if they match by type
             if(typeMirror != null){
                 VariableElement element = methodParameters.get(i);
                 TypeMirror eleType = element.asType();
-                if (!TypeUtils.matchFirstPrecedence(eleType, typeMirror))
+                if (!TypeUtils.matchFirstPrecedence(eleType, typeMirror)) {
+                    System.out.println(eleType + " does not match " + typeMirror);
                     return false;
+                }
             }
         }
 
@@ -75,12 +82,47 @@ public class ElementUtils {
                 && ((ExecutableElement) elem).getParameters().size() == 1;
     }
 
+    public static boolean isGetter(Element elem){
+        return elem != null && ExecutableElement.class.isInstance(elem)
+                && elem.getKind() == ElementKind.METHOD
+                && elem.getSimpleName().toString().startsWith("get")
+                && ((ExecutableElement) elem).getReturnType().getKind() != TypeKind.VOID
+                && ((ExecutableElement) elem).getParameters().size() == 0;
+    }
+
     public static boolean isGetterForField(Element elem, String field, TypeKind typeKind){
         return elem != null && ExecutableElement.class.isInstance(elem)
                 && elem.getKind() == ElementKind.METHOD
                 && elem.getSimpleName().toString().toLowerCase().equals("get" + field)
                 && ((ExecutableElement) elem).getReturnType().getKind() == typeKind
                 && ((ExecutableElement) elem).getParameters().size() == 0;
+    }
+
+    public static TypeMirror getElementType(TypeElement model, String field){
+        TypeMirror typeMirror = null;
+        for(Element f : model.getEnclosedElements()){
+            String fName = f.getSimpleName().toString().toLowerCase();
+            ExecutableElement exec = (ExecutableElement) f;
+            if(fName.equals("set" + field) && isSetter(f)){
+                TypeMirror setType = exec.getParameters().get(0).asType();
+                if(typeMirror != null){
+                    checkMatch(model, field, typeMirror, setType);
+                }
+                typeMirror = setType;
+            }else if(fName.equals("get" + field) && isGetter(f)){
+                TypeMirror getType = exec.getReturnType();
+                if(typeMirror != null){
+                    checkMatch(model, field, typeMirror, getType);
+                }
+                typeMirror = getType;
+            }
+        }
+        return typeMirror;
+    }
+
+    private static void checkMatch(TypeElement model, String field, TypeMirror typeMirror, TypeMirror t){
+        if(!TypeUtils.isSameType(typeMirror, t))
+            MessageUtils.error(model, "Getter and Setter for field '%s' do not match", field);
     }
 
     public static boolean hasGetterAndSetter(TypeElement model, String field){

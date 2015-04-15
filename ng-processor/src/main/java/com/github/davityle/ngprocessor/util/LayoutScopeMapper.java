@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 
 /**
  * Created by tyler on 4/7/15.
@@ -88,12 +90,12 @@ public class LayoutScopeMapper {
         isMapped = true;
     }
 
-    private boolean scopeHasMethods(Element scope, List<MethodSource> methodSources){
+    private boolean scopeHasMethods(Element scope, List<MethodSource> methodSources, Map<ModelSource,ModelSource> typedModels){
         boolean match = true;
         for (MethodSource methodSource : methodSources) {
             boolean found = false;
             for (Element child : scope.getEnclosedElements()) {
-                if(ElementUtils.methodsMatch(child, methodSource)){
+                if(ElementUtils.methodsMatch(child, methodSource, typedModels)){
                     found = true;
                     break;
                 }
@@ -133,10 +135,45 @@ public class LayoutScopeMapper {
     private boolean scopeMatchesXmlView(Element scope, XmlNode view){
         boolean match = true;
         for (XmlAttribute attribute : view.getAttributes()) {
-            match = scopeHasMethods(scope, attribute.getMethodSource());
-            match = match && scopeHasModels(scope, attribute.getModelSource());
+            Map<ModelSource, ModelSource> typedModels = mapScopeToModels(scope, attribute.getModelSource());
+            if(typedModels == null){
+                match = false;
+            }else{
+//                match = scopeHasModels(scope, attribute.getModelSource());
+                match = match && scopeHasMethods(scope, attribute.getMethodSource(), typedModels);
+            }
         }
         return match;
+    }
+
+    /**
+     * maps the scope to the models
+     * sets the types of the scope fields to the models
+     * @param scope
+     * @param modelSources
+     * @return
+     */
+    private Map<ModelSource, ModelSource> mapScopeToModels(Element scope, List<ModelSource> modelSources){
+        Map<ModelSource, ModelSource> mappedSources = new HashMap<>();
+        for (ModelSource modelSource : modelSources) {
+            boolean found = false;
+            for (Element child : scope.getEnclosedElements()) {
+                if (child.getSimpleName().toString().equals(modelSource.getModelName())) {
+                    TypeMirror childType = child.asType();
+                    TypeElement typeElement = TypeUtils.asTypeElement(childType);
+                    String fieldName = modelSource.getFieldName();
+                    if(ElementUtils.hasGetterAndSetter(typeElement, fieldName)) {
+                        ModelSource copy = modelSource.copy(ElementUtils.getElementType(typeElement, fieldName));
+                        mappedSources.put(copy, copy);
+                        found = true;
+                        break;
+                    } //TODO field was found but model did not have getter and setter
+                }
+            }
+            if (!found) // TODO list attribute as not found
+                return null;
+        }
+        return mappedSources;
     }
 
     private void put(XmlNode view, List<Element> matchingScopes){

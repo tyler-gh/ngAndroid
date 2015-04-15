@@ -84,4 +84,17 @@ public class ModelSource extends Source<ModelSource> {
     public void setMethod(String method){
         this.method = method;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null || !(obj instanceof ModelSource))
+            return false;
+        ModelSource ms = (ModelSource) obj;
+        return modelName.equals(ms.modelName) && fieldName.equals(ms.fieldName);
+    }
+
+    @Override
+    public int hashCode() {
+        return modelName.hashCode() * 17 + fieldName.hashCode() * 7;
+    }
 }

@@ -19,10 +19,26 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
                 case ${manifestPackageName}.R.layout.${mapEntry.key}:{
                     #foreach($v in $mapEntry.value)
                         ${v.elementType} ${v.id} = (${v.elementType}) __view__.findViewById(${manifestPackageName}.R.id.${v.id});
-                        #foreach($attr in $v.attributes)
-                            ${attr.source};
-                        #end
                     #end
+                    break;
+                }
+            #end
+        }
+	}
+
+	public void execute(int layoutId, int viewId, String attr){
+	    switch(layoutId){
+            #foreach ($mapEntry in $layouts.entrySet())
+                case ${manifestPackageName}.R.layout.${mapEntry.key}:{
+                    switch(viewId){
+                        #foreach($v in $mapEntry.value)
+                            case ${manifestPackageName}.R.id.${v.id}:
+                                #foreach($attr in $v.attributes)
+                                    ${attr.source};
+                                #end
+                                break;
+                        #end
+                    }
                     break;
                 }
             #end

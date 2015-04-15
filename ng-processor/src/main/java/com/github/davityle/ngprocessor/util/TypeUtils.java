@@ -104,11 +104,11 @@ public class TypeUtils {
                 return typeUtils.getPrimitiveType(TypeKind.LONG);
 
             if (
-                either(leftKind, rightKind, TypeKind.INT) ||
-                either(leftKind, rightKind, TypeKind.CHAR) ||
-                either(leftKind, rightKind, TypeKind.SHORT) ||
-                either(leftKind, rightKind, TypeKind.BYTE)
-            ) {
+                    either(leftKind, rightKind, TypeKind.INT) ||
+                            either(leftKind, rightKind, TypeKind.CHAR) ||
+                            either(leftKind, rightKind, TypeKind.SHORT) ||
+                            either(leftKind, rightKind, TypeKind.BYTE)
+                    ) {
                 return typeUtils.getPrimitiveType(TypeKind.INT);
             }
             // one of the above should always return
@@ -148,6 +148,13 @@ public class TypeUtils {
         return typeUtils.isSameType(current, typeMirror) ||
                 typeUtils.isSubtype(typeMirror, current)  ||
                 typeUtils.isAssignable(typeMirror, current);
+    }
+
+    public static boolean isSameType(TypeMirror current, TypeMirror typeMirror){
+        if(isString(current) && isString(typeMirror))
+            return true;
+
+        return typeUtils.isSameType(current, typeMirror);
     }
 
     public static boolean match(TypeMirror current, TypeMirror typeMirror) {
