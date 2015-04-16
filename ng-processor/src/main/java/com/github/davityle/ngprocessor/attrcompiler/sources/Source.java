@@ -36,6 +36,7 @@ public abstract class Source <T extends Source> {
     public abstract String getSource();
     public abstract void getModelSource(List<ModelSource> models);
     public abstract void getMethodSource(List<MethodSource> methods);
+    public abstract boolean isVoid();
     protected abstract T cp(TypeMirror typeMirror) throws IllegalArgumentException;
 
     public T copy(TypeMirror typeMirror) throws IllegalArgumentException{

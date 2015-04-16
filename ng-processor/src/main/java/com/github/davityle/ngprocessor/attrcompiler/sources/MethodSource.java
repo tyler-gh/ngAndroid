@@ -78,6 +78,12 @@ public class MethodSource extends Source<MethodSource> {
         }
     }
 
+    @Override
+    public boolean isVoid() {
+        // TODO check to see what it returns
+        return true;
+    }
+
     public List<Source> getParameters(){
         return Collections.unmodifiableList(parameters);
     }

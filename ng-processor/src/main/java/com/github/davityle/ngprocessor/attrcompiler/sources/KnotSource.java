@@ -51,6 +51,11 @@ public class KnotSource extends Source<KnotSource> {
     }
 
     @Override
+    public boolean isVoid() {
+        return false;
+    }
+
+    @Override
     protected KnotSource cp(TypeMirror typeMirror) throws IllegalArgumentException {
         return new KnotSource(source);
     }

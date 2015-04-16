@@ -139,7 +139,6 @@ public class LayoutScopeMapper {
             if(typedModels == null){
                 match = false;
             }else{
-//                match = scopeHasModels(scope, attribute.getModelSource());
                 match = match && scopeHasMethods(scope, attribute.getMethodSource(), typedModels);
             }
         }
@@ -162,8 +161,11 @@ public class LayoutScopeMapper {
                     TypeMirror childType = child.asType();
                     TypeElement typeElement = TypeUtils.asTypeElement(childType);
                     String fieldName = modelSource.getFieldName();
-                    if(ElementUtils.hasGetterAndSetter(typeElement, fieldName)) {
+                    Tuple<String, String> methods = ElementUtils.getGetAndSetMethodNames(typeElement, fieldName);
+                    if(methods.getFirst() != null && methods.getSecond() != null) {
                         ModelSource copy = modelSource.copy(ElementUtils.getElementType(typeElement, fieldName));
+                        copy.setGetter(methods.getFirst());
+                        copy.setSetter(methods.getSecond());
                         mappedSources.put(copy, copy);
                         found = true;
                         break;

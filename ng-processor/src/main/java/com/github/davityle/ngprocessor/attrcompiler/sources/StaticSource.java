@@ -41,6 +41,11 @@ public class StaticSource extends Source<StaticSource> {
     @Override public void getMethodSource(List<MethodSource> methods) {}
 
     @Override
+    public boolean isVoid() {
+        return false;
+    }
+
+    @Override
     protected StaticSource cp(TypeMirror typeMirror) throws IllegalArgumentException {
         return new StaticSource(source, typeMirror);
     }

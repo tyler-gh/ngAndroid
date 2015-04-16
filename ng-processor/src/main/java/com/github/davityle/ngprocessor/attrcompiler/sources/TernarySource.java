@@ -58,6 +58,11 @@ public class TernarySource extends Source<TernarySource> {
     }
 
     @Override
+    public boolean isVoid() {
+        return false;
+    }
+
+    @Override
     protected TernarySource cp(TypeMirror typeMirror) throws IllegalArgumentException {
         return new TernarySource(booleanSource, valTrue, valFalse);
     }

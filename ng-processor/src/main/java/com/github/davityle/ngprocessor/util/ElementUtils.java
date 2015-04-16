@@ -128,17 +128,35 @@ public class ElementUtils {
     public static boolean hasGetterAndSetter(TypeElement model, String field){
         boolean hasGetter = false, hasSetter = false;
         for(Element f : model.getEnclosedElements()){
-            if(f.getSimpleName().toString().toLowerCase().equals("set" + field)){
+            String name = f.getSimpleName().toString().toLowerCase();
+            if(name.equals("set" + field)){
                 hasSetter = true;
                 if(hasGetter)
                     break;
-            }else if(f.getSimpleName().toString().toLowerCase().equals("get" + field)){
+            }else if(name.equals("get" + field)){
                 hasGetter = true;
                 if(hasSetter)
                     break;
             }
         }
         return hasGetter && hasSetter;
+    }
+
+    public static Tuple<String,String> getGetAndSetMethodNames(TypeElement model, String field){
+        String get = null, set = null;
+        for(Element f : model.getEnclosedElements()){
+            String name = f.getSimpleName().toString().toLowerCase();
+            if(name.equals("set" + field)){
+                get = f.getSimpleName().toString();
+                if(set != null)
+                    break;
+            }else if(name.equals("get" + field)){
+                set = f.getSimpleName().toString();
+                if(get != null)
+                    break;
+            }
+        }
+        return Tuple.of(get, set);
     }
 
     public static boolean returnsVoid(ExecutableElement method){

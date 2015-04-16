@@ -22,7 +22,7 @@ package com.ngandroid.demo.models.test;
 public interface TestModel {
     public String getJoe();
     public void setJoe(String joe);
-    public boolean getIsinvisible();
+    public boolean getIsInvisible();
     public void setIsInvisible(boolean isVisible);
     public int getNum();
     public void setNum(int num);

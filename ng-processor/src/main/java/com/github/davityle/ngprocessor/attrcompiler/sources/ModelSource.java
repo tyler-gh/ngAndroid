@@ -30,7 +30,10 @@ public class ModelSource extends Source<ModelSource> {
 
     private final String modelName;
     private final String fieldName;
+
     private String method;
+    private String getter;
+    private String setter;
 
     public ModelSource(String modelName, String fieldName) {
         this(modelName, fieldName, null);
@@ -66,6 +69,11 @@ public class ModelSource extends Source<ModelSource> {
     public void getMethodSource(List<MethodSource> methods) {}
 
     @Override
+    public boolean isVoid() {
+        return false;
+    }
+
+    @Override
     protected ModelSource cp(TypeMirror typeMirror) {
         TypeMirror current = getTypeMirror();
         if(current != null && !TypeUtils.match(current, typeMirror))
@@ -83,6 +91,22 @@ public class ModelSource extends Source<ModelSource> {
 
     public void setMethod(String method){
         this.method = method;
+    }
+
+    public String getGetter() {
+        return getter;
+    }
+
+    public void setGetter(String getter) {
+        this.getter = getter;
+    }
+
+    public String getSetter() {
+        return setter;
+    }
+
+    public void setSetter(String setter) {
+        this.setter = setter;
     }
 
     @Override

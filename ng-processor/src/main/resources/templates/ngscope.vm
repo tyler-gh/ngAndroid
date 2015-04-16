@@ -26,7 +26,7 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
         }
 	}
 
-	public void execute(int layoutId, int viewId, String attr){
+	public Object execute(int layoutId, int viewId, String attr){
 	    switch(layoutId){
             #foreach ($mapEntry in $layouts.entrySet())
                 case ${manifestPackageName}.R.layout.${mapEntry.key}:{
@@ -34,15 +34,22 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
                         #foreach($v in $mapEntry.value)
                             case ${manifestPackageName}.R.id.${v.id}:
                                 #foreach($attr in $v.attributes)
-                                    ${attr.source};
+                                    if(attr.equals("${attr.name}")){
+                                        #if($attr.source.void)
+                                            ${attr.source};
+                                            return null;
+                                        #else
+                                            return ${attr.source};
+                                        #end
+                                    }
                                 #end
-                                break;
                         #end
                     }
                     break;
                 }
             #end
         }
+        return null;
 	}
 
 	public com.ngandroid.lib.ng.Model getModel(String field){

@@ -61,6 +61,11 @@ public class BinaryOperatorSource extends Source<BinaryOperatorSource> {
     }
 
     @Override
+    public boolean isVoid() {
+        return false;
+    }
+
+    @Override
     protected BinaryOperatorSource cp(TypeMirror typeMirror) throws IllegalArgumentException {
         return new BinaryOperatorSource(leftSide, rightSide, operator, typeMirror);
     }
