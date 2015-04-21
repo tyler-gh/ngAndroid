@@ -2,6 +2,8 @@
 
 # ngAndroid
 
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-ngAndroid-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1724)
+
 ngAndroid brings some of the angular directives to android xml attributes. 
 
 The current version is based on reflection. This library will soon use compile time annotations with no reflection. The API will change slightly when this is completed. Including allowing any class to be used, along with interfaces, to declare a model. You can try out the reflection version using.
