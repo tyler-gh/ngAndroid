@@ -41,6 +41,7 @@ public class TextInteracter implements TextWatcher, ModelMethod {
             e.printStackTrace();
             return;
         }
+
         text = str;
         try{
             model.setValue(field, value);

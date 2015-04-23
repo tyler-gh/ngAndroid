@@ -20,7 +20,6 @@ package com.ngandroid.lib.utils;
  * Created by davityle on 1/13/15.
  */
 public class TypeUtils {
-    public static final Object EMPTY = new Object();
     public static final int INTEGER = 0, LONG = 1, STRING = 2, DOUBLE = 3, FLOAT = 4, BOOLEAN = 7, OBJECT = 8;
 
     public static int getType(Class<?> clzz){
@@ -58,8 +57,9 @@ public class TypeUtils {
                 default:
                     return value;
             }
+        }else{
+            return getEmptyValue(type);
         }
-        return EMPTY;
     }
 
     public static Object fromString(int type, String value) {
