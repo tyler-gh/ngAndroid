@@ -18,18 +18,20 @@ package com.github.davityle.ngprocessor.util;
 
 import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
+import com.github.davityle.ngprocessor.util.xml.TypedXmlAttribute;
+import com.github.davityle.ngprocessor.util.xml.TypedXmlNode;
 import com.github.davityle.ngprocessor.util.xml.XmlAttribute;
 import com.github.davityle.ngprocessor.util.xml.XmlNode;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
@@ -39,7 +41,6 @@ import javax.lang.model.type.TypeMirror;
 public class LayoutScopeMapper {
 
     private final Set<Map.Entry<File, List<XmlNode>>> xmlLayouts;
-    private final Map<XmlNode, List<Element>> viewScopeMap = new HashMap<>();
     private final Map<Element, List<XmlNode>> elementNodeMap = new HashMap<>();
     private final List<Element> scopes;
     private boolean isMapped;
@@ -49,12 +50,6 @@ public class LayoutScopeMapper {
         this.xmlLayouts = fileNodeMap.entrySet();
     }
 
-    public Map<XmlNode, List<Element>> getViewScopeMap(){
-        if(!isMapped){
-            linkLayouts();
-        }
-        return viewScopeMap;
-    }
 
     public Map<Element, List<XmlNode>> getElementNodeMap(){
         if(!isMapped){
@@ -63,86 +58,78 @@ public class LayoutScopeMapper {
         return elementNodeMap;
     }
 
-    public void checkLayoutsValid(){
-        Set<Map.Entry<XmlNode, List<Element>>> entries = getViewScopeMap().entrySet();
-        for(Map.Entry<XmlNode, List<Element>> entry : entries){
-            if(entry.getValue().size() == 0){
+    private void checkLayoutsValid(Map<XmlNode, Boolean> viewScopeMap){
+        Set<Map.Entry<XmlNode, Boolean>> entries = viewScopeMap.entrySet();
+        for(Map.Entry<XmlNode, Boolean> entry : entries){
+            if(entry.getValue() == null || !entry.getValue()){
                 MessageUtils.error(null, "This view does not match any scope specifically this element did not match");
             }
         }
     }
 
     private void linkLayouts(){
+        final Map<XmlNode, Boolean> viewScopeMap = new HashMap<>();
+
         for (Map.Entry<File, List<XmlNode>> layout : xmlLayouts) {
             List<XmlNode> views = layout.getValue();
-
             for (XmlNode view : views) {
-                List<Element> matchingScopes = new ArrayList<>(scopes);
-                for (Iterator<Element> it = matchingScopes.listIterator(); it.hasNext();) {
-                    Element scope = it.next();
-                    if (!scopeMatchesXmlView(scope, view)) {
-                        it.remove();
+                for (Element scope : scopes) {
+                    TypedXmlNode node = scopeMatchesXmlView(scope, view);
+                    if (node != null) {
+                        put(node, scope);
+                        viewScopeMap.put(view, true);
                     }
                 }
-                put(view, matchingScopes);
             }
         }
+
+        checkLayoutsValid(viewScopeMap);
         isMapped = true;
     }
 
-    private boolean scopeHasMethods(Element scope, List<MethodSource> methodSources, Map<ModelSource,ModelSource> typedModels){
+    private void put(XmlNode view, Element element){
+            List<XmlNode> nodes =  elementNodeMap.get(element);
+            if(nodes == null){
+                nodes = new ArrayList<>();
+                elementNodeMap.put(element, nodes);
+            }
+            nodes.add(view);
+    }
+
+    private TypedXmlNode scopeMatchesXmlView(Element scope, XmlNode view){
         boolean match = true;
+        List<TypedXmlAttribute> typedAttributes = new ArrayList<>();
+        for (XmlAttribute attribute : view.getAttributes()) {
+            Map<ModelSource, ModelSource> typedModels = mapScopeToModels(scope, attribute.getModelSource());
+            Map<MethodSource, MethodSource> typedMethods = mapScopeToMethods(scope, attribute.getMethodSource(), typedModels);
+            match = match && typedMethods != null;
+            if(match){
+                typedAttributes.add(new TypedXmlAttribute(attribute, typedModels, typedMethods));
+            }
+        }
+        return match ? new TypedXmlNode(view, typedAttributes) : null;
+    }
+
+    private Map<MethodSource, MethodSource> mapScopeToMethods(Element scope, List<MethodSource> methodSources, Map<ModelSource,ModelSource> typedModels){
+        if(typedModels == null)
+            return null;
+        Map<MethodSource, MethodSource> methods = new HashMap<>();
         for (MethodSource methodSource : methodSources) {
             boolean found = false;
             for (Element child : scope.getEnclosedElements()) {
                 if(ElementUtils.methodsMatch(child, methodSource, typedModels)){
+                    MethodSource copy = methodSource.copy(((ExecutableElement) child).getReturnType());
+                    methods.put(copy, copy);
                     found = true;
                     break;
                 }
             }
             if (!found) {
                 // TODO list attribute as not found
-                match = false;
-                break;
+                return null;
             }
         }
-        return match;
-    }
-
-    private boolean scopeHasModels(Element scope, List<ModelSource> modelSources){
-        boolean match = true;
-        for (ModelSource modelSource : modelSources) {
-            boolean found = false;
-            for (Element child : scope.getEnclosedElements()) {
-                if (child.getSimpleName().toString().equals(modelSource.getModelName())) {
-                    if(ElementUtils.hasGetterAndSetter(TypeUtils.asTypeElement(child.asType()), modelSource.getFieldName())) {
-                        found = true;
-                        break;
-                    }else{
-                        //TODO field was found but model did not have getter and setter
-                    }
-                }
-            }
-            if (!found) {
-                // TODO list attribute as not found
-                match = false;
-                break;
-            }
-        }
-        return match;
-    }
-
-    private boolean scopeMatchesXmlView(Element scope, XmlNode view){
-        boolean match = true;
-        for (XmlAttribute attribute : view.getAttributes()) {
-            Map<ModelSource, ModelSource> typedModels = mapScopeToModels(scope, attribute.getModelSource());
-            if(typedModels == null){
-                match = false;
-            }else{
-                match = match && scopeHasMethods(scope, attribute.getMethodSource(), typedModels);
-            }
-        }
-        return match;
+        return methods;
     }
 
     /**
@@ -176,18 +163,6 @@ public class LayoutScopeMapper {
                 return null;
         }
         return mappedSources;
-    }
-
-    private void put(XmlNode view, List<Element> matchingScopes){
-        viewScopeMap.put(view, matchingScopes);
-        for(Element element : matchingScopes){
-            List<XmlNode> nodes =  elementNodeMap.get(element);
-            if(nodes == null){
-                nodes = new ArrayList<>();
-                elementNodeMap.put(element, nodes);
-            }
-            nodes.add(view);
-        }
     }
 
 }

@@ -34,7 +34,11 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
                         #foreach($v in $mapEntry.value)
                             case ${manifestPackageName}.R.id.${v.id}:
                                 #foreach($attr in $v.attributes)
+                                    #if( $foreach.count == 1)
                                     if(attr.equals("${attr.name}")){
+                                    #else
+                                    else if(attr.equals("${attr.name}")){
+                                    #end
                                         #if($attr.source.void)
                                             ${attr.source};
                                             return null;
@@ -43,23 +47,52 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
                                         #end
                                     }
                                 #end
+                                    else{
+                                        android.util.Log.w("${simpleClassName}", "view ${v.id} in layout ${mapEntry.key} does not have attribute " + attr);
+                                        return null;
+                                    }
                         #end
+                        default:
+                           android.util.Log.w("${simpleClassName}", "View " + Integer.toHexString(layoutId) + " in layout " + Integer.toHexString(layoutId) + " does not have any ngAttributes");
+                           return null;
                     }
-                    break;
                 }
             #end
+            default:{
+                android.util.Log.w("${simpleClassName}", "${simpleClassName} does not match layout " + Integer.toHexString(layoutId));
+                return null;
+            }
         }
-        return null;
 	}
 
-	public com.ngandroid.lib.ng.Model getModel(String field){
-		switch(field){
+	public <T> void setModelValue(String model, String field, T value){
+        switch(model){
+            #foreach($field in $fields)
+                case "${field.name}":
+                    ((com.ngandroid.lib.ng.Model) scope.${field.name}).setValue(field, value);
+            #end
+        }
+        throw new com.ngandroid.lib.exceptions.NgException("Field '" + model + "' was not found in ${simpleClassName}");
+	}
+
+	public <T> T getModelValue(String model, String field){
+	    switch(model){
+            #foreach($field in $fields)
+                case "${field.name}":
+                    return (T) ((com.ngandroid.lib.ng.Model) scope.${field.name}).getValue(field);
+            #end
+        }
+        throw new com.ngandroid.lib.exceptions.NgException("Field '" + model + "' was not found in ${simpleClassName}");
+	}
+
+	public com.ngandroid.lib.ng.Model getModel(String model){
+		switch(model){
 		    #foreach($field in $fields)
 		        case "${field.name}":
 		            return (com.ngandroid.lib.ng.Model) scope.${field.name};
             #end
 		}
-		throw new com.ngandroid.lib.exceptions.NgException("Field '" + field + "' was not found in ${simpleClassName}");
+		throw new com.ngandroid.lib.exceptions.NgException("Field '" + model + "' was not found in ${simpleClassName}");
 	}
 
 	public Object invokeMethod(String name, Object ... args){

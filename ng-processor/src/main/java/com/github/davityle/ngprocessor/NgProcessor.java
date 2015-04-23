@@ -90,8 +90,6 @@ public class NgProcessor extends AbstractProcessor {
         Map<File, List<XmlNode>> fileNodeMap = XmlUtils.getFileNodeMap();
 
         LayoutScopeMapper layoutScopeMapper = new LayoutScopeMapper(scopes, fileNodeMap);
-        // check that all attributes match an existing scope
-        layoutScopeMapper.checkLayoutsValid();
 
         ModelScopeMapper modelScopeMapper = new ModelScopeMapper(annotations, roundEnv, scopes);
 

@@ -23,11 +23,11 @@ import java.util.List;
  */
 public class XmlNode {
     private final String id;
-    private final List<XmlAttribute> attributes;
+    private final List<? extends XmlAttribute> attributes;
     private final String layoutParent;
     private final String elementType;
 
-    public XmlNode(String id, List<XmlAttribute> attributes, String layoutParent, String elementType) {
+    public XmlNode(String id, List<? extends XmlAttribute> attributes, String layoutParent, String elementType) {
         this.id = id;
         this.attributes = attributes;
         this.elementType = elementType;
@@ -42,7 +42,7 @@ public class XmlNode {
         return elementType;
     }
 
-    public List<XmlAttribute> getAttributes() {
+    public List<? extends XmlAttribute> getAttributes() {
         return attributes;
     }
 

@@ -27,8 +27,8 @@ import javax.lang.model.type.TypeMirror;
  */
 public class TernarySource extends Source<TernarySource> {
 
-    private final Source booleanSource;
-    private final Source valTrue, valFalse;
+    private Source booleanSource;
+    private Source valTrue, valFalse;
 
     public TernarySource(Source booleanSource, Source valTrue, Source valFalse) {
         // TODO binaryoperator equals equals doesn't make a whole lot of sense for ternary operator
@@ -65,5 +65,29 @@ public class TernarySource extends Source<TernarySource> {
     @Override
     protected TernarySource cp(TypeMirror typeMirror) throws IllegalArgumentException {
         return new TernarySource(booleanSource, valTrue, valFalse);
+    }
+
+    public Source getBooleanSource() {
+        return booleanSource;
+    }
+
+    public void setBooleanSource(Source booleanSource) {
+        this.booleanSource = booleanSource;
+    }
+
+    public Source getValTrue() {
+        return valTrue;
+    }
+
+    public void setValTrue(Source valTrue) {
+        this.valTrue = valTrue;
+    }
+
+    public Source getValFalse() {
+        return valFalse;
+    }
+
+    public void setValFalse(Source valFalse) {
+        this.valFalse = valFalse;
     }
 }

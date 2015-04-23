@@ -53,7 +53,7 @@ public class ModelSource extends Source<ModelSource> {
 //        }
 //        return modelName + '.' + method + "()";
         // TODO
-        return "scope." + modelName + '.' + "get" + capitalize(fieldName) + "()";
+        return "scope." + modelName + '.' + getGetter() + "()";
     }
 
     private String capitalize(final String line) {

@@ -28,8 +28,8 @@ import javax.lang.model.type.TypeMirror;
  */
 public class BinaryOperatorSource extends Source<BinaryOperatorSource> {
 
-    protected final Source leftSide;
-    protected final Source rightSide;
+    protected Source leftSide;
+    protected Source rightSide;
     protected final TokenType.BinaryOperator operator;
 
     private BinaryOperatorSource(Source leftSide, Source rightSide, TokenType.BinaryOperator operator, TypeMirror typeMirror) {
@@ -67,6 +67,22 @@ public class BinaryOperatorSource extends Source<BinaryOperatorSource> {
 
     @Override
     protected BinaryOperatorSource cp(TypeMirror typeMirror) throws IllegalArgumentException {
-        return new BinaryOperatorSource(leftSide, rightSide, operator, typeMirror);
+        return new BinaryOperatorSource(leftSide.copy(), rightSide.copy(), operator, typeMirror);
+    }
+
+    public Source getRightSide() {
+        return rightSide;
+    }
+
+    public Source getLeftSide() {
+        return leftSide;
+    }
+
+    public void setLeftSide(Source leftSide) {
+        this.leftSide = leftSide;
+    }
+
+    public void setRightSide(Source rightSide) {
+        this.rightSide = rightSide;
     }
 }

@@ -28,7 +28,7 @@ import javax.lang.model.type.TypeMirror;
  */
 public class KnotSource extends Source<KnotSource> {
 
-    private final Source source;
+    private Source source;
 
     public KnotSource(Source source) {
         super(TypeUtils.getBooleanType());
@@ -57,6 +57,14 @@ public class KnotSource extends Source<KnotSource> {
 
     @Override
     protected KnotSource cp(TypeMirror typeMirror) throws IllegalArgumentException {
-        return new KnotSource(source);
+        return new KnotSource(source.copy());
+    }
+
+    public Source getBooleanSource(){
+        return source;
+    }
+
+    public void setBooleanSource(Source booleanSource) {
+        this.source = booleanSource;
     }
 }

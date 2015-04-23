@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
 /**
@@ -29,7 +30,7 @@ import javax.lang.model.type.TypeMirror;
 public class MethodSource extends Source<MethodSource> {
 
     private final String methodName;
-    private final List<Source> parameters;
+    private List<Source> parameters;
     private String parametersSource;
 
     public MethodSource(String source, List<Source> parameters) {
@@ -80,8 +81,12 @@ public class MethodSource extends Source<MethodSource> {
 
     @Override
     public boolean isVoid() {
-        // TODO check to see what it returns
-        return true;
+        return getTypeMirror() == null || getTypeMirror().getKind() == TypeKind.VOID;
+    }
+
+    public void setParameters(List<Source> parameters) {
+        this.parameters = parameters;
+        parametersSource = null;
     }
 
     public List<Source> getParameters(){
@@ -90,6 +95,23 @@ public class MethodSource extends Source<MethodSource> {
 
     @Override
     protected MethodSource cp(TypeMirror typeMirror) {
-        return new MethodSource(methodName, new ArrayList<>(parameters), typeMirror);
+        ArrayList<Source> paramCopy = new ArrayList<>();
+        for(Source source : parameters){
+            paramCopy.add(source.copy());
+        }
+        return new MethodSource(methodName, paramCopy, typeMirror);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null || !(obj instanceof MethodSource))
+            return false;
+        MethodSource ms = (MethodSource) obj;
+        return getMethodName().equals(ms.getMethodName()) && getSource().equals(ms.getSource());
+    }
+
+    @Override
+    public int hashCode() {
+        return getMethodName().hashCode() * 17 + getSource().hashCode() * 7;
     }
 }

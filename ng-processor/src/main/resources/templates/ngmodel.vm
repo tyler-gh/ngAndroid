@@ -26,15 +26,15 @@ public class ${simpleClassName}$$NgModel #if($isInterface) implements ${classNam
 		}
 	}
 
-	public Object getValue(String field){
+	public <T> T  getValue(String field){
 		switch(field.toLowerCase()){
             #foreach($field in $fields)
                 #if( ($isInterface) || ($field.getter))
                     case "${field.name}":
                         #if($isInterface)
-                            return ${field.name}_;
+                            return (T) (Object) ${field.name}_;
                         #else
-                            return ${field.getter}();
+                            return (T) (Object) ${field.getter}();
                         #end
                 #end
             #end

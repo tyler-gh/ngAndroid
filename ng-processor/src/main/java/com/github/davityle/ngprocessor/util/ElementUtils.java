@@ -146,11 +146,12 @@ public class ElementUtils {
         String get = null, set = null;
         for(Element f : model.getEnclosedElements()){
             String name = f.getSimpleName().toString().toLowerCase();
-            if(name.equals("set" + field)){
+            // TODO better check than this - check parameters and so forth
+            if(name.equals("get" + field)){
                 get = f.getSimpleName().toString();
                 if(set != null)
                     break;
-            }else if(name.equals("get" + field)){
+            }else if(name.equals("set" + field)){
                 set = f.getSimpleName().toString();
                 if(get != null)
                     break;
