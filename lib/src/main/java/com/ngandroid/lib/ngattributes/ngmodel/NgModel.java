@@ -20,15 +20,12 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.ngandroid.lib.R;
 import com.ngandroid.lib.exceptions.NgException;
-import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.interpreter.TokenType;
 import com.ngandroid.lib.ng.Model;
-import com.ngandroid.lib.ng.ModelMethod;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.interpreter.getters.Getter;
-import com.ngandroid.lib.interpreter.getters.ModelGetter;
-import com.ngandroid.lib.interpreter.setters.ModelSetter;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 
 /**
@@ -43,75 +40,41 @@ public class NgModel implements NgAttribute {
 
     private NgModel() {}
 
-    public void typeCheck(Token[] tokens, Getter getter){
-        TypeUtils.strictTypeCheck(tokens, TokenType.MODEL_NAME, TokenType.PERIOD, TokenType.MODEL_FIELD, TokenType.EOF);
-    }
-
     @Override
-    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] modelBuilders, View view) throws Throwable {
-        bindModelView((ModelGetter) getter, view, modelBuilders[0]);
-    }
-
-//    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View bindView) throws Throwable {
-//        if(!(getter instanceof ModelGetter)){
-//            throw new RuntimeException("You must only use models in ngModel");
-//        }
-//        ModelGetter modelGetter = (ModelGetter) getter;
-//        ModelBuilder modelBuilder = modelBuilderMap.get(modelGetter.getModelName());
-//        bindModelView(modelGetter, bindView, modelBuilder);
-//    }
-
-    public void bindModelView(ModelGetter getter, View view, Model builder) throws Throwable {
+    public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String, String>[] models) {
+        // TODO make a compile error if NgModel does not contain a model
+        Model model = scope.getModel(models[0].getFirst());
+        String field = models[0].getSecond();
         if(view instanceof CompoundButton){
-            bindModelToCompoundButton(getter, (CompoundButton) view, builder);
-        }else if(view instanceof  TextView){
-            bindModelToTextView(getter, (TextView)view, builder);
+            bindModelToCompoundButton((CompoundButton) view, model, field);
+        }else if(view instanceof TextView){
+            bindModelToTextView((TextView)view, model, field);
         }
     }
-    private void bindModelToCompoundButton(ModelGetter<Boolean> getter, final CompoundButton compoundButton, Model model) throws Throwable {
-        if(getter.getType() != TypeUtils.BOOLEAN){
+
+    private void bindModelToCompoundButton(final CompoundButton compoundButton, Model model, String field) {
+        if(TypeUtils.getType(model.getType(field)) != TypeUtils.BOOLEAN){
             throw new NgException("A compound button requires a boolean type model");
         }
         boolean isChecked = compoundButton.isChecked();
-        String fieldName = getter.getFieldName();
-        final ModelSetter modelSetter = new ModelSetter(fieldName, model);
-        modelSetter.set(isChecked);
-        CompundButtonInteracter compundButtonInteracter = new CompundButtonInteracter(modelSetter, compoundButton);
+        model.setValue(field, isChecked);
+        CompundButtonInteracter compundButtonInteracter = new CompundButtonInteracter(model, field, compoundButton);
         compoundButton.setOnCheckedChangeListener(compundButtonInteracter);
-        model.addObserver(fieldName, compundButtonInteracter);
+        model.addObserver(field, compundButtonInteracter);
     }
 
-
-    private void bindModelToTextView(ModelGetter getter, final TextView textView, Model model) throws Throwable {
-        final String fieldNamelower = getter.getFieldName();
+    private void bindModelToTextView(final TextView textView, Model model, String field) {
         String defaultText =  textView.getText().toString();
-        int methodType = getter.getType();
-        ModelSetter setter = new ModelSetter(fieldNamelower, model);
         if(!defaultText.isEmpty())
-            setter.set(TypeUtils.fromString(methodType, defaultText));
-        final SetTextWhenChangedListener setTextWhenChangedListener = new SetTextWhenChangedListener(setter, methodType);
-        textView.addTextChangedListener(setTextWhenChangedListener);
-        // TODO clean this up
-        model.addObserver(fieldNamelower, new ModelMethod() {
-            @Override
-            public Object invoke(String fieldName, Object... args) {
-                String value = String.valueOf(args[0]);
-                if (!value.equals(textView.getText().toString())) {
-                    textView.removeTextChangedListener(setTextWhenChangedListener);
-                    textView.setText(value.equals("0") ? "" : value);
-                    textView.addTextChangedListener(setTextWhenChangedListener);
-                }
-                return null;
-            }
-        });
+            model.setValue(field, TypeUtils.fromString(TypeUtils.getType(model.getType(field)), defaultText));
+        final TextInteracter textInteracter = new TextInteracter(model, field, textView);
+        textView.addTextChangedListener(textInteracter);
+        model.addObserver(field, textInteracter);
     }
 
 
-
-
-
-
-
-
-
+        @Override
+    public int getAttribute() {
+        return R.styleable.ngAndroid_ngModel;
+    }
 }

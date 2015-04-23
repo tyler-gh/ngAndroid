@@ -18,7 +18,9 @@ package com.ngandroid.lib.ngattributes.ngif;
 
 import android.view.View;
 
-import com.ngandroid.lib.interpreter.getters.Getter;
+import com.ngandroid.lib.R;
+import com.ngandroid.lib.ng.Model;
+import com.ngandroid.lib.ng.ModelMethod;
 
 /**
  * Created by tyler on 2/10/15.
@@ -34,7 +36,12 @@ public class NgGone extends NgIf {
     }
 
     @Override
-    protected FireCheckObserver getModelMethod(Getter<Boolean> getter, View view) {
-        return new FireCheckObserver(getter, view, true);
+    protected ModelMethod getModelMethod(Model model, View view, String field) {
+        return new FireCheckObserver(model, view, field, true);
+    }
+
+    @Override
+    public int getAttribute() {
+        return R.styleable.ngAndroid_ngIf;
     }
 }

@@ -18,12 +18,11 @@ package com.ngandroid.lib.ngattributes.nglongclick;
 
 import android.view.View;
 
-import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.ng.Model;
+import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.interpreter.getters.Getter;
-import com.ngandroid.lib.interpreter.getters.ModelGetter;
+import com.ngandroid.lib.ng.Scope;
 import com.ngandroid.lib.ngattributes.ngclick.NgClick;
+import com.ngandroid.lib.utils.Tuple;
 
 /**
  * Created by tyler on 1/28/15.
@@ -39,12 +38,12 @@ public class NgLongClick implements NgAttribute {
     }
 
     @Override
-    public void typeCheck(Token[] tokens, Getter getter) {
-
+    public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String, String>[] models) {
+        NgClick.getInstance().attach(scope, view, layoutId, viewId, getAttribute(), true);
     }
 
     @Override
-    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] models, View view) throws Throwable {
-        NgClick.getInstance().attach(getter, view, true);
+    public int getAttribute() {
+        return R.styleable.ngAndroid_ngLongClick;
     }
 }

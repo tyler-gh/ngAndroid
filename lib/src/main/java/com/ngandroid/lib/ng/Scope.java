@@ -23,6 +23,6 @@ import android.view.View;
  */
 public interface Scope {
     public <T extends Model> T getModel(String name);
-    public <T> T invokeMethod(String name, Object ... args);
+    public Object execute(int layoutId, int viewId, int attr);
     public void attach(int layoutId, View __view__);
 }

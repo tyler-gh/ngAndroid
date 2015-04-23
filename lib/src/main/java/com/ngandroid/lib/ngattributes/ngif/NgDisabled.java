@@ -18,8 +18,9 @@ package com.ngandroid.lib.ngattributes.ngif;
 
 import android.view.View;
 
+import com.ngandroid.lib.R;
+import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelMethod;
-import com.ngandroid.lib.interpreter.getters.Getter;
 
 /**
  * Created by tyler on 2/10/15.
@@ -33,12 +34,12 @@ public class NgDisabled extends NgIf {
     }
 
     @Override
-    protected ModelMethod getModelMethod(final Getter<Boolean> getter, final View view) {
+    protected ModelMethod getModelMethod(final Model model, final View view, final String field) {
         return new ModelMethod() {
             @Override
             public Object invoke(String fieldName, Object... args) {
                 try {
-                    if(getter.get()){
+                    if(model.getValue(field)){
                         view.setEnabled(false);
                     }else{
                         view.setEnabled(true);
@@ -50,5 +51,10 @@ public class NgDisabled extends NgIf {
                 return null;
             }
         };
+    }
+
+    @Override
+    public int getAttribute() {
+        return R.styleable.ngAndroid_ngDisabled;
     }
 }

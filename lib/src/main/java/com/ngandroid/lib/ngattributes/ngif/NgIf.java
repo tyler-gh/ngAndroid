@@ -18,44 +18,24 @@ package com.ngandroid.lib.ngattributes.ngif;
 
 import android.view.View;
 
-import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.interpreter.getters.Getter;
-import com.ngandroid.lib.interpreter.getters.ModelGetter;
 import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelMethod;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.utils.TypeUtils;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.utils.Tuple;
 
 /**
  * Created by tyler on 2/10/15.
  */
 public abstract class NgIf implements NgAttribute {
     @Override
-    public void typeCheck(Token[] tokens, Getter getter) throws Exception {
-        // TODO - error
-        if(getter.getType() != TypeUtils.BOOLEAN)
-            throw new Exception(getClass().getSimpleName() + " requires a boolean type model");
-
-    }
-
-    @Override
-    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] models, View view) throws Throwable {
-        if(modelGetters.length == 0)
-            throw new Exception(getClass().getSimpleName() +" requires a model to observe. Try reformatting your statement to include a model");
-        for(int index = 0 ; index < modelGetters.length; index++){
-            ModelGetter modelGetter = modelGetters[index];
-            Model model = models[index];
-            model.addObserver(modelGetter.getFieldName(), getModelMethod(getter, view));
+    public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String,String>[] models) {
+        for(Tuple<String,String> model : models){
+            Model m = scope.getModel(model.getFirst());
+            m.addObserver(model.getSecond(), getModelMethod(m, view, model.getSecond()));
         }
     }
 
-//    public void attach(Getter getter, ModelBuilderMap modelBuilderMap, View view) throws Exception {
-//        if(!observeModels(getter, getter, modelBuilderMap, view)){
-//            // TODO - error
-//            throw new Exception(getClass().getSimpleName() +" requires a model to observe. Try reformatting your statement to include a model");
-//        }
-//    }
-
-    protected abstract ModelMethod getModelMethod(Getter<Boolean> getter, View view);
+    protected abstract ModelMethod getModelMethod(Model model, View view, String field);
 
 }

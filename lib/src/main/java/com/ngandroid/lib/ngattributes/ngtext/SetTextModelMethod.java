@@ -16,31 +16,39 @@
 
 package com.ngandroid.lib.ngattributes.ngtext;
 
-import android.view.View;
+import android.util.Log;
+import android.widget.TextView;
 
 import com.ngandroid.lib.ng.ModelMethod;
-import com.ngandroid.lib.interpreter.getters.Getter;
-
-import java.lang.reflect.Method;
+import com.ngandroid.lib.ng.Scope;
 
 /**
 * Created by tyler on 3/10/15.
 */
 class SetTextModelMethod implements ModelMethod {
-    private final Method method;
-    private final View view;
-    private final Getter<String> getter;
 
-    public SetTextModelMethod(Method method, View view, Getter<String> getter) {
-        this.method = method;
-        this.view = view;
-        this.getter = getter;
+
+    private final Scope scope;
+    private final int layoutId, viewId, attr;
+    private final TextView hasText;
+
+    SetTextModelMethod(Scope scope, int layoutId, int viewId, int attr, TextView hasText) {
+        this.scope = scope;
+        this.layoutId = layoutId;
+        this.viewId = viewId;
+        this.attr = attr;
+        this.hasText = hasText;
     }
 
     @Override
     public Object invoke(String fieldName, Object... args) {
         try {
-            method.invoke(view, getter.get());
+            Object value = scope.execute(layoutId, viewId, attr);
+            if(value == null){
+                Log.e("NgAndroid", "NgText value was null");
+                return null;
+            }
+            hasText.setText(value.toString());
         } catch (Throwable throwable) {
             // TODO
             throwable.printStackTrace();

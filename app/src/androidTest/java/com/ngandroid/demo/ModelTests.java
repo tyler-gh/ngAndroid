@@ -17,15 +17,9 @@
 package com.ngandroid.demo;
 
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.UiThreadTest;
 
 import com.ngandroid.demo.models.test.ModelTestScope;
 import com.ngandroid.lib.NgAndroid;
-import com.ngandroid.lib.interpreter.ExpressionBuilder;
-import com.ngandroid.lib.ng.Scope;
-import com.ngandroid.lib.ng.ScopeBuilder;
-
-import java.lang.reflect.Field;
 
 /**
  * Created by tyler on 2/24/15.
@@ -47,7 +41,6 @@ public class ModelTests extends ActivityInstrumentationTestCase2<DemoActivity> {
         ModelTestScope scope = new ModelTestScope();
         ngAndroid.buildScope(scope);
         assertNull(scope.testSetterRequired);
-//        assertNotNull(scope.testGetterNotRequired);
         assertNotNull(scope.testJsonModel);
         assertNotNull(scope.testSubModel);
     }
@@ -132,18 +125,18 @@ public class ModelTests extends ActivityInstrumentationTestCase2<DemoActivity> {
 //        assertEquals("xyc", jsonmodel.getJsonModel().getString());
 //        assertEquals(false, jsonmodel.getJsonModel().getBoolean());
 //    }
-    @UiThreadTest
-    public void testDefaults() throws NoSuchFieldException, IllegalAccessException {
-        ModelTestScope tc = new ModelTestScope();
-        Scope scope = ScopeBuilder.buildScope(tc);
-        tc.testJsonModel.setInt(300);
-        new ExpressionBuilder("testJsonModel.int").build(tc, scope);
-        Field f = tc.getClass().getDeclaredField("testJsonModel");
-        f.setAccessible(true);
-        assertNotNull(f.get(tc));
-        assertTrue(tc.testJsonModel == f.get(tc));
-        assertEquals(300, tc.testJsonModel.getInt());
-    }
+//    @UiThreadTest
+//    public void testDefaults() throws NoSuchFieldException, IllegalAccessException {
+//        ModelTestScope tc = new ModelTestScope();
+//        Scope scope = ScopeBuilder.buildScope(tc);
+//        tc.testJsonModel.setInt(300);
+//        new ExpressionBuilder("testJsonModel.int").build(tc, scope);
+//        Field f = tc.getClass().getDeclaredField("testJsonModel");
+//        f.setAccessible(true);
+//        assertNotNull(f.get(tc));
+//        assertTrue(tc.testJsonModel == f.get(tc));
+//        assertEquals(300, tc.testJsonModel.getInt());
+//    }
 
 
 }

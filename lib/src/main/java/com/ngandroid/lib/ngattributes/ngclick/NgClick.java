@@ -18,15 +18,11 @@ package com.ngandroid.lib.ngattributes.ngclick;
 
 import android.view.View;
 
-import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.interpreter.TokenType;
-import com.ngandroid.lib.ng.Model;
+import com.ngandroid.lib.R;
+import com.ngandroid.lib.ng.Executor;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.interpreter.getters.Getter;
-import com.ngandroid.lib.interpreter.getters.MethodGetter;
-import com.ngandroid.lib.interpreter.getters.ModelGetter;
-import com.ngandroid.lib.ngattributes.nglongclick.LongClickInvoker;
-import com.ngandroid.lib.utils.TypeUtils;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.utils.Tuple;
 
 /**
  * Created by davityle on 1/23/15.
@@ -42,22 +38,20 @@ public class NgClick implements NgAttribute {
     }
 
     @Override
-    public void typeCheck(Token[] tokens, Getter getter) {
-        TypeUtils.startsWith(tokens, TokenType.FUNCTION_NAME);
-        TypeUtils.endsWith(tokens, TokenType.CLOSE_PARENTHESIS);
+    public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String, String>[] models) {
+        attach(scope, view, layoutId, viewId, getAttribute(), false);
+    }
+
+    public void attach(Scope scope, View view, int layoutId, int viewId, int attr, boolean isLongClick){
+        Executor executor = new Executor(scope, layoutId, viewId, attr);
+        if(!isLongClick)
+            view.setOnClickListener(executor);
+        else
+            view.setOnLongClickListener(executor);
     }
 
     @Override
-    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] modelBuilders, View view) throws Throwable {
-        attach(getter, view, false);
+    public int getAttribute() {
+        return R.styleable.ngAndroid_ngClick;
     }
-
-    public void attach(Getter getter, View view, boolean isLongClick){
-        MethodGetter methodGetter = (MethodGetter) getter;
-        if(!isLongClick)
-            view.setOnClickListener(new ClickInvoker(methodGetter));
-        else
-            view.setOnLongClickListener(new LongClickInvoker(methodGetter));
-    }
-
 }

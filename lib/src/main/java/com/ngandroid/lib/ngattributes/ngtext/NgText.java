@@ -17,15 +17,14 @@
 package com.ngandroid.lib.ngattributes.ngtext;
 
 import android.view.View;
+import android.widget.TextView;
 
-import com.ngandroid.lib.interpreter.Token;
+import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.interpreter.getters.Getter;
-import com.ngandroid.lib.interpreter.getters.ModelGetter;
-import com.ngandroid.lib.utils.TypeUtils;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.utils.Tuple;
 
-import java.lang.reflect.Method;
 
 /**
  * Created by tyler on 3/10/15.
@@ -40,19 +39,35 @@ public class NgText implements NgAttribute {
     private NgText(){}
 
     @Override
-    public void typeCheck(Token[] tokens, Getter getter) throws Exception {
-        if(getter.getType() != TypeUtils.STRING)
-            throw new RuntimeException("NgText type must be STRING");
+    public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String, String>[] models) {
+        // TODO make this more flexible
+        if(view instanceof TextView) {
+            for (Tuple<String, String> model : models) {
+                Model m = scope.getModel(model.getFirst());
+                m.addObserver(model.getSecond(), new SetTextModelMethod(scope, layoutId, viewId, getAttribute(), (TextView) view));
+            }
+        }
     }
 
     @Override
-    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] models, View view) throws Throwable {
-        Method method = view.getClass().getDeclaredMethod("setText", CharSequence.class);
-        for(int index = 0; index < modelGetters.length; index++){
-            ModelGetter modelGetter = modelGetters[index];
-            Model model = models[index];
-            model.addObserver(modelGetter.getFieldName(), new SetTextModelMethod(method, view, getter));
-        }
+    public int getAttribute() {
+        return R.styleable.ngAndroid_ngText;
     }
+
+//    @Override
+//    public void typeCheck(Token[] tokens, Getter getter) throws Exception {
+//        if(getter.getType() != TypeUtils.STRING)
+//            throw new RuntimeException("NgText type must be STRING");
+//    }
+//
+//    @Override
+//    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] models, View view) throws Throwable {
+//        Method method = view.getClass().getDeclaredMethod("setText", CharSequence.class);
+//        for(int index = 0; index < modelGetters.length; index++){
+//            ModelGetter modelGetter = modelGetters[index];
+//            Model model = models[index];
+//            model.addObserver(modelGetter.getFieldName(), new SetTextModelMethod(method, view, getter));
+//        }
+//    }
 
 }

@@ -18,19 +18,22 @@ package com.ngandroid.lib.ngattributes.ngmodel;
 
 import android.widget.CompoundButton;
 
+import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelMethod;
-import com.ngandroid.lib.interpreter.setters.ModelSetter;
 
 /**
 * Created by tyler on 2/24/15.
 */
 final class CompundButtonInteracter implements CompoundButton.OnCheckedChangeListener, ModelMethod {
-    private final ModelSetter modelSetter;
+
+    private final Model model;
+    private final String field;
     private final CompoundButton compoundButton;
     private boolean isFromSelf;
 
-    CompundButtonInteracter(ModelSetter modelSetter, CompoundButton compoundButton) {
-        this.modelSetter = modelSetter;
+    CompundButtonInteracter(Model model, String field, CompoundButton compoundButton) {
+        this.model = model;
+        this.field = field;
         this.compoundButton = compoundButton;
     }
 
@@ -53,7 +56,7 @@ final class CompundButtonInteracter implements CompoundButton.OnCheckedChangeLis
         try {
             if(!isFromSelf) {
                 isFromSelf = true;
-                modelSetter.set(isChecked);
+                model.setValue(field, isChecked);
             }
         } catch (Throwable throwable) {
             // TODO - error

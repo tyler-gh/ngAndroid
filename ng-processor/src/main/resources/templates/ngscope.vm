@@ -6,10 +6,15 @@ import android.widget.*;
 public class ${simpleClassName}$$NgScope <T extends ${className}> implements com.ngandroid.lib.ng.Scope {
 
 	private T scope;
-	public ${simpleClassName}$$NgScope(T scope){
+	private com.ngandroid.lib.NgAndroid ngandroid_;
+
+	public ${simpleClassName}$$NgScope(T scope, com.ngandroid.lib.NgAndroid ngandroid){
 		this.scope = scope;
+		this.ngandroid_ = ngandroid;
 		#foreach($field in $fields)
-            this.scope.${field.name} = new ${field.typeName}$$NgModel();
+		    if(this.scope.${field.name} == null || !(this.scope.${field.name} instanceof com.ngandroid.lib.ng.Model)){
+                this.scope.${field.name} = new ${field.typeName}$$NgModel();
+            }
         #end
 	}
 
@@ -19,6 +24,19 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
                 case ${manifestPackageName}.R.layout.${mapEntry.key}:{
                     #foreach($v in $mapEntry.value)
                         ${v.elementType} ${v.id} = (${v.elementType}) __view__.findViewById(${manifestPackageName}.R.id.${v.id});
+                        #foreach($attr in $v.attributes)
+                            #set( $models = $attr.modelSource )
+                            ngandroid_.attach(
+                                ${manifestPackageName}.R.styleable.ngAndroid_${attr.name},
+                                this,
+                                ${v.id},
+                                ${manifestPackageName}.R.layout.${mapEntry.key},
+                                ${manifestPackageName}.R.id.${v.id}
+                                #foreach($model in $models)
+                                    ,com.ngandroid.lib.utils.Tuple.of("${model.modelName}","${model.fieldName}")
+                                #end
+                            );
+                        #end
                     #end
                     break;
                 }
@@ -26,7 +44,7 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
         }
 	}
 
-	public Object execute(int layoutId, int viewId, String attr){
+	public Object execute(int layoutId, int viewId, int attr){
 	    switch(layoutId){
             #foreach ($mapEntry in $layouts.entrySet())
                 case ${manifestPackageName}.R.layout.${mapEntry.key}:{
@@ -35,9 +53,9 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
                             case ${manifestPackageName}.R.id.${v.id}:
                                 #foreach($attr in $v.attributes)
                                     #if( $foreach.count == 1)
-                                    if(attr.equals("${attr.name}")){
+                                    if(attr == ${manifestPackageName}.R.styleable.ngAndroid_${attr.name}){
                                     #else
-                                    else if(attr.equals("${attr.name}")){
+                                    else if(attr == ${manifestPackageName}.R.styleable.ngAndroid_${attr.name}){
                                     #end
                                         #if($attr.source.void)
                                             ${attr.source};
@@ -94,9 +112,4 @@ public class ${simpleClassName}$$NgScope <T extends ${className}> implements com
 		}
 		throw new com.ngandroid.lib.exceptions.NgException("Field '" + model + "' was not found in ${simpleClassName}");
 	}
-
-	public Object invokeMethod(String name, Object ... args){
-	    return null;
-	}
-
 }

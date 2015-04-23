@@ -23,7 +23,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ngandroid.lib.binder.AttributeBinder;
 import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
@@ -37,7 +36,7 @@ import com.ngandroid.lib.ngattributes.ngif.NgGone;
 import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
 import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
 import com.ngandroid.lib.ngattributes.ngmodel.NgModel;
-import com.ngandroid.lib.ngattributes.ngtext.NgText;
+import com.ngandroid.lib.utils.Tuple;
 
 /**
  * Created by davityle on 1/12/15.
@@ -61,17 +60,14 @@ public class NgAndroid {
         return instance;
     }
 
-    /**
-     * the ngAttributes used in binding to views
-     */
-    private final SparseArray<NgAttribute> mAttributes;
+    private final SparseArray<NgAttribute> attributes;
 
     /**
      * private constructor
-     * @param attributes sets mAttributes
+     * @param attributes
      */
     private NgAndroid(SparseArray<NgAttribute> attributes){
-        this.mAttributes = attributes;
+        this.attributes = attributes;
     }
 
     /**
@@ -80,7 +76,7 @@ public class NgAndroid {
      * @param resourceId xml layout resource to bind to scope and set contentView of Activity
      */
     public void setContentView(Activity activity, int resourceId) {
-        setContentView(activity, activity, resourceId);
+        setContentView(buildScope(activity), activity, resourceId);
     }
 
     /**
@@ -90,8 +86,9 @@ public class NgAndroid {
      * @param activity contentView set
      * @param resourceId xml layout resource to bind to scope and set contentView of Activity
      */
-    public void setContentView(Object scope, Activity activity, int resourceId) {
-        new AttributeBinder(activity, scope, mAttributes).setContentView(activity, resourceId);
+    public void setContentView(Scope scope, Activity activity, int resourceId) {
+        activity.setContentView(resourceId);
+        scope.attach(resourceId, activity.findViewById(android.R.id.content));
     }
 
     /**
@@ -103,36 +100,42 @@ public class NgAndroid {
      * @return
      */
     public View inflate(Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
-        return inflate(activity, activity, resourceId, viewGroup, attach);
+        return inflate(buildScope(activity), activity, resourceId, viewGroup, attach);
     }
 
     public View inflate(Activity activity, int resourceId, ViewGroup viewGroup){
-        return inflate(activity, activity, resourceId, viewGroup, false);
+        return inflate(buildScope(activity), activity, resourceId, viewGroup, false);
     }
 
-    public View inflate(Object scope, Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
-        return new AttributeBinder(activity, scope, mAttributes).inflate(resourceId, viewGroup, attach);
+    public View inflate(Scope scope, Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
+        View v = activity.getLayoutInflater().inflate(resourceId, viewGroup, attach);
+        scope.attach(resourceId, v);
+        return v;
     }
 
-    public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
+    public View inflate(Scope scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
         return inflate(scope, inflater, resourceId, viewGroup, false);
     }
 
-    public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
-        return new AttributeBinder(inflater, scope, mAttributes).inflate(resourceId, viewGroup, attach);
+    public View inflate(Scope scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
+        View v = inflater.inflate(resourceId, viewGroup, attach);
+        scope.attach(resourceId, v);
+        return v;
     }
 
     public Scope buildScope(Object scope) {
-        return ScopeBuilder.buildScope(scope);
+        return ScopeBuilder.getScope(scope, this);
+    }
+
+    /**
+     * DO NOT USE. This is for generated code to access the NgAttributes
+     */
+    public void attach(int attr, Scope scope, View view, int layoutId, int viewId, Tuple<String,String> ... models) {
+        attributes.get(attr).attach(scope, view, layoutId, viewId, models);
     }
 
     public static final class Builder {
         private SparseArray<NgAttribute> attributes = new SparseArray<>();
-
-        public Builder addCustomAttribute(int attributeId, NgAttribute ngAttribute){
-            attributes.put(attributeId, ngAttribute);
-            return this;
-        }
 
         public NgAndroid build(){
             attributes.put(R.styleable.ngAndroid_ngModel, NgModel.getInstance());
@@ -144,7 +147,6 @@ public class NgAndroid {
             attributes.put(R.styleable.ngAndroid_ngDisabled, NgDisabled.getInstance());
             attributes.put(R.styleable.ngAndroid_ngBlur, NgBlur.getInstance());
             attributes.put(R.styleable.ngAndroid_ngFocus, NgFocus.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngText, NgText.getInstance());
             return new NgAndroid(attributes);
         }
     }

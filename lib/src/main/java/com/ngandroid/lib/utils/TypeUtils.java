@@ -16,11 +16,6 @@
 
 package com.ngandroid.lib.utils;
 
-import com.ngandroid.lib.exceptions.NgException;
-import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.interpreter.TokenType;
-
-
 /**
  * Created by davityle on 1/13/15.
  */
@@ -44,7 +39,7 @@ public class TypeUtils {
         return OBJECT;
     }
 
-    public static Object fromStringEmptyStringIfEmpty(int type, String value) throws Exception {
+    public static Object fromStringEmptyStringIfEmpty(int type, String value) {
         if(!value.trim().isEmpty()) {
             switch (type) {
                 case INTEGER:
@@ -67,7 +62,7 @@ public class TypeUtils {
         return EMPTY;
     }
 
-    public static Object fromString(int type, String value) throws Exception {
+    public static Object fromString(int type, String value) {
         if(!value.trim().isEmpty()) {
             switch (type) {
                 case INTEGER:
@@ -111,46 +106,4 @@ public class TypeUtils {
                 return null;
         }
     }
-
-    private static void assertEquals(Object actual, Object expected){
-        if(!actual.equals(expected)){
-            throw new NgException("Invalid syntax. Expected '" + expected + "' actual was '" + actual + '\'');
-        }
-    }
-
-    public static void strictTypeCheck(Token[] tokens, TokenType ... types){
-        if(tokens.length != types.length){
-            throw new NgException("Invalid syntax. Expected " + types.length + " tokens; actual was " + tokens.length);
-        }
-        for(int index = 0; index < tokens.length; index++)
-            assertEquals(tokens[index].getTokenType(), types[index]);
-    }
-
-    public static void looseTypeCheck(Token[] tokens, TokenType ... types){
-        int foundCount = 0;
-        for(int i = 0; i < types.length; i++){
-            for(int t = i; t < tokens.length; t++){
-                if(tokens[t].getTokenType() == types[i]){
-                    foundCount++;
-                    break;
-                }
-            }
-        }
-        assertEquals(foundCount, types.length);
-    }
-
-    public static void startsWith(Token[] tokens, TokenType type){
-        if(tokens.length == 0)
-            throw new NgException("Empty string in attribute. Expecting " + type);
-        assertEquals(tokens[0].getTokenType(), type);
-    }
-
-    public static void endsWith(Token[] tokens, TokenType type){
-        if(tokens.length < 2)
-            throw new NgException("Empty string in attribute. Expecting " + type);
-        // assuming last token is EOF
-        assertEquals(tokens[tokens.length - 2].getTokenType(), type);
-    }
-
-
 }

@@ -18,20 +18,15 @@ package com.ngandroid.lib.ngattributes.ngchange;
 
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.ngandroid.lib.interpreter.Token;
-import com.ngandroid.lib.interpreter.TokenType;
-import com.ngandroid.lib.ng.Model;
+import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.interpreter.getters.Getter;
-import com.ngandroid.lib.interpreter.getters.MethodGetter;
-import com.ngandroid.lib.interpreter.getters.ModelGetter;
-import com.ngandroid.lib.ngattributes.ngclick.ClickInvoker;
-import com.ngandroid.lib.utils.TypeUtils;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.ng.Executor;
+import com.ngandroid.lib.utils.Tuple;
 
 /**
  * Created by tyler on 1/29/15.
@@ -47,26 +42,25 @@ public class NgChange implements NgAttribute {
     private NgChange() {}
 
     @Override
-    public void typeCheck(Token[] tokens, Getter getter) {
-        TypeUtils.startsWith(tokens, TokenType.FUNCTION_NAME);
-        TypeUtils.endsWith(tokens, TokenType.CLOSE_PARENTHESIS);
+    public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String, String>[] models){
+        Executor executor = new Executor(scope, layoutId, viewId, getAttribute());
+        if(view instanceof CompoundButton){
+            CompoundButton button = (CompoundButton) view;
+            button.setOnCheckedChangeListener(executor);
+        }else if(view instanceof TextView){
+            TextView textView = (TextView) view;
+            textView.addTextChangedListener(executor);
+        }else if(view instanceof Spinner){
+            Spinner spinner = (Spinner) view;
+            spinner.setOnItemSelectedListener(executor);
+        }else if(view instanceof RadioGroup){
+            RadioGroup group = (RadioGroup) view;
+            group.setOnCheckedChangeListener(executor);
+        }
     }
 
     @Override
-    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] models, View bindView) throws Throwable {
-        final MethodGetter invoker = (MethodGetter) getter;
-        if(bindView instanceof CompoundButton){
-            RadioButton button = (RadioButton) bindView;
-            button.setOnClickListener(new ClickInvoker(invoker));
-        }else if(bindView instanceof TextView){
-            TextView textView = (TextView) bindView;
-            textView.addTextChangedListener(new TextChangedWatcher(invoker));
-        }else if(bindView instanceof Spinner){
-            Spinner spinner = (Spinner) bindView;
-            spinner.setOnItemSelectedListener(new SelectionChangeListener(invoker));
-        }else if(bindView instanceof RadioGroup){
-            RadioGroup group = (RadioGroup) bindView;
-            group.setOnCheckedChangeListener(new CheckChangeListener(invoker));
-        }
+    public int getAttribute() {
+        return R.styleable.ngAndroid_ngChange;
     }
 }

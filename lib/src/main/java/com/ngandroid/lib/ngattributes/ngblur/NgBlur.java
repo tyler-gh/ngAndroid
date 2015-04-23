@@ -21,8 +21,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.ngandroid.lib.R;
+import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelMethod;
-import com.ngandroid.lib.interpreter.getters.Getter;
 import com.ngandroid.lib.ngattributes.ngif.NgIf;
 import com.ngandroid.lib.utils.BlurUtils;
 
@@ -40,7 +41,7 @@ public class NgBlur extends NgIf{
     }
 
     @Override
-    protected ModelMethod getModelMethod(final Getter<Boolean> getter, final View view) {
+    protected ModelMethod getModelMethod(final Model model, final View view, final String field) {
         ViewGroup parent = (ViewGroup) view.getParent();
         FrameLayout layout = new FrameLayout(view.getContext());
         layout.setLayoutParams(view.getLayoutParams());
@@ -51,18 +52,16 @@ public class NgBlur extends NgIf{
         layout.addView(view);
         parent.addView(layout, index);
 
-
         final ImageView imageView = new ImageView(view.getContext());
         imageView.setLayoutParams(layoutParams);
         imageView.setVisibility(View.GONE);
         layout.addView(imageView);
 
-
         return new ModelMethod() {
             @Override
             public Object invoke(String fieldName, Object... args) {
                 try {
-                    if(getter.get()){
+                    if(model.getValue(field)){
                         view.setVisibility(View.GONE);
                         view.setDrawingCacheEnabled(true);
                         imageView.setImageBitmap(BlurUtils.blurBitmap(view.getDrawingCache(), view.getContext()));
@@ -77,5 +76,10 @@ public class NgBlur extends NgIf{
                 return null;
             }
         };
+    }
+
+    @Override
+    public int getAttribute() {
+        return R.styleable.ngAndroid_ngBlur;
     }
 }

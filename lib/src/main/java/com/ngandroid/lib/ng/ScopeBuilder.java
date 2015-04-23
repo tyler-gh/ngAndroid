@@ -16,23 +16,44 @@
 
 package com.ngandroid.lib.ng;
 
+import com.ngandroid.lib.NgAndroid;
 import com.ngandroid.lib.exceptions.NgException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by tyler on 3/23/15.
  */
 public class ScopeBuilder {
-    public static Scope buildScope(Object scope){
-        String packageName = scope.getClass().getPackage().getName();
-        String scopeName = scope.getClass().getSimpleName();
+    private static final String SCOPE_APPEN = "$$NgScope";
+    private static Map<String, Constructor<? extends Scope>> scopeClasses = new HashMap<>();
+
+    public static Scope getScope(Object scope, NgAndroid ngAndroid){
+        String scopeName = scope.getClass().getName() + SCOPE_APPEN;
+        Constructor<? extends Scope> constructor = scopeClasses.get(scopeName);
+        if(constructor == null){
+            try {
+                Class<? extends Scope> scopeClass = (Class<? extends Scope>) Class.forName(scopeName);
+                constructor = scopeClass.getConstructor(scope.getClass(), NgAndroid.class);
+                scopeClasses.put(scopeName, constructor);
+            } catch (ClassNotFoundException e) {
+                throw new NgException("Scope " + scopeName + " not found", e);
+            } catch (ClassCastException e){
+                throw new NgException(scopeName + " does not extend Scope", e);
+            } catch (NoSuchMethodException e) {
+                throw new NgException("Correct constructor for '" +scopeName + "' does not exist", e);
+            }
+        }
         try {
-            Class<?> generatedScopeClass = Class.forName(packageName+ '.' + scopeName +"$$NgScope");
-            Constructor constructor = generatedScopeClass.getConstructor(scope.getClass());
-            return (Scope) constructor.newInstance(scope);
-        } catch (ClassNotFoundException | NoSuchMethodException |InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            return constructor.newInstance(scope, ngAndroid);
+        } catch (InstantiationException e) {
+            throw new NgException("Unable to instantiate scope", e);
+        } catch (IllegalAccessException e) {
+            throw new NgException("Unable to access scope", e);
+        } catch (InvocationTargetException e) {
             throw new NgException(e);
         }
     }

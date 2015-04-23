@@ -18,20 +18,22 @@ package com.ngandroid.lib.ngattributes.ngif;
 
 import android.view.View;
 
+import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelMethod;
-import com.ngandroid.lib.interpreter.getters.Getter;
 
 /**
 * Created by tyler on 2/10/15.
 */
 final class FireCheckObserver implements ModelMethod {
 
-    private final Getter<Boolean> getter;
+    private final Model model;
+    private final String field;
     private final View view;
     private final boolean isGone;
 
-    FireCheckObserver(Getter<Boolean> getter, View view, boolean isGone) {
-        this.getter = getter;
+    FireCheckObserver(Model model, View view, String field, boolean isGone) {
+        this.model = model;
+        this.field = field;
         this.view = view;
         this.isGone = isGone;
     }
@@ -39,7 +41,7 @@ final class FireCheckObserver implements ModelMethod {
     @Override
     public Object invoke(String fieldName, Object... args) {
         try {
-            if(getter.get()){
+            if(model.getValue(field)){
                 if(isGone)
                     view.setVisibility(View.GONE);
                 else

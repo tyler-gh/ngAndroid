@@ -18,8 +18,8 @@ package com.ngandroid.lib.ngattributes.ngfocus;
 
 import android.view.View;
 
+import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelMethod;
-import com.ngandroid.lib.interpreter.getters.Getter;
 import com.ngandroid.lib.ngattributes.ngif.NgIf;
 
 /**
@@ -33,12 +33,12 @@ public class NgFocus extends NgIf {
     public static NgFocus getInstance(){return ngFocus;}
 
     @Override
-    protected ModelMethod getModelMethod(final Getter<Boolean> getter, final View view) {
+    protected ModelMethod getModelMethod(final Model model, final View view, final String field) {
         return new ModelMethod() {
             @Override
             public Object invoke(String fieldName, Object... args) {
                 try {
-                    if(getter.get()){
+                    if(model.getValue(field)){
                         view.requestFocus();
                     }else{
                         view.clearFocus();
@@ -49,5 +49,10 @@ public class NgFocus extends NgIf {
                 return null;
             }
         };
+    }
+
+    @Override
+    public int getAttribute() {
+        return 0;
     }
 }

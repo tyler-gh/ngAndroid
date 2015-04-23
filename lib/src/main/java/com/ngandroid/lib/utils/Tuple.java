@@ -49,4 +49,17 @@ public class Tuple<T,K> {
     public static <T,K> Tuple<T,K> of(T t, K k){
         return new Tuple<>(t,k);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null || !(obj instanceof Tuple))
+            return false;
+        Tuple t = (Tuple) obj;
+        return first.equals(t.first) && second.equals(t.second);
+    }
+
+    @Override
+    public int hashCode() {
+        return first.hashCode() * 7 + second.hashCode() * 17;
+    }
 }
