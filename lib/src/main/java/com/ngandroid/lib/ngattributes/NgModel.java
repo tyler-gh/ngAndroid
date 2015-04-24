@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngmodel;
+package com.ngandroid.lib.ngattributes;
 
 import android.view.View;
 import android.widget.CompoundButton;
@@ -25,20 +25,25 @@ import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.ngattributes.helpers.CompundButtonInteracter;
+import com.ngandroid.lib.ngattributes.helpers.TextInteracter;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
+import com.ngandroid.lib.utils.ValueFormatter;
 
 /**
  * Created by davityle on 1/17/15.
  */
 public class NgModel implements NgAttribute {
-    private static NgModel ourInstance = new NgModel();
+    private final ValueFormatter valueFormatter;
 
-    public static NgModel getInstance() {
-        return ourInstance;
+    static NgModel getInstance(ValueFormatter valueFormatter) {
+        return new NgModel(valueFormatter);
     }
 
-    private NgModel() {}
+    private NgModel(ValueFormatter valueFormatter) {
+        this.valueFormatter = valueFormatter;
+    }
 
     @Override
     public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String, String>[] models) {
@@ -67,7 +72,7 @@ public class NgModel implements NgAttribute {
         String defaultText =  textView.getText().toString();
         if(!defaultText.isEmpty())
             model.setValue(field, TypeUtils.fromString(TypeUtils.getType(model.getType(field)), defaultText));
-        final TextInteracter textInteracter = new TextInteracter(model, field, textView);
+        final TextInteracter textInteracter = new TextInteracter(model, field, textView, valueFormatter);
         textView.addTextChangedListener(textInteracter);
         model.addObserver(field, textInteracter);
     }

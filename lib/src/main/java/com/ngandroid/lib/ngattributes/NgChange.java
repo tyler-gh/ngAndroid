@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngchange;
+package com.ngandroid.lib.ngattributes;
 
 import android.view.View;
 import android.widget.CompoundButton;
@@ -35,7 +35,7 @@ public class NgChange implements NgAttribute {
 
     private static NgChange ourInstance = new NgChange();
 
-    public static NgChange getInstance() {
+    static NgChange getInstance() {
         return ourInstance;
     }
 

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngtext;
+package com.ngandroid.lib.ngattributes;
 
 import android.view.View;
 import android.widget.TextView;
@@ -23,7 +23,9 @@ import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.ngattributes.helpers.SetTextModelObserver;
 import com.ngandroid.lib.utils.Tuple;
+import com.ngandroid.lib.utils.ValueFormatter;
 
 
 /**
@@ -31,12 +33,15 @@ import com.ngandroid.lib.utils.Tuple;
  */
 public class NgText implements NgAttribute {
 
-    private static NgText ngText = new NgText();
-    public static NgText getInstance(){
-        return ngText;
+    private final ValueFormatter valueFormatter;
+
+    static NgText getInstance(ValueFormatter valueFormatter){
+        return new NgText(valueFormatter);
     }
 
-    private NgText(){}
+    private NgText(ValueFormatter valueFormatter){
+        this.valueFormatter = valueFormatter;
+    }
 
     @Override
     public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String, String>[] models) {
@@ -48,13 +53,13 @@ public class NgText implements NgAttribute {
             if(tv.getText().toString().isEmpty()){
                 Object modelValue = scope.execute(layoutId, viewId, getAttribute());
                 if(modelValue != null && !modelValue.toString().isEmpty()){
-                    tv.setText(modelValue.toString());
+                    tv.setText(valueFormatter.format(modelValue));
                 }
             }
 
             for (Tuple<String, String> model : models) {
                 Model m = scope.getModel(model.getFirst());
-                m.addObserver(model.getSecond(), new SetTextModelMethod(scope, layoutId, viewId, getAttribute(), tv));
+                m.addObserver(model.getSecond(), new SetTextModelObserver(scope, layoutId, viewId, getAttribute(), tv, valueFormatter));
             }
         }
     }

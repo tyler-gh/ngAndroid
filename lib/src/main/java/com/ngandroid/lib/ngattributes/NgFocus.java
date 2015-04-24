@@ -14,47 +14,43 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngif;
+package com.ngandroid.lib.ngattributes;
 
 import android.view.View;
 
-import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.Model;
-import com.ngandroid.lib.ng.ModelMethod;
+import com.ngandroid.lib.ng.ModelObserver;
 
 /**
- * Created by tyler on 2/10/15.
+ * Created by tyler on 2/17/15.
  */
-public class NgDisabled extends NgIf {
-    private static NgDisabled ngDisabled = new NgDisabled();
-    private NgDisabled(){}
+public class NgFocus extends NgIf {
 
-    public static NgDisabled getInstance(){
-        return ngDisabled;
-    }
+    private static NgFocus ngFocus = new NgFocus();
+    private NgFocus(){}
+
+    static NgFocus getInstance(){return ngFocus;}
 
     @Override
-    protected ModelMethod getModelMethod(final Model model, final View view, final String field) {
-        return new ModelMethod() {
+    protected ModelObserver getModelMethod(final Model model, final View view, final String field) {
+        return new ModelObserver() {
             @Override
-            public Object invoke(String fieldName, Object... args) {
+            public void invoke(String fieldName, Object arg) {
                 try {
                     if(model.getValue(field)){
-                        view.setEnabled(false);
+                        view.requestFocus();
                     }else{
-                        view.setEnabled(true);
+                        view.clearFocus();
                     }
                 } catch (Throwable throwable) {
-                    // TODO - error
                     throwable.printStackTrace();
                 }
-                return null;
             }
         };
     }
 
     @Override
     public int getAttribute() {
-        return R.styleable.ngAndroid_ngDisabled;
+        return 0;
     }
 }

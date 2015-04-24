@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngblur;
+package com.ngandroid.lib.ngattributes;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +23,7 @@ import android.widget.ImageView;
 
 import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.Model;
-import com.ngandroid.lib.ng.ModelMethod;
-import com.ngandroid.lib.ngattributes.ngif.NgIf;
+import com.ngandroid.lib.ng.ModelObserver;
 import com.ngandroid.lib.utils.BlurUtils;
 
 /**
@@ -33,7 +32,7 @@ import com.ngandroid.lib.utils.BlurUtils;
 public class NgBlur extends NgIf{
     private static NgBlur ourInstance = new NgBlur();
 
-    public static NgBlur getInstance() {
+    static NgBlur getInstance() {
         return ourInstance;
     }
 
@@ -41,7 +40,7 @@ public class NgBlur extends NgIf{
     }
 
     @Override
-    protected ModelMethod getModelMethod(final Model model, final View view, final String field) {
+    protected ModelObserver getModelMethod(final Model model, final View view, final String field) {
         ViewGroup parent = (ViewGroup) view.getParent();
         FrameLayout layout = new FrameLayout(view.getContext());
         layout.setLayoutParams(view.getLayoutParams());
@@ -57,9 +56,9 @@ public class NgBlur extends NgIf{
         imageView.setVisibility(View.GONE);
         layout.addView(imageView);
 
-        return new ModelMethod() {
+        return new ModelObserver() {
             @Override
-            public Object invoke(String fieldName, Object... args) {
+            public void invoke(String fieldName, Object arg) {
                 try {
                     if(model.getValue(field)){
                         view.setVisibility(View.GONE);
@@ -73,7 +72,6 @@ public class NgBlur extends NgIf{
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
                 }
-                return null;
             }
         };
     }

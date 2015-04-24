@@ -14,24 +14,24 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngif;
+package com.ngandroid.lib.ngattributes.helpers;
 
 import android.view.View;
 
 import com.ngandroid.lib.ng.Model;
-import com.ngandroid.lib.ng.ModelMethod;
+import com.ngandroid.lib.ng.ModelObserver;
 
 /**
 * Created by tyler on 2/10/15.
 */
-final class FireCheckObserver implements ModelMethod {
+public final class FireCheckObserver implements ModelObserver {
 
     private final Model model;
     private final String field;
     private final View view;
     private final boolean isGone;
 
-    FireCheckObserver(Model model, View view, String field, boolean isGone) {
+    public FireCheckObserver(Model model, View view, String field, boolean isGone) {
         this.model = model;
         this.field = field;
         this.view = view;
@@ -39,7 +39,7 @@ final class FireCheckObserver implements ModelMethod {
     }
 
     @Override
-    public Object invoke(String fieldName, Object... args) {
+    public void invoke(String fieldName, Object arg) {
         try {
             if(model.getValue(field)){
                 if(isGone)
@@ -53,6 +53,5 @@ final class FireCheckObserver implements ModelMethod {
             // TODO - error
             throwable.printStackTrace();
         }
-        return null;
     }
 }

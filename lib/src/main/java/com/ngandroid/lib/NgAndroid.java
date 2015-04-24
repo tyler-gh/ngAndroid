@@ -27,17 +27,10 @@ import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
 import com.ngandroid.lib.ng.ScopeBuilder;
-import com.ngandroid.lib.ngattributes.ngblur.NgBlur;
-import com.ngandroid.lib.ngattributes.ngchange.NgChange;
-import com.ngandroid.lib.ngattributes.ngclick.NgClick;
-import com.ngandroid.lib.ngattributes.ngfocus.NgFocus;
-import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
-import com.ngandroid.lib.ngattributes.ngif.NgGone;
-import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
-import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
-import com.ngandroid.lib.ngattributes.ngmodel.NgModel;
-import com.ngandroid.lib.ngattributes.ngtext.NgText;
+import com.ngandroid.lib.ngattributes.Attrs;
+import com.ngandroid.lib.utils.DefaultValueFormatter;
 import com.ngandroid.lib.utils.Tuple;
+import com.ngandroid.lib.utils.ValueFormatter;
 
 /**
  * Created by davityle on 1/12/15.
@@ -132,24 +125,27 @@ public class NgAndroid {
      * DO NOT USE. This is for generated code to access the NgAttributes
      */
     public void attach(int attr, Scope scope, View view, int layoutId, int viewId, Tuple<String,String> ... models) {
-        attributes.get(attr).attach(scope, view, layoutId, viewId, models);
+        NgAttribute ngAttribute = attributes.get(attr);
+        if(ngAttribute == null)
+            throw new NgException("Unable to find NgAttribute " + Integer.toHexString(attr));
+        ngAttribute.attach(scope, view, layoutId, viewId, models);
     }
 
     public static final class Builder {
-        private SparseArray<NgAttribute> attributes = new SparseArray<>();
+
+        private ValueFormatter valueFormatter;
+
+        public Builder setValueFormatter(ValueFormatter valueFormatter){
+            this.valueFormatter = valueFormatter;
+            return this;
+        }
 
         public NgAndroid build(){
-            attributes.put(R.styleable.ngAndroid_ngModel, NgModel.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngClick, NgClick.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngLongClick, NgLongClick.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngChange, NgChange.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngGone, NgGone.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngInvisible, NgInvisible.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngDisabled, NgDisabled.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngBlur, NgBlur.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngFocus, NgFocus.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngText, NgText.getInstance());
-            return new NgAndroid(attributes);
+
+            if(valueFormatter == null)
+                valueFormatter = new DefaultValueFormatter();
+
+            return new NgAndroid(Attrs.getAttributes(valueFormatter));
         }
     }
 }

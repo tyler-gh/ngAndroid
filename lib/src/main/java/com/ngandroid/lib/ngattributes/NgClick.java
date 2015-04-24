@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngclick;
+package com.ngandroid.lib.ngattributes;
 
 import android.view.View;
 
@@ -30,7 +30,7 @@ import com.ngandroid.lib.utils.Tuple;
 public class NgClick implements NgAttribute {
     private static NgClick ourInstance = new NgClick();
 
-    public static NgClick getInstance() {
+    static NgClick getInstance() {
         return ourInstance;
     }
 

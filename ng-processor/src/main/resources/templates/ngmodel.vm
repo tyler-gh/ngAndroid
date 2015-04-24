@@ -8,17 +8,17 @@ public class ${simpleClassName}$$NgModel #if($isInterface) implements ${classNam
         #end
     #end
     #foreach($field in $fields)
-        private java.util.List<com.ngandroid.lib.ng.ModelMethod> ${field.name}Observers;
+        private java.util.List<com.ngandroid.lib.ng.ModelObserver> ${field.name}Observers;
     #end
 
-	public void addObserver(String field, com.ngandroid.lib.ng.ModelMethod modelMethod){
+	public void addObserver(String field, com.ngandroid.lib.ng.ModelObserver modelObserver){
 		switch(field.toLowerCase()){
 		    #foreach($field in $fields)
                 case "${field.name}":
                     if(${field.name}Observers == null){
                         ${field.name}Observers = new java.util.ArrayList<>();
                     }
-                    ${field.name}Observers.add(modelMethod);
+                    ${field.name}Observers.add(modelObserver);
                     break;
             #end
 			default:
@@ -81,7 +81,7 @@ public class ${simpleClassName}$$NgModel #if($isInterface) implements ${classNam
                 super.${field.setter}(${field.name}_);
             #end
             if(${field.name}Observers != null){
-                for(com.ngandroid.lib.ng.ModelMethod observer : ${field.name}Observers){
+                for(com.ngandroid.lib.ng.ModelObserver observer : ${field.name}Observers){
                     observer.invoke("${field.name}", ${field.name}_);
                 }
             }

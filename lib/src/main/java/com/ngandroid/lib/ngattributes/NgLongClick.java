@@ -14,34 +14,35 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngif;
+package com.ngandroid.lib.ngattributes;
 
 import android.view.View;
 
 import com.ngandroid.lib.R;
-import com.ngandroid.lib.ng.Model;
-import com.ngandroid.lib.ng.ModelMethod;
+import com.ngandroid.lib.ng.NgAttribute;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.utils.Tuple;
 
 /**
- * Created by tyler on 2/10/15.
+ * Created by tyler on 1/28/15.
  */
-public class NgGone extends NgIf {
+public class NgLongClick implements NgAttribute {
+    private static NgLongClick ourInstance = new NgLongClick();
 
-    private static NgGone ngGone = new NgGone();
+    static NgLongClick getInstance() {
+        return ourInstance;
+    }
 
-    private NgGone(){}
-
-    public static NgGone getInstance() {
-        return ngGone;
+    private NgLongClick() {
     }
 
     @Override
-    protected ModelMethod getModelMethod(Model model, View view, String field) {
-        return new FireCheckObserver(model, view, field, true);
+    public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String, String>[] models) {
+        NgClick.getInstance().attach(scope, view, layoutId, viewId, getAttribute(), true);
     }
 
     @Override
     public int getAttribute() {
-        return R.styleable.ngAndroid_ngIf;
+        return R.styleable.ngAndroid_ngLongClick;
     }
 }

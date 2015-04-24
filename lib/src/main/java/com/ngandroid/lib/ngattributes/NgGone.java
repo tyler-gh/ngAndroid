@@ -14,32 +14,35 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngif;
+package com.ngandroid.lib.ngattributes;
 
 import android.view.View;
 
 import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.Model;
-import com.ngandroid.lib.ng.ModelMethod;
+import com.ngandroid.lib.ng.ModelObserver;
+import com.ngandroid.lib.ngattributes.helpers.FireCheckObserver;
 
 /**
  * Created by tyler on 2/10/15.
  */
-public class NgInvisible extends NgIf {
-    private static NgInvisible ngInvisible = new NgInvisible();
-    private NgInvisible(){}
+public class NgGone extends NgIf {
 
-    public static NgInvisible getInstance() {
-        return ngInvisible;
+    private static NgGone ngGone = new NgGone();
+
+    private NgGone(){}
+
+    static NgGone getInstance() {
+        return ngGone;
     }
 
     @Override
-    protected ModelMethod getModelMethod(Model model, View view, String field) {
-        return new FireCheckObserver(model, view, field, false);
+    protected ModelObserver getModelMethod(Model model, View view, String field) {
+        return new FireCheckObserver(model, view, field, true);
     }
 
     @Override
     public int getAttribute() {
-        return R.styleable.ngAndroid_ngInvisible;
+        return R.styleable.ngAndroid_ngIf;
     }
 }

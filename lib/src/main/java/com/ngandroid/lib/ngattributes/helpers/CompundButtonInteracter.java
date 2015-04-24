@@ -14,41 +14,40 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngmodel;
+package com.ngandroid.lib.ngattributes.helpers;
 
 import android.widget.CompoundButton;
 
 import com.ngandroid.lib.ng.Model;
-import com.ngandroid.lib.ng.ModelMethod;
+import com.ngandroid.lib.ng.ModelObserver;
 
 /**
 * Created by tyler on 2/24/15.
 */
-final class CompundButtonInteracter implements CompoundButton.OnCheckedChangeListener, ModelMethod {
+public final class CompundButtonInteracter implements CompoundButton.OnCheckedChangeListener, ModelObserver {
 
     private final Model model;
     private final String field;
     private final CompoundButton compoundButton;
     private boolean isFromSelf;
 
-    CompundButtonInteracter(Model model, String field, CompoundButton compoundButton) {
+    public CompundButtonInteracter(Model model, String field, CompoundButton compoundButton) {
         this.model = model;
         this.field = field;
         this.compoundButton = compoundButton;
     }
 
     @Override
-    public Object invoke(String fieldName, Object... args) {
+    public void invoke(String fieldName, Object arg) {
         try{
             if(!isFromSelf){
                 isFromSelf = true;
-                Boolean b = (Boolean) args[0];
+                Boolean b = (Boolean) arg;
                 compoundButton.setChecked(b);
             }
         }finally {
             isFromSelf = false;
         }
-        return null;
     }
 
     @Override

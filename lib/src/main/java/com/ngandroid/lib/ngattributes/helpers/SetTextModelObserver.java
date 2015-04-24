@@ -14,45 +14,47 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.ngtext;
+package com.ngandroid.lib.ngattributes.helpers;
 
 import android.util.Log;
 import android.widget.TextView;
 
-import com.ngandroid.lib.ng.ModelMethod;
+import com.ngandroid.lib.ng.ModelObserver;
 import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.utils.ValueFormatter;
 
 /**
 * Created by tyler on 3/10/15.
 */
-class SetTextModelMethod implements ModelMethod {
+public class SetTextModelObserver implements ModelObserver {
 
 
     private final Scope scope;
     private final int layoutId, viewId, attr;
     private final TextView hasText;
+    private final ValueFormatter valueFormatter;
 
-    SetTextModelMethod(Scope scope, int layoutId, int viewId, int attr, TextView hasText) {
+    public SetTextModelObserver(Scope scope, int layoutId, int viewId, int attr, TextView hasText, ValueFormatter valueFormatter) {
         this.scope = scope;
         this.layoutId = layoutId;
         this.viewId = viewId;
         this.attr = attr;
         this.hasText = hasText;
+        this.valueFormatter = valueFormatter;
     }
 
     @Override
-    public Object invoke(String fieldName, Object... args) {
+    public void invoke(String fieldName, Object arg) {
         try {
             Object value = scope.execute(layoutId, viewId, attr);
             if(value == null){
                 Log.e("NgAndroid", "NgText value was null");
-                return null;
+                return;
             }
-            hasText.setText(value.toString());
+            hasText.setText(valueFormatter.format(value));
         } catch (Throwable throwable) {
             // TODO
             throwable.printStackTrace();
         }
-        return null;
     }
 }

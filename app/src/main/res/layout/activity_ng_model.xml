@@ -1,68 +1,100 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ng="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/activity_horizontal_margin"
-    android:orientation="vertical"
     tools:context="com.ngandroid.demo.ui.pages.ngmodel.NgModelActivity"
     tools:ignore="MissingPrefix">
-    
-    <TextView
-        android:id="@+id/tvStr"
-        ng:ngModel="mod.str"
-        style="@style/TextStyle"/>
 
-    <EditText
-        android:id="@+id/etStr"
-        ng:ngModel="mod.str"
-        style="@style/TextStyle"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/activity_horizontal_margin">
 
+        <TextView
+            style="@style/Header"
+            android:text="@string/string" />
 
-    <TextView
-        android:id="@+id/tvInteger"
-        ng:ngModel="mod.integer"
-        style="@style/TextStyle"/>
+        <View style="@style/hr" />
 
-    <EditText
-        android:id="@+id/etInteger"
-        ng:ngModel="mod.integer"
-        android:inputType="number"
-        style="@style/TextStyle"/>
+        <TextView
+            android:id="@+id/tvStr"
+            style="@style/TextStyle"
+            ng:ngModel="mod.str" />
 
-    <TextView
-        android:id="@+id/tvDub"
-        ng:ngModel="mod.dub"
-        style="@style/TextStyle"/>
+        <EditText
+            android:id="@+id/etStr"
+            style="@style/TextStyle"
+            ng:ngModel="mod.str" />
 
-    <EditText
-        android:id="@+id/etDub"
-        ng:ngModel="mod.dub"
-        android:inputType="numberDecimal"
-        style="@style/TextStyle"/>
+        <TextView
+            style="@style/Header"
+            android:text="@string/integer" />
 
-    <TextView
-        android:id="@+id/tvFlt"
-        ng:ngModel="mod.flt"
-        style="@style/TextStyle"/>
+        <View style="@style/hr" />
 
-    <EditText
-        android:id="@+id/etFlt"
-        ng:ngModel="mod.flt"
-        android:inputType="numberDecimal"
-        style="@style/TextStyle"/>
+        <TextView
+            android:id="@+id/tvInteger"
+            style="@style/TextStyle"
+            ng:ngModel="mod.integer" />
 
-    <TextView
-        android:id="@+id/tvLon"
-        ng:ngModel="mod.lon"
-        style="@style/TextStyle"/>
+        <EditText
+            android:id="@+id/etInteger"
+            style="@style/TextStyle"
+            android:inputType="number"
+            ng:ngModel="mod.integer" />
 
-    <EditText
-        android:id="@+id/etLon"
-        ng:ngModel="mod.lon"
-        android:inputType="numberDecimal"
-        style="@style/TextStyle"/>
+        <TextView
+            style="@style/Header"
+            android:text="@string/dub" />
 
+        <View style="@style/hr" />
 
+        <TextView
+            android:id="@+id/tvDub"
+            style="@style/TextStyle"
+            ng:ngModel="mod.dub" />
 
-</LinearLayout>
+        <EditText
+            android:id="@+id/etDub"
+            style="@style/TextStyle"
+            android:inputType="numberDecimal"
+            ng:ngModel="mod.dub" />
+
+        <TextView
+            style="@style/Header"
+            android:text="@string/flt" />
+
+        <View style="@style/hr" />
+
+        <TextView
+            android:id="@+id/tvFlt"
+            style="@style/TextStyle"
+            ng:ngModel="mod.flt" />
+
+        <EditText
+            android:id="@+id/etFlt"
+            style="@style/TextStyle"
+            android:inputType="numberDecimal"
+            ng:ngModel="mod.flt" />
+
+        <TextView
+            style="@style/Header"
+            android:text="@string/lng" />
+
+        <View style="@style/hr" />
+
+        <TextView
+            android:id="@+id/tvLon"
+            style="@style/TextStyle"
+            ng:ngModel="mod.lon" />
+
+        <EditText
+            android:id="@+id/etLon"
+            style="@style/TextStyle"
+            android:inputType="numberDecimal"
+            ng:ngModel="mod.lon" />
+
+    </LinearLayout>
+</ScrollView>

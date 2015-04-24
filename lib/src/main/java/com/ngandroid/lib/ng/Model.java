@@ -20,7 +20,7 @@ package com.ngandroid.lib.ng;
  * Created by tyler on 3/20/15.
  */
 public interface Model {
-    public void addObserver(String field, ModelMethod modelMethod);
+    public void addObserver(String field, ModelObserver modelObserver);
     public <T> T getValue(String field);
     public <T> void setValue(String field, T value);
     public Class<?> getType(String field);

@@ -14,36 +14,28 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.nglongclick;
+package com.ngandroid.lib.ngattributes;
 
 import android.view.View;
 
-import com.ngandroid.lib.R;
+import com.ngandroid.lib.ng.Model;
+import com.ngandroid.lib.ng.ModelObserver;
 import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
-import com.ngandroid.lib.ngattributes.ngclick.NgClick;
 import com.ngandroid.lib.utils.Tuple;
 
 /**
- * Created by tyler on 1/28/15.
+ * Created by tyler on 2/10/15.
  */
-public class NgLongClick implements NgAttribute {
-    private static NgLongClick ourInstance = new NgLongClick();
-
-    public static NgLongClick getInstance() {
-        return ourInstance;
-    }
-
-    private NgLongClick() {
-    }
-
+public abstract class NgIf implements NgAttribute {
     @Override
-    public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String, String>[] models) {
-        NgClick.getInstance().attach(scope, view, layoutId, viewId, getAttribute(), true);
+    public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String,String>[] models) {
+        for(Tuple<String,String> model : models){
+            Model m = scope.getModel(model.getFirst());
+            m.addObserver(model.getSecond(), getModelMethod(m, view, model.getSecond()));
+        }
     }
 
-    @Override
-    public int getAttribute() {
-        return R.styleable.ngAndroid_ngLongClick;
-    }
+    protected abstract ModelObserver getModelMethod(Model model, View view, String field);
+
 }
