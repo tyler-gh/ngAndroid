@@ -42,9 +42,19 @@ public class NgText implements NgAttribute {
     public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String, String>[] models) {
         // TODO make this more flexible
         if(view instanceof TextView) {
+            TextView tv = (TextView) view;
+
+            // TODO this may not be right and or useful...
+            if(tv.getText().toString().isEmpty()){
+                Object modelValue = scope.execute(layoutId, viewId, getAttribute());
+                if(modelValue != null && !modelValue.toString().isEmpty()){
+                    tv.setText(modelValue.toString());
+                }
+            }
+
             for (Tuple<String, String> model : models) {
                 Model m = scope.getModel(model.getFirst());
-                m.addObserver(model.getSecond(), new SetTextModelMethod(scope, layoutId, viewId, getAttribute(), (TextView) view));
+                m.addObserver(model.getSecond(), new SetTextModelMethod(scope, layoutId, viewId, getAttribute(), tv));
             }
         }
     }

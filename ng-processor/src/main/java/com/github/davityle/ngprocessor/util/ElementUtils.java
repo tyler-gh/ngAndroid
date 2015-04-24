@@ -101,20 +101,22 @@ public class ElementUtils {
     public static TypeMirror getElementType(TypeElement model, String field){
         TypeMirror typeMirror = null;
         for(Element f : model.getEnclosedElements()){
-            String fName = f.getSimpleName().toString().toLowerCase();
-            ExecutableElement exec = (ExecutableElement) f;
-            if(fName.equals("set" + field) && isSetter(f)){
-                TypeMirror setType = exec.getParameters().get(0).asType();
-                if(typeMirror != null){
-                    checkMatch(model, field, typeMirror, setType);
+            if(f instanceof ExecutableElement) {
+                String fName = f.getSimpleName().toString().toLowerCase();
+                ExecutableElement exec = (ExecutableElement) f;
+                if (fName.equals("set" + field) && isSetter(f)) {
+                    TypeMirror setType = exec.getParameters().get(0).asType();
+                    if (typeMirror != null) {
+                        checkMatch(model, field, typeMirror, setType);
+                    }
+                    typeMirror = setType;
+                } else if (fName.equals("get" + field) && isGetter(f)) {
+                    TypeMirror getType = exec.getReturnType();
+                    if (typeMirror != null) {
+                        checkMatch(model, field, typeMirror, getType);
+                    }
+                    typeMirror = getType;
                 }
-                typeMirror = setType;
-            }else if(fName.equals("get" + field) && isGetter(f)){
-                TypeMirror getType = exec.getReturnType();
-                if(typeMirror != null){
-                    checkMatch(model, field, typeMirror, getType);
-                }
-                typeMirror = getType;
             }
         }
         return typeMirror;

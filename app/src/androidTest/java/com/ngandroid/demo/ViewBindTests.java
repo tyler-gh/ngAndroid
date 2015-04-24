@@ -18,6 +18,8 @@ package com.ngandroid.demo;
 
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.ngandroid.demo.ui.pages.main.DemoActivity;
+
 /**
  * Created by tyler on 3/9/15.
  */

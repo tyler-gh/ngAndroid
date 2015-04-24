@@ -36,6 +36,7 @@ import com.ngandroid.lib.ngattributes.ngif.NgGone;
 import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
 import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
 import com.ngandroid.lib.ngattributes.ngmodel.NgModel;
+import com.ngandroid.lib.ngattributes.ngtext.NgText;
 import com.ngandroid.lib.utils.Tuple;
 
 /**
@@ -107,19 +108,19 @@ public class NgAndroid {
         return inflate(buildScope(activity), activity, resourceId, viewGroup, false);
     }
 
-    public View inflate(Scope scope, Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
+    public View inflate(Object scope, Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
         View v = activity.getLayoutInflater().inflate(resourceId, viewGroup, attach);
-        scope.attach(resourceId, v);
+        buildScope(scope).attach(resourceId, v);
         return v;
     }
 
-    public View inflate(Scope scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
+    public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
         return inflate(scope, inflater, resourceId, viewGroup, false);
     }
 
-    public View inflate(Scope scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
+    public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
         View v = inflater.inflate(resourceId, viewGroup, attach);
-        scope.attach(resourceId, v);
+        buildScope(scope).attach(resourceId, v);
         return v;
     }
 
@@ -147,6 +148,7 @@ public class NgAndroid {
             attributes.put(R.styleable.ngAndroid_ngDisabled, NgDisabled.getInstance());
             attributes.put(R.styleable.ngAndroid_ngBlur, NgBlur.getInstance());
             attributes.put(R.styleable.ngAndroid_ngFocus, NgFocus.getInstance());
+            attributes.put(R.styleable.ngAndroid_ngText, NgText.getInstance());
             return new NgAndroid(attributes);
         }
     }

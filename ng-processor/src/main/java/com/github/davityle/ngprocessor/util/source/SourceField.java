@@ -25,7 +25,7 @@ public final class SourceField {
 
     public SourceField(String name, String typeName) {
         this.name = name;
-        this.typeName = typeName;
+        this.typeName = typeName.replaceAll("<.*>", "");
     }
 
     public String getName(){
