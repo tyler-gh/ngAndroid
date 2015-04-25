@@ -17,30 +17,19 @@
 package com.ngandroid.lib;
 
 import android.app.Activity;
+import android.os.Looper;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ngandroid.lib.attacher.AttributeAttacher;
-import com.ngandroid.lib.annotations.Ignore;
-import com.ngandroid.lib.ng.ModelBuilder;
-import com.ngandroid.lib.ng.NgAttribute;
-import com.ngandroid.lib.ngattributes.ngblur.NgBlur;
-import com.ngandroid.lib.ngattributes.ngchange.NgChange;
-import com.ngandroid.lib.ngattributes.ngclick.NgClick;
-import com.ngandroid.lib.ngattributes.ngfocus.NgFocus;
-import com.ngandroid.lib.ngattributes.ngif.NgDisabled;
-import com.ngandroid.lib.ngattributes.ngif.NgGone;
-import com.ngandroid.lib.ngattributes.ngif.NgInvisible;
-import com.ngandroid.lib.ngattributes.nglongclick.NgLongClick;
-import com.ngandroid.lib.ngattributes.ngmodel.NgModel;
-import com.ngandroid.lib.utils.JsonUtils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.lang.reflect.Field;
+import com.ngandroid.lib.exceptions.NgException;
+import com.ngandroid.lib.ng.Scope;
+import com.ngandroid.lib.ngattributes.Attrs;
+import com.ngandroid.lib.ngattributes.NgAttribute;
+import com.ngandroid.lib.utils.DefaultValueFormatter;
+import com.ngandroid.lib.utils.Tuple;
+import com.ngandroid.lib.utils.ValueFormatter;
 
 /**
  * Created by davityle on 1/12/15.
@@ -50,113 +39,172 @@ public class NgAndroid {
     private static NgAndroid instance;
 
     /**
-     * this method is not thread safe
-     * @return
+     * returns a default singleton instance of NgAndroid
+     * @return NgAndroid
+     *
+     * @throws NgException if not called on the main ui thread
      */
     public static NgAndroid getInstance(){
+        if(Looper.myLooper() != Looper.getMainLooper())
+            throw new NgException("NgAndroid should only be used on the main ui thread.");
         if(instance == null){
             instance = new Builder().build();
         }
         return instance;
     }
 
-    private final SparseArray<NgAttribute> mAttributes;
+    private final SparseArray<NgAttribute> attributes;
 
     private NgAndroid(SparseArray<NgAttribute> attributes){
-        this.mAttributes = attributes;
+        this.attributes = attributes;
     }
 
-
+    /**
+     * sets the content view of the Activity to the given resourceId
+     * @param activity used as the scope of the binding, contentView set
+     * @param resourceId xml layout resource to bind to scope and set contentView of Activity
+     */
     public void setContentView(Activity activity, int resourceId) {
-        setContentView(activity, activity, resourceId);
+        setContentView(buildScope(activity), activity, resourceId);
     }
 
-    public void setContentView(Object scope, Activity activity, int resourceId) {
-        new AttributeAttacher(activity, scope, mAttributes).setContentView(activity, resourceId);
+    /**
+     * sets the content view of the Activity to the given resourceId
+     * binds the scope to the view
+     * @param scope scope of the binding
+     * @param activity contentView set
+     * @param resourceId xml layout resource to bind to scope and set contentView of Activity
+     */
+    public void setContentView(Scope scope, Activity activity, int resourceId) {
+        activity.setContentView(resourceId);
+        scope.attach(resourceId, activity.findViewById(android.R.id.content));
     }
 
+    /**
+     * this inflates the view using {@link Activity#getLayoutInflater()}, calls,
+     * {@link #buildScope(Object)}, and then attaches the view to the scope using
+     * {@link Scope#attach(int, View)}, the activity is used as the scope object
+     * @param activity the scope and the context for the layout inflater
+     * @param resourceId layout resource id
+     * @param viewGroup  the parent of the view to be
+     * @param attach attach to the view group
+     * @return the inflated and attached view
+     */
     public View inflate(Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
-        return inflate(activity, activity, resourceId, viewGroup, attach);
+        return inflate(buildScope(activity), activity, resourceId, viewGroup, attach);
     }
 
+    /**
+     * this inflates the view using {@link Activity#getLayoutInflater()}, calls,
+     * {@link #buildScope(Object)}, and then attaches the view to the scope using
+     * {@link Scope#attach(int, View)}, the activity is used as the scope object
+     *
+     * @param activity the scope and the context for the layout inflater
+     * @param resourceId layout resource id
+     * @param viewGroup the parent of the view to be, the view is not attched to the view group
+     *                  by default
+     * @return the inflated and attached view
+     */
     public View inflate(Activity activity, int resourceId, ViewGroup viewGroup){
-        return inflate(activity, activity, resourceId, viewGroup, false);
+        return inflate(buildScope(activity), activity, resourceId, viewGroup, false);
     }
 
+    /**
+     * this inflates the view using {@link Activity#getLayoutInflater()}, calls,
+     * {@link #buildScope(Object)}, and then attaches the view to the scope using
+     * {@link Scope#attach(int, View)}
+     * @param scope the annotated scope object
+     * @param activity activity is used to get the layout inflater
+     * @param resourceId layout resource id
+     * @param viewGroup attach to the view group
+     * @param attach attach to the view group
+     * @return the inflated and attached view
+     */
     public View inflate(Object scope, Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
-        return new AttributeAttacher(activity, scope, mAttributes).inflate(resourceId, viewGroup, attach);
+        View v = activity.getLayoutInflater().inflate(resourceId, viewGroup, attach);
+        buildScope(scope).attach(resourceId, v);
+        return v;
     }
 
+    /**
+     * this inflates the view, calls,  {@link #buildScope(Object)}, and then attaches the view
+     * to the scope using {@link Scope#attach(int, View)}
+     * @param scope the annotated scope object
+     * @param inflater inflater for inflating the view
+     * @param resourceId layout resource id
+     * @param viewGroup the parent of the view to be, the view is not attched to the view group
+     *                  by default
+     * @return the inflated and attached view
+     */
     public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
         return inflate(scope, inflater, resourceId, viewGroup, false);
     }
 
+    /**
+     * this inflates the view, calls,  {@link #buildScope(Object)}, and then attaches the view
+     * to the scope using {@link Scope#attach(int, View)}
+     * @param scope the annotated scope object
+     * @param inflater inflater for inflating the view
+     * @param resourceId layout resource id
+     * @param viewGroup the parent of the view to be
+     * @param attach attach to the view group
+     * @return the inflated and attached view
+     */
     public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
-        return new AttributeAttacher(inflater, scope, mAttributes).inflate(resourceId, viewGroup, attach);
+        View v = inflater.inflate(resourceId, viewGroup, attach);
+        buildScope(scope).attach(resourceId, v);
+        return v;
     }
 
-    public <T> T buildModel(Class<T> clss){
-        return  (T) new ModelBuilder(clss).create();
+    /**
+     * builds the scope, this function will set the fields annotated with
+     * {@link com.ngandroid.lib.annotations.NgModel} that are null or do not
+     * implement {@link com.ngandroid.lib.ng.Model}
+     * @param scope the annotated scope object
+     * @return the Scope
+     */
+    public Scope buildScope(Object scope) {
+        return ScopeBuilder.getScope(scope, this);
     }
 
-    public <T> T buildModel(Object scope, String fieldName, Class<T> clss){
-        try {
-            Field f = scope.getClass().getDeclaredField(fieldName);
-            f.setAccessible(true);
-            T val = (T) new ModelBuilder(clss).create();
-            f.set(scope, val);
-            return val;
-        } catch (NoSuchFieldException e) {
-            //TODO
-            throw new RuntimeException("There is no such field '" + fieldName + "' found in " + scope.getClass().getSimpleName());
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Unable to access field '" + fieldName + "' in " + scope.getClass().getSimpleName());
-        }
+    /**
+     * DO NOT USE. This is for generated code to access the NgAttributes
+     */
+    public void attach(int attr, Scope scope, View view, int layoutId, int viewId, Tuple<String,String> ... models) {
+        NgAttribute ngAttribute = attributes.get(attr);
+        if(ngAttribute == null)
+            throw new NgException("Unable to find NgAttribute " + Integer.toHexString(attr));
+        ngAttribute.attach(scope, view, layoutId, viewId, models);
     }
 
-    public <T> T buildScope(Class<T> clss){
-        T instance;
-        try {
-            instance = clss.newInstance();
-            Field[] fields = clss.getDeclaredFields();
-            for(Field f : fields){
-                f.setAccessible(true);
-                Class type = f.getType();
-                if(type.isInterface() && !f.isAnnotationPresent(Ignore.class)){
-                    f.set(instance, buildModel(type));
-                }
-            }
-        } catch (InstantiationException | IllegalAccessException e) {
-            // TODO
-            throw new RuntimeException("Error instantiating scope.", e);
-        }
-        return instance;
-    }
-
-    public <T> T modelFromJson(String json, Class<T> clss) throws JSONException {
-        return JsonUtils.buildModelFromJson(new JSONObject(json), clss);
-    }
-
-
+    /**
+     * Customizes and Builds a NgAndroid
+     */
     public static final class Builder {
-        private SparseArray<NgAttribute> attributes = new SparseArray<>();
 
-        public Builder addCustomAttribute(int attributeId, NgAttribute ngAttribute){
-            attributes.put(attributeId, ngAttribute);
+        private ValueFormatter valueFormatter;
+
+        /**
+         * sets the value formatter that {@link com.ngandroid.lib.ngattributes.NgText} and
+         * {@link com.ngandroid.lib.ngattributes.NgModel} will use to format and convert values
+         * @param valueFormatter the value formatter
+         * @return this
+         */
+        public Builder setValueFormatter(ValueFormatter valueFormatter){
+            this.valueFormatter = valueFormatter;
             return this;
         }
 
+        /**
+         * builds the NgAndroid instance
+         * @return NgAndroid
+         */
         public NgAndroid build(){
-            attributes.put(R.styleable.ngAndroid_ngModel, NgModel.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngClick, NgClick.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngLongClick, NgLongClick.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngChange, NgChange.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngGone, NgGone.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngInvisible, NgInvisible.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngDisabled, NgDisabled.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngBlur, NgBlur.getInstance());
-            attributes.put(R.styleable.ngAndroid_ngFocus, NgFocus.getInstance());
-            return new NgAndroid(attributes);
+
+            if(valueFormatter == null)
+                valueFormatter = new DefaultValueFormatter();
+
+            return new NgAndroid(Attrs.getAttributes(valueFormatter));
         }
     }
 }

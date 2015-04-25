@@ -1,0 +1,90 @@
+package ${packageName};
+
+public class ${simpleClassName}$$NgModel #if($isInterface) implements ${className}, #else extends ${className} implements #end com.ngandroid.lib.ng.Model {
+
+    #if($isInterface)
+        #foreach($field in $fields)
+            private ${field.typeName} ${field.name}_;
+        #end
+    #end
+    #foreach($field in $fields)
+        private java.util.List<com.ngandroid.lib.ng.ModelObserver> ${field.name}Observers;
+    #end
+
+	public void addObserver(String field, com.ngandroid.lib.ng.ModelObserver modelObserver){
+		switch(field.toLowerCase()){
+		    #foreach($field in $fields)
+                case "${field.name}":
+                    if(${field.name}Observers == null){
+                        ${field.name}Observers = new java.util.ArrayList<>();
+                    }
+                    ${field.name}Observers.add(modelObserver);
+                    break;
+            #end
+			default:
+			    throw new com.ngandroid.lib.exceptions.NgException("Field '" + field + "' was not found in ${simpleClassName}");
+		}
+	}
+
+	public <T> T  getValue(String field){
+		switch(field.toLowerCase()){
+            #foreach($field in $fields)
+                #if( ($isInterface) || ($field.getter))
+                    case "${field.name}":
+                        #if($isInterface)
+                            return (T) (Object) ${field.name}_;
+                        #else
+                            return (T) (Object) ${field.getter}();
+                        #end
+                #end
+            #end
+		}
+		throw new com.ngandroid.lib.exceptions.NgException("Field '" + field + "' was not found or getter was not available in ${simpleClassName}");
+	}
+
+	public void setValue(String field, Object value){
+		switch(field.toLowerCase()){
+		    #foreach($field in $fields)
+                case "${field.name}":
+                    ${field.setter}((${field.typeName}) value);
+                    break;
+            #end
+			default:
+			    throw new com.ngandroid.lib.exceptions.NgException("Field '" + field + "' was not found in ${simpleClassName}");
+        }
+	}
+
+	public Class<?> getType(String field){
+		switch(field.toLowerCase()){
+			#foreach($field in $fields)
+                case "${field.name}":
+                    return ${field.typeName}.class;
+            #end
+		}
+		throw new com.ngandroid.lib.exceptions.NgException("Field '" + field + "' was not found in " + getClass().getSimpleName());
+	}
+    #if($isInterface)
+        #foreach($field in $fields)
+            #if($field.getter)
+                public ${field.typeName} ${field.getter}() {
+                    return ${field.name}_;
+                }
+            #end
+        #end
+    #end
+
+    #foreach($field in $fields)
+        public void ${field.setter}(${field.typeName} ${field.name}_) {
+            #if($isInterface)
+                this.${field.name}_ = ${field.name}_;
+            #else
+                super.${field.setter}(${field.name}_);
+            #end
+            if(${field.name}Observers != null){
+                for(com.ngandroid.lib.ng.ModelObserver observer : ${field.name}Observers){
+                    observer.invoke("${field.name}", ${field.name}_);
+                }
+            }
+        }
+    #end
+}

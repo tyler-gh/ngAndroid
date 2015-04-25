@@ -27,5 +27,7 @@
         <attr name="ngSrc" format="string"/>
         <!--custom android attribute - must be used in correlation with ngModel-->
         <attr name="ngJsonSrc" format="string"/>
+        <attr name="ngText" format="string"/>
+        <attr name="ngOnItemClickListener" format="string"/>
     </declare-styleable>
 </resources>

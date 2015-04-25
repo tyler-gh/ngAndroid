@@ -16,22 +16,12 @@
 
 package com.ngandroid.lib.ng;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-
 /**
- * Created by davityle on 1/12/15.
+ * Defines a Model. Used in generated code.
  */
-public class Model implements InvocationHandler {
-
-    private final MethodInvoker invocationHandler;
-
-    public Model(MethodInvoker invocationHandler) {
-        this.invocationHandler = invocationHandler;
-    }
-
-    @Override
-    public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
-        return invocationHandler.invoke(method.getName(), objects);
-    }
+public interface Model {
+    void addObserver(String field, ModelObserver modelObserver);
+    <T> T getValue(String field);
+    <T> void setValue(String field, T value);
+    Class<?> getType(String field);
 }

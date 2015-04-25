@@ -24,7 +24,8 @@ import android.support.v8.renderscript.RenderScript;
 import android.support.v8.renderscript.ScriptIntrinsicBlur;
 
 /**
- * Created by tyler on 2/16/15.
+ * This class can be used to blur a bitmap using {@link RenderScript} and resizing of the bitmap.
+ * It needs to be much more customizable.
  */
 public class BlurUtils {
     private static final float SCALE_RATIO = 5f;

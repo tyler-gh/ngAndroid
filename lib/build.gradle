@@ -16,8 +16,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "0.0.1"
 
         renderscriptTargetApi 19
         renderscriptSupportModeEnabled true
@@ -47,7 +47,7 @@ android {
 // N.B.: We're using a specific commit from a fork to
 // work around a bug in the recipe caused by the new
 // version of gradle which hasn't been upstreamed yet.
-//apply from: 'https://raw.github.com/shamanland/gradle-mvn-push/cc18d56549cdea03f744b6fff27911569394073e/gradle-mvn-push.gradle'
+apply from: 'https://raw.github.com/shamanland/gradle-mvn-push/cc18d56549cdea03f744b6fff27911569394073e/gradle-mvn-push.gradle'
 //
 // Revert to this version once chrisbanes/gradle-mvn-push#29
 // is merged.
