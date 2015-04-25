@@ -21,12 +21,11 @@ import android.view.View;
 import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelObserver;
-import com.ngandroid.lib.ngattributes.helpers.FireCheckObserver;
 
 /**
  * Created by tyler on 2/10/15.
  */
-public class NgGone extends NgIf {
+class NgGone extends NgIf {
 
     private static NgGone ngGone = new NgGone();
 

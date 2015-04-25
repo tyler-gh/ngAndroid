@@ -23,15 +23,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ngandroid.lib.R;
-import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
-import com.ngandroid.lib.ng.Executor;
 import com.ngandroid.lib.utils.Tuple;
 
-/**
- * Created by tyler on 1/29/15.
- */
-public class NgChange implements NgAttribute {
+class NgChange implements NgAttribute {
 
     private static NgChange ourInstance = new NgChange();
 

@@ -1,4 +1,4 @@
-package com.ngandroid.lib.ngattributes.helpers;
+package com.ngandroid.lib.ngattributes;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,7 +15,7 @@ import com.ngandroid.lib.utils.ValueFormatter;
  * Created by tyler on 4/23/15.
  */
 // TODO this class needs an overhaul
-public class TextInteracter implements TextWatcher, ModelObserver {
+class TextInteracter implements TextWatcher, ModelObserver {
 
     private static final String TAG = "TextInteracter";
 

@@ -24,7 +24,7 @@ import com.ngandroid.lib.ng.ModelObserver;
 /**
  * Created by tyler on 2/17/15.
  */
-public class NgFocus extends NgIf {
+class NgFocus extends NgIf {
 
     private static NgFocus ngFocus = new NgFocus();
     private NgFocus(){}

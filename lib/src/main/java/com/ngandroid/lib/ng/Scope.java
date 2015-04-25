@@ -19,10 +19,10 @@ package com.ngandroid.lib.ng;
 import android.view.View;
 
 /**
- * Created by tyler on 3/20/15.
+ *
  */
 public interface Scope {
-    public <T extends Model> T getModel(String name);
+    <T extends Model> T getModel(String name);
     public Object execute(int layoutId, int viewId, int attr);
     public void attach(int layoutId, View __view__);
 }

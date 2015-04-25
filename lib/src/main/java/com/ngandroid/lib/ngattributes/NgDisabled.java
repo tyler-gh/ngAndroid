@@ -16,16 +16,14 @@
 
 package com.ngandroid.lib.ngattributes;
 
+import android.util.Log;
 import android.view.View;
 
 import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelObserver;
 
-/**
- * Created by tyler on 2/10/15.
- */
-public class NgDisabled extends NgIf {
+class NgDisabled extends NgIf {
     private static NgDisabled ngDisabled = new NgDisabled();
     private NgDisabled(){}
 
@@ -45,8 +43,7 @@ public class NgDisabled extends NgIf {
                         view.setEnabled(true);
                     }
                 } catch (Throwable throwable) {
-                    // TODO - error
-                    throwable.printStackTrace();
+                    Log.e("NgDisabled", "An error was thrown while getting a value from a model.", throwable);
                 }
             }
         };

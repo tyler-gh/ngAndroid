@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.helpers;
+package com.ngandroid.lib.ngattributes;
 
 import android.util.Log;
 import android.widget.TextView;
@@ -26,7 +26,7 @@ import com.ngandroid.lib.utils.ValueFormatter;
 /**
 * Created by tyler on 3/10/15.
 */
-public class SetTextModelObserver implements ModelObserver {
+class SetTextModelObserver implements ModelObserver {
 
 
     private final Scope scope;
@@ -48,13 +48,12 @@ public class SetTextModelObserver implements ModelObserver {
         try {
             Object value = scope.execute(layoutId, viewId, attr);
             if(value == null){
-                Log.e("NgAndroid", "NgText value was null");
+                Log.e("SetTextObserver", "NgText value was null");
                 return;
             }
             hasText.setText(valueFormatter.format(value));
         } catch (Throwable throwable) {
-            // TODO
-            throwable.printStackTrace();
+            Log.e("SetTextObserver", "An error was thrown while executing a method and formatting a value", throwable);
         }
     }
 }

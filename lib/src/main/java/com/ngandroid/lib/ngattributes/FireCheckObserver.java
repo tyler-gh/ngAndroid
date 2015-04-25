@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.helpers;
+package com.ngandroid.lib.ngattributes;
 
+import android.util.Log;
 import android.view.View;
 
 import com.ngandroid.lib.ng.Model;
@@ -24,7 +25,7 @@ import com.ngandroid.lib.ng.ModelObserver;
 /**
 * Created by tyler on 2/10/15.
 */
-public final class FireCheckObserver implements ModelObserver {
+final class FireCheckObserver implements ModelObserver {
 
     private final Model model;
     private final String field;
@@ -50,8 +51,7 @@ public final class FireCheckObserver implements ModelObserver {
                 view.setVisibility(View.VISIBLE);
             }
         } catch (Throwable throwable) {
-            // TODO - error
-            throwable.printStackTrace();
+            Log.e("Visibility", "An error was thrown while getting the value from a model.", throwable);
         }
     }
 }

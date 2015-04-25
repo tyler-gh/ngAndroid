@@ -19,14 +19,13 @@ package com.ngandroid.lib.ngattributes;
 import android.view.View;
 
 import com.ngandroid.lib.R;
-import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
 import com.ngandroid.lib.utils.Tuple;
 
 /**
  * Created by tyler on 1/28/15.
  */
-public class NgLongClick implements NgAttribute {
+class NgLongClick implements NgAttribute {
     private static NgLongClick ourInstance = new NgLongClick();
 
     static NgLongClick getInstance() {

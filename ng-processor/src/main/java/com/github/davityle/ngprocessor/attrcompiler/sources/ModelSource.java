@@ -48,11 +48,6 @@ public class ModelSource extends Source<ModelSource> {
     @Override
     public String getSource() {
         // TODO
-//        if(method == null){
-//            throw new RuntimeException("Method not set for '" + modelName + '.' + fieldName + '\'');
-//        }
-//        return modelName + '.' + method + "()";
-        // TODO
         return "scope." + modelName + '.' + getGetter() + "()";
     }
 

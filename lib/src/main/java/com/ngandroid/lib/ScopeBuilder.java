@@ -14,31 +14,28 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib;
 
-import com.ngandroid.lib.NgAndroid;
 import com.ngandroid.lib.exceptions.NgException;
+import com.ngandroid.lib.ng.Scope;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by tyler on 3/23/15.
- */
-public class ScopeBuilder {
+class ScopeBuilder {
     private static final String SCOPE_APPEN = "$$NgScope";
-    private static Map<String, Constructor<? extends Scope>> scopeClasses = new HashMap<>();
+    private static final Map<String, Constructor<? extends Scope>> CLASSES = new HashMap<>();
 
-    public static Scope getScope(Object scope, NgAndroid ngAndroid){
+    static Scope getScope(Object scope, NgAndroid ngAndroid){
         String scopeName = scope.getClass().getName() + SCOPE_APPEN;
-        Constructor<? extends Scope> constructor = scopeClasses.get(scopeName);
+        Constructor<? extends Scope> constructor = CLASSES.get(scopeName);
         if(constructor == null){
             try {
                 Class<? extends Scope> scopeClass = (Class<? extends Scope>) Class.forName(scopeName);
                 constructor = scopeClass.getConstructor(scope.getClass(), NgAndroid.class);
-                scopeClasses.put(scopeName, constructor);
+                CLASSES.put(scopeName, constructor);
             } catch (ClassNotFoundException e) {
                 throw new NgException("Scope " + scopeName + " not found", e);
             } catch (ClassCastException e){

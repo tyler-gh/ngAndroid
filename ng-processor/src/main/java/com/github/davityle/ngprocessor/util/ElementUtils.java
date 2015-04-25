@@ -61,7 +61,7 @@ public class ElementUtils {
             if(parameter instanceof ModelSource)
                 parameter = typedModels.get(parameter);
             TypeMirror typeMirror = parameter.getTypeMirror();
-            // TODO get the model types from the models in the matching scope and see if they match by type
+
             if(typeMirror != null){
                 VariableElement element = methodParameters.get(i);
                 TypeMirror eleType = element.asType();

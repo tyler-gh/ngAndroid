@@ -24,10 +24,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ngandroid.lib.exceptions.NgException;
-import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
-import com.ngandroid.lib.ng.ScopeBuilder;
 import com.ngandroid.lib.ngattributes.Attrs;
+import com.ngandroid.lib.ngattributes.NgAttribute;
 import com.ngandroid.lib.utils.DefaultValueFormatter;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.ValueFormatter;
@@ -56,10 +55,6 @@ public class NgAndroid {
 
     private final SparseArray<NgAttribute> attributes;
 
-    /**
-     * private constructor
-     * @param attributes
-     */
     private NgAndroid(SparseArray<NgAttribute> attributes){
         this.attributes = attributes;
     }
@@ -86,37 +81,88 @@ public class NgAndroid {
     }
 
     /**
-     * inflates and binds a view
-     * @param activity
-     * @param resourceId
-     * @param viewGroup
-     * @param attach
-     * @return
+     * this inflates the view using {@link Activity#getLayoutInflater()}, calls,
+     * {@link #buildScope(Object)}, and then attaches the view to the scope using
+     * {@link Scope#attach(int, View)}, the activity is used as the scope object
+     * @param activity the scope and the context for the layout inflater
+     * @param resourceId layout resource id
+     * @param viewGroup  the parent of the view to be
+     * @param attach attach to the view group
+     * @return the inflated and attached view
      */
     public View inflate(Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
         return inflate(buildScope(activity), activity, resourceId, viewGroup, attach);
     }
 
+    /**
+     * this inflates the view using {@link Activity#getLayoutInflater()}, calls,
+     * {@link #buildScope(Object)}, and then attaches the view to the scope using
+     * {@link Scope#attach(int, View)}, the activity is used as the scope object
+     *
+     * @param activity the scope and the context for the layout inflater
+     * @param resourceId layout resource id
+     * @param viewGroup the parent of the view to be, the view is not attched to the view group
+     *                  by default
+     * @return the inflated and attached view
+     */
     public View inflate(Activity activity, int resourceId, ViewGroup viewGroup){
         return inflate(buildScope(activity), activity, resourceId, viewGroup, false);
     }
 
+    /**
+     * this inflates the view using {@link Activity#getLayoutInflater()}, calls,
+     * {@link #buildScope(Object)}, and then attaches the view to the scope using
+     * {@link Scope#attach(int, View)}
+     * @param scope the annotated scope object
+     * @param activity activity is used to get the layout inflater
+     * @param resourceId layout resource id
+     * @param viewGroup attach to the view group
+     * @param attach attach to the view group
+     * @return the inflated and attached view
+     */
     public View inflate(Object scope, Activity activity, int resourceId, ViewGroup viewGroup, boolean attach){
         View v = activity.getLayoutInflater().inflate(resourceId, viewGroup, attach);
         buildScope(scope).attach(resourceId, v);
         return v;
     }
 
+    /**
+     * this inflates the view, calls,  {@link #buildScope(Object)}, and then attaches the view
+     * to the scope using {@link Scope#attach(int, View)}
+     * @param scope the annotated scope object
+     * @param inflater inflater for inflating the view
+     * @param resourceId layout resource id
+     * @param viewGroup the parent of the view to be, the view is not attched to the view group
+     *                  by default
+     * @return the inflated and attached view
+     */
     public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
         return inflate(scope, inflater, resourceId, viewGroup, false);
     }
 
+    /**
+     * this inflates the view, calls,  {@link #buildScope(Object)}, and then attaches the view
+     * to the scope using {@link Scope#attach(int, View)}
+     * @param scope the annotated scope object
+     * @param inflater inflater for inflating the view
+     * @param resourceId layout resource id
+     * @param viewGroup the parent of the view to be
+     * @param attach attach to the view group
+     * @return the inflated and attached view
+     */
     public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup, boolean attach){
         View v = inflater.inflate(resourceId, viewGroup, attach);
         buildScope(scope).attach(resourceId, v);
         return v;
     }
 
+    /**
+     * builds the scope, this function will set the fields annotated with
+     * {@link com.ngandroid.lib.annotations.NgModel} that are null or do not
+     * implement {@link com.ngandroid.lib.ng.Model}
+     * @param scope the annotated scope object
+     * @return the Scope
+     */
     public Scope buildScope(Object scope) {
         return ScopeBuilder.getScope(scope, this);
     }
@@ -131,15 +177,28 @@ public class NgAndroid {
         ngAttribute.attach(scope, view, layoutId, viewId, models);
     }
 
+    /**
+     * Customizes and Builds a NgAndroid
+     */
     public static final class Builder {
 
         private ValueFormatter valueFormatter;
 
+        /**
+         * sets the value formatter that {@link com.ngandroid.lib.ngattributes.NgText} and
+         * {@link com.ngandroid.lib.ngattributes.NgModel} will use to format and convert values
+         * @param valueFormatter the value formatter
+         * @return this
+         */
         public Builder setValueFormatter(ValueFormatter valueFormatter){
             this.valueFormatter = valueFormatter;
             return this;
         }
 
+        /**
+         * builds the NgAndroid instance
+         * @return NgAndroid
+         */
         public NgAndroid build(){
 
             if(valueFormatter == null)

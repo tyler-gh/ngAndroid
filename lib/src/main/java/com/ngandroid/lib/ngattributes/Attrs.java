@@ -3,7 +3,6 @@ package com.ngandroid.lib.ngattributes;
 import android.util.SparseArray;
 
 import com.ngandroid.lib.R;
-import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.utils.ValueFormatter;
 
 /**

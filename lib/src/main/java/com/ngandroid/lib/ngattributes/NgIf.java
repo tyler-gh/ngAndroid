@@ -20,14 +20,13 @@ import android.view.View;
 
 import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelObserver;
-import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
 import com.ngandroid.lib.utils.Tuple;
 
 /**
  * Created by tyler on 2/10/15.
  */
-public abstract class NgIf implements NgAttribute {
+abstract class NgIf implements NgAttribute {
     @Override
     public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String,String>[] models) {
         for(Tuple<String,String> model : models){

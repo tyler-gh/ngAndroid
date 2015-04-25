@@ -31,7 +31,6 @@ public class TernarySource extends Source<TernarySource> {
     private Source valTrue, valFalse;
 
     public TernarySource(Source booleanSource, Source valTrue, Source valFalse) {
-        // TODO binaryoperator equals equals doesn't make a whole lot of sense for ternary operator
         super(TypeUtils.getOperatorKind(valTrue, valFalse));
         this.booleanSource = booleanSource;
         this.valTrue = valTrue;

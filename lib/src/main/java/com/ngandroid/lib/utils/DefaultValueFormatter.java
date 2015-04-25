@@ -3,7 +3,9 @@ package com.ngandroid.lib.utils;
 import android.util.Log;
 
 /**
- * Created by tyler on 4/24/15.
+ * This is the default {@link ValueFormatter} used in the library. Can be extended and passed into
+ * {@link com.ngandroid.lib.NgAndroid.Builder#setValueFormatter(ValueFormatter)} in order to
+ * customize the how values are translated and for adding custom class transformations.
  */
 public class DefaultValueFormatter extends ValueFormatter {
 

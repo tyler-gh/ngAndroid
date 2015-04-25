@@ -26,10 +26,8 @@ import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelObserver;
 import com.ngandroid.lib.utils.BlurUtils;
 
-/**
- * Created by tyler on 2/16/15.
- */
-public class NgBlur extends NgIf{
+
+class NgBlur extends NgIf{
     private static NgBlur ourInstance = new NgBlur();
 
     static NgBlur getInstance() {

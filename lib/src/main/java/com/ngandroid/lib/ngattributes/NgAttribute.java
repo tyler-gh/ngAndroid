@@ -14,16 +14,17 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ngattributes;
 
 import android.view.View;
 
+import com.ngandroid.lib.ng.Scope;
 import com.ngandroid.lib.utils.Tuple;
 
 /**
- * Created by davityle on 1/23/15.
+ * NgAttributes are mostly useful when used in conjunction with generated code.
  */
 public interface NgAttribute {
-    public void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String,String>[] models);
-    public int getAttribute();
+    void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String,String>[] models);
+    int getAttribute();
 }

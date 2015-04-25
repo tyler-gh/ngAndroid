@@ -19,15 +19,10 @@ package com.ngandroid.lib.ngattributes;
 import android.view.View;
 
 import com.ngandroid.lib.R;
-import com.ngandroid.lib.ng.Executor;
-import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
 import com.ngandroid.lib.utils.Tuple;
 
-/**
- * Created by davityle on 1/23/15.
- */
-public class NgClick implements NgAttribute {
+class NgClick implements NgAttribute {
     private static NgClick ourInstance = new NgClick();
 
     static NgClick getInstance() {

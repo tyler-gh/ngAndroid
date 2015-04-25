@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ng;
+package com.ngandroid.lib.ngattributes;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,10 +23,12 @@ import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 
+import com.ngandroid.lib.ng.Scope;
+
 /**
  * Created by tyler on 2/24/15.
  */
-public class Executor implements
+class Executor implements
         View.OnClickListener,
         TextWatcher,
         AdapterView.OnItemSelectedListener,

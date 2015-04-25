@@ -17,11 +17,17 @@
 package com.ngandroid.lib.utils;
 
 /**
- * Created by davityle on 1/13/15.
+ * DO NOT USE. This is for NgAndroid internal use.
  */
 public class TypeUtils {
+    /**
+     * DO NOT USE. This is for NgAndroid internal use.
+     */
     public static final int INTEGER = 0, LONG = 1, STRING = 2, DOUBLE = 3, FLOAT = 4, BOOLEAN = 7, OBJECT = 8;
 
+    /**
+     * DO NOT USE. This is for NgAndroid internal use.
+     */
     public static int getType(Class<?> clzz){
         if(int.class.equals(clzz) || Integer.class.equals(clzz))
             return INTEGER;
@@ -38,30 +44,9 @@ public class TypeUtils {
         return OBJECT;
     }
 
-    public static Object fromStringEmptyStringIfEmpty(int type, String value) {
-        if(!value.trim().isEmpty()) {
-            switch (type) {
-                case INTEGER:
-                    return Integer.parseInt(value);
-                case LONG:
-                    return Long.parseLong(value);
-                case DOUBLE:
-                    return Double.parseDouble(value);
-                case FLOAT:
-                    return Float.parseFloat(value);
-                case BOOLEAN:
-                    return Boolean.parseBoolean(value);
-                case STRING:
-                case OBJECT:
-                    // TODO what to do here?
-                default:
-                    return value;
-            }
-        }else{
-            return getEmptyValue(type);
-        }
-    }
-
+    /**
+     * DO NOT USE. This is for NgAndroid internal use.
+     */
     public static Object fromString(int type, String value) {
         if(!value.trim().isEmpty()) {
             switch (type) {
@@ -86,6 +71,9 @@ public class TypeUtils {
         }
     }
 
+    /**
+     * DO NOT USE. This is for NgAndroid internal use.
+     */
     public static Object getEmptyValue(int type){
         switch (type) {
             case INTEGER:

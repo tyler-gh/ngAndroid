@@ -22,7 +22,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by tyler on 3/31/15.
+ * This annotation marks a class as a Scope. A scope can also be thought of as a controller. A scope
+ * can be used to interact with and control a view. It's models can be bound to views and it's
+ * methods can be triggered upon view events.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)

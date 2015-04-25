@@ -23,10 +23,7 @@ import android.widget.TextView;
 import com.ngandroid.lib.R;
 import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.ng.Model;
-import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
-import com.ngandroid.lib.ngattributes.helpers.CompundButtonInteracter;
-import com.ngandroid.lib.ngattributes.helpers.TextInteracter;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.TypeUtils;
 import com.ngandroid.lib.utils.ValueFormatter;
@@ -34,7 +31,7 @@ import com.ngandroid.lib.utils.ValueFormatter;
 /**
  * Created by davityle on 1/17/15.
  */
-public class NgModel implements NgAttribute {
+class NgModel implements NgAttribute {
     private final ValueFormatter valueFormatter;
 
     static NgModel getInstance(ValueFormatter valueFormatter) {

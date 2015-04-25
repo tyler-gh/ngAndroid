@@ -17,10 +17,9 @@
 package com.ngandroid.lib.utils;
 
 /**
- * Created by tyler on 1/28/15.
+ * A basic tuple class
  */
 public class Tuple<T,K> {
-
 
     private T first;
     private K second;

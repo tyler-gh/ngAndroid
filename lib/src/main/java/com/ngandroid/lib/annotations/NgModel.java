@@ -22,7 +22,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by tyler on 3/18/15.
+ * This marks a field in a {@link NgScope} as a Model. The ng-processor will generate a class
+ * that extends the class of the field annotated with this annotation. This extension will allow
+ * dynamic access to the fields of the model without using reflection.
+ *
+ * Any class that is marked as a {@link NgModel} must have a getter and a setter for every field
+ * that will made dynamically accessible by the compiler. It must also have a default constructor.
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)

@@ -17,20 +17,16 @@
 package com.ngandroid.lib.exceptions;
 
 /**
- * Created by tylerdavis on 3/10/15.
+ * Will be thrown in various places throughout the NgAndroid library for misuse of the library
  */
 public class NgException extends RuntimeException {
-
     public NgException(){}
-
     public NgException(String message){
         super(message);
     }
-
     public NgException(String message, Throwable t){
         super(message, t);
     }
-
     public NgException(Throwable t){
         super(t);
     }

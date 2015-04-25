@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.lib.ngattributes.helpers;
+package com.ngandroid.lib.ngattributes;
 
+import android.util.Log;
 import android.widget.CompoundButton;
 
 import com.ngandroid.lib.ng.Model;
@@ -24,7 +25,7 @@ import com.ngandroid.lib.ng.ModelObserver;
 /**
 * Created by tyler on 2/24/15.
 */
-public final class CompundButtonInteracter implements CompoundButton.OnCheckedChangeListener, ModelObserver {
+final class CompundButtonInteracter implements CompoundButton.OnCheckedChangeListener, ModelObserver {
 
     private final Model model;
     private final String field;
@@ -58,8 +59,7 @@ public final class CompundButtonInteracter implements CompoundButton.OnCheckedCh
                 model.setValue(field, isChecked);
             }
         } catch (Throwable throwable) {
-            // TODO - error
-            throwable.printStackTrace();
+            Log.e("CompoundButton", "An error was thrown while setting the value on a model.", throwable);
         }finally {
             isFromSelf = false;
         }

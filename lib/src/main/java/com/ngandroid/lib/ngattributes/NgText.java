@@ -21,9 +21,7 @@ import android.widget.TextView;
 
 import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.Model;
-import com.ngandroid.lib.ng.NgAttribute;
 import com.ngandroid.lib.ng.Scope;
-import com.ngandroid.lib.ngattributes.helpers.SetTextModelObserver;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.ValueFormatter;
 
@@ -31,7 +29,7 @@ import com.ngandroid.lib.utils.ValueFormatter;
 /**
  * Created by tyler on 3/10/15.
  */
-public class NgText implements NgAttribute {
+class NgText implements NgAttribute {
 
     private final ValueFormatter valueFormatter;
 
