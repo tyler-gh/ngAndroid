@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "com.ngandroid.angularandroid"
         minSdkVersion 15
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
         renderscriptTargetApi 19
@@ -25,4 +25,5 @@ android {
 dependencies {
     compile project(':lib')
     apt project(':ng-processor')
+    compile "com.android.support:appcompat-v7:22.1.+"
 }

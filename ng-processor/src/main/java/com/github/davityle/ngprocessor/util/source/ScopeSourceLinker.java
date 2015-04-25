@@ -18,6 +18,7 @@ package com.github.davityle.ngprocessor.util.source;
 
 import com.github.davityle.ngprocessor.sourcelinks.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
+import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 import com.github.davityle.ngprocessor.util.xml.XmlNode;
 
 import java.util.ArrayList;
@@ -51,20 +52,24 @@ public class ScopeSourceLinker {
     }
 
     public List<NgScopeSourceLink> getSourceLinks(){
-        Set<Map.Entry<String, List<Element>>> entries = scopeMap.entrySet();
+
         List<NgScopeSourceLink> scopeSourceLinks = new ArrayList<>();
-        for(Map.Entry<String, List<Element>> entry : entries){
-            List<Element> elements = entry.getValue();
-            scopeSourceLinks.add(getSourceLink(elements));
+
+        for(Element scope : elementNodeMap.keySet()){
+            scopeSourceLinks.add(getSourceLink(scope));
         }
+
         return scopeSourceLinks;
     }
 
-    private NgScopeSourceLink getSourceLink(List<Element> elements){
-        // TODO do this better
-        Element scopeClass = elements.get(0).getEnclosingElement();
+    private NgScopeSourceLink getSourceLink(Element scopeClass){
+
         String packageName = ElementUtils.getPackageName((TypeElement) scopeClass);
         String className = ElementUtils.getClassName((TypeElement) scopeClass, packageName);
+        String scopeName = className + NgScopeAnnotationUtils.SCOPE_APPENDAGE;
+        String key = packageName + "." + scopeName;
+
+        List<Element> elements = scopeMap.get(key);
 
         List<SourceField> fields = new ArrayList<>();
         for(Element element : elements){

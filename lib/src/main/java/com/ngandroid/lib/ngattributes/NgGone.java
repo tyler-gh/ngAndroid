@@ -22,9 +22,6 @@ import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelObserver;
 
-/**
- * Created by tyler on 2/10/15.
- */
 class NgGone extends NgIf {
 
     private static NgGone ngGone = new NgGone();

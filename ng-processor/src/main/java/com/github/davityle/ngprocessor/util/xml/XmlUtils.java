@@ -156,7 +156,7 @@ public class XmlUtils {
                     }
 
                 }
-                if(attributeList != null){
+                if(attributeList != null && !attributeList.isEmpty()){
                     if(id == null){
                         MessageUtils.error(null, "xml attributes '%s' in node '%s' in layout file '%s' need an id", attributeList.toString(), childNode.toString(), fileName);
                     }else {
