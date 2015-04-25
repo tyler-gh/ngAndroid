@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Ngandroid by davityle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Ngandroid</h1>
+      <h2 class="project-tagline">ngAndroid is bringing angularjs type directives to android xml attributes</h2>
+      <a href="https://github.com/davityle/ngAndroid" class="btn">View on GitHub</a>
+      <a href="https://github.com/davityle/ngAndroid/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/davityle/ngAndroid/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="ngandroid" class="anchor" href="#ngandroid" aria-hidden="true"><span class="octicon octicon-link"></span></a>NgAndroid</h1>
+
+<p>NgAndroid is a compile time MVC framework inspired by <a href="https://angularjs.org/">AngularJS</a>. NgAndroid sticks to the philosophy that views should be separate from the models and the controls. It allows you to declare view - model bindings and events straight from your xml layout that will interact with the scope/controller.</p>
+
+<p>To start using NgAndroid you are going to need a model. A model is any class with a default constructor that has accessible getters and setters for the fields that are going to interact with the view.</p>
+
+<h3>
+<a id="model" class="anchor" href="#model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Model</h3>
+
+<div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Note</span> {
+    <span class="pl-k">private</span> <span class="pl-k">long</span> time;
+    <span class="pl-k">private</span> <span class="pl-k">int</span> id;
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> title;
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> text;
+
+
+    <span class="pl-k">public</span> <span class="pl-k">long</span> <span class="pl-en">getTime</span>() {
+        <span class="pl-k">return</span> time;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">setTime</span>(<span class="pl-k">long</span> <span class="pl-v">time</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>time <span class="pl-k">=</span> time;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">int</span> <span class="pl-en">getId</span>() {
+        <span class="pl-k">return</span> id;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">setId</span>(<span class="pl-k">int</span> <span class="pl-v">id</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>id <span class="pl-k">=</span> id;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">getTitle</span>() {
+        <span class="pl-k">return</span> title;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">setTitle</span>(<span class="pl-smi">String</span> <span class="pl-v">title</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>title <span class="pl-k">=</span> title;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">getText</span>() {
+        <span class="pl-k">return</span> text;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">setText</span>(<span class="pl-smi">String</span> <span class="pl-v">text</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>text <span class="pl-k">=</span> text;
+    }
+}</pre></div>
+
+<p>Then you'll need a scope. A scope is the scope of the controller. Everything is defined within and referenced from that scope. A scope can be anything. An Activity, Fragment, or even a separate encapsulated class can be defined as scopes. </p>
+
+<h3>
+<a id="controller" class="anchor" href="#controller" aria-hidden="true"><span class="octicon octicon-link"></span></a>Controller</h3>
+
+<div class="highlight highlight-java"><pre><span class="pl-c">// Declare your scope</span>
+@<span class="pl-smi">NgScope</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">NoteFragment</span> <span class="pl-k">extends</span> <span class="pl-e">Fragment</span> {
+    <span class="pl-c">// declare your models within your scope</span>
+    <span class="pl-k">@NgModel</span>
+    <span class="pl-smi">Note</span> note;
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">View</span> <span class="pl-en">onCreateView</span>(<span class="pl-smi">LayoutInflater</span> <span class="pl-v">inflater</span>, <span class="pl-smi">ViewGroup</span> <span class="pl-v">container</span>, <span class="pl-smi">Bundle</span> <span class="pl-v">savedInstanceState</span>) {
+        <span class="pl-c">// inflate your view with your instance of NgAndroid</span>
+        <span class="pl-smi">View</span> v <span class="pl-k">=</span> ngAndroid<span class="pl-k">.</span>inflate(<span class="pl-v">this</span>, inflater, <span class="pl-smi">R</span><span class="pl-k">.</span>layout<span class="pl-k">.</span>fragment_note, container, <span class="pl-c1">false</span>);
+        <span class="pl-c1">...</span>
+        <span class="pl-k">return</span> v;
+    }
+
+    <span class="pl-c">// A method that will be called on a view event</span>
+    <span class="pl-smi">String</span> <span class="pl-en">getTimeString</span>(<span class="pl-k">long</span> <span class="pl-v">time</span>){
+        <span class="pl-k">return</span> <span class="pl-smi">TimeUtils</span><span class="pl-k">.</span>getTimeString(time);
+    }
+}</pre></div>
+
+<p>Finally, you'll need your view. NgAndroid supports a small scripting language within your xml views that makes the 'magic' happen. There will be more documentation on this script later and this will be updated when that happens.</p>
+
+<h3>
+<a id="view" class="anchor" href="#view" aria-hidden="true"><span class="octicon octicon-link"></span></a>View</h3>
+
+<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">ScrollView</span> ...
+    <span class="pl-e">xmlns</span><span class="pl-e">:</span><span class="pl-e">tools</span>=<span class="pl-s"><span class="pl-pds">"</span>http://schemas.android.com/tools<span class="pl-pds">"</span></span>
+    <span class="pl-e">xmlns</span><span class="pl-e">:</span><span class="pl-e">ngAndroid</span>=<span class="pl-s"><span class="pl-pds">"</span>http://schemas.android.com/apk/res-auto<span class="pl-pds">"</span></span>
+    <span class="pl-e">tools</span><span class="pl-e">:</span><span class="pl-e">ignore</span>=<span class="pl-s"><span class="pl-pds">"</span>MissingPrefix<span class="pl-pds">"</span></span>&gt;
+
+    &lt;<span class="pl-ent">RelativeLayout</span> ...&gt;
+
+        &lt;<span class="pl-ent">EditText</span>
+            <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>@+id/et_title<span class="pl-pds">"</span></span>
+            <span class="pl-e">ngAndroid</span><span class="pl-e">:</span><span class="pl-e">ngModel</span>=<span class="pl-s"><span class="pl-pds">"</span>note.title<span class="pl-pds">"</span></span>
+            .../&gt;
+
+        &lt;<span class="pl-ent">TextView</span>
+            <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>@+id/tv_time<span class="pl-pds">"</span></span>
+            <span class="pl-e">ngAndroid</span><span class="pl-e">:</span><span class="pl-e">ngText</span>=<span class="pl-s"><span class="pl-pds">"</span>getTimeString(note.time)<span class="pl-pds">"</span></span>
+            .../&gt;
+
+        &lt;<span class="pl-ent">EditText</span>
+            <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>@+id/et_text<span class="pl-pds">"</span></span>
+            <span class="pl-e">ngAndroid</span><span class="pl-e">:</span><span class="pl-e">ngModel</span>=<span class="pl-s"><span class="pl-pds">"</span>note.text<span class="pl-pds">"</span></span>
+            .../&gt;
+    &lt;/<span class="pl-ent">RelativeLayout</span>&gt;
+&lt;/<span class="pl-ent">ScrollView</span>&gt;</pre></div>
+
+<p>With the combination of the model,view, and controller you know have a fully interactive user interface. The field 'title' in your Note model will always reflect what is contained in the et_title EditText and vice versa. The TextView tv_time will always be updated with the current time as formatted through the getTimeString(long) method, but it is a one way binding. The field 'time' in your Note model will not be affected by your TextView. Note.text and et_text are also bound two way. Both always reflecting the state of the other. </p>
+
+<h3>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h3>
+
+<p>In order to use NgAndroid you will need Gradle. Add this to your build.gradle file in your app's module.</p>
+
+<div class="highlight highlight-groovy"><pre>buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath <span class="pl-s"><span class="pl-pds">'</span>com.neenbedankt.gradle.plugins:android-apt:1.4<span class="pl-pds">'</span></span>
+    }
+}
+
+allprojects {
+    repositories {
+        maven {
+            url <span class="pl-s"><span class="pl-pds">'</span>http://oss.sonatype.org/content/repositories/snapshots<span class="pl-pds">'</span></span>
+        }
+    }
+}
+apply <span class="pl-c1">plugin</span>: <span class="pl-s"><span class="pl-pds">'</span>com.neenbedankt.android-apt<span class="pl-pds">'</span></span>
+
+dependencies {
+    compile <span class="pl-s"><span class="pl-pds">'</span>com.github.davityle:ngandroid:1.0.3-SNAPSHOT<span class="pl-pds">'</span></span>
+    apt <span class="pl-s"><span class="pl-pds">'</span>com.github.davityle:ng-processor:1.0.3-SNAPSHOT<span class="pl-pds">'</span></span>
+}</pre></div>
+
+<p>The allprojects.repositories.maven snapshot url will not be necessary once an official version is released.</p>
+
+<p>Repo can be found here <a href="https://github.com/davityle/ngAndroid/">ngAndroid</a></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/davityle/ngAndroid">Ngandroid</a> is maintained by <a href="https://github.com/davityle">davityle</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
