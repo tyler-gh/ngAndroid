@@ -12,6 +12,8 @@ The current version is based on reflection. This library will soon use compile t
 
 `compile 'com.github.davityle:ngandroid:0.0.4'`
 
+Read more about the compile time version that is in beta here [NgAndroid](http://davityle.github.io/ngAndroid)
+
 Feedback and contributions are encouraged
 
 Also there are known issues with adding custom attributes to Android views while using the AppCompat libraries such as FragmentActivity. Please report any other issues and we'll work to figure them out
