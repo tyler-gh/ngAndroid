@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ngandroid by davityle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+</head>
+
+<body>
+    <section class="page-header">
+        <h1 class="project-name">NgAndroid</h1>
+        <h2 class="project-tagline">ngAndroid is bringing angularjs type directives to android xml attributes</h2>
+        <a href="https://github.com/davityle/ngAndroid" class="btn">View on GitHub</a>
+        <a href="https://github.com/davityle/ngAndroid/zipball/master" class="btn">Download .zip</a>
+        <a href="https://github.com/davityle/ngAndroid/tarball/master" class="btn">Download .tar.gz</a>
+        <br>
+        <a href="http://davityle.github.io/ngAndroid/" class="btn">Home</a>
+        <a href="http://davityle.github.io/ngAndroid/models.html" class="btn">Models</a>
+        <a href="http://davityle.github.io/ngAndroid/views.html" class="btn">Views</a>
+        <a href="http://davityle.github.io/ngAndroid/scopes.html" class="btn">Scopes</a>
+        <a href="http://davityle.github.io/ngAndroid/scripts.html" class="btn">Scripts</a>
+    </section>
+
+    <section class="main-content">
+
+        <h1><a id="ngandroid" class="anchor" href="#ngandroid" aria-hidden="true"><span class="octicon octicon-link"></span></a>Models</h1>
+
+        <p>A model is any class with a default constructor that has accessible getters and setters for the fields that are going to interact with the view.</p>
+
+        <div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Note</span> {
+    <span class="pl-k">private</span> <span class="pl-k">long</span> time;
+    <span class="pl-k">private</span> <span class="pl-k">int</span> id;
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> title;
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> text;
+
+
+    <span class="pl-k">public</span> <span class="pl-k">long</span> <span class="pl-en">getTime</span>() {
+        <span class="pl-k">return</span> time;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">setTime</span>(<span class="pl-k">long</span> <span class="pl-v">time</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>time <span class="pl-k">=</span> time;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">int</span> <span class="pl-en">getId</span>() {
+        <span class="pl-k">return</span> id;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">setId</span>(<span class="pl-k">int</span> <span class="pl-v">id</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>id <span class="pl-k">=</span> id;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">getTitle</span>() {
+        <span class="pl-k">return</span> title;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">setTitle</span>(<span class="pl-smi">String</span> <span class="pl-v">title</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>title <span class="pl-k">=</span> title;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">getText</span>() {
+        <span class="pl-k">return</span> text;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">setText</span>(<span class="pl-smi">String</span> <span class="pl-v">text</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>text <span class="pl-k">=</span> text;
+    }
+}</pre>
+        </div>
+
+        <p>The model is marked as a <a href="https://github.com/davityle/ngAndroid/blob/master/lib/src/main/java/com/ngandroid/lib/annotations/NgModel.java">NgModel</a> inside of the <a href="https://github.com/davityle/ngAndroid/blob/master/lib/src/main/java/com/ngandroid/lib/annotations/NgScope.java">scope</a>.</p>
+
+        <div class="highlight highlight-java"><pre><span class="pl-c">// Declare your scope</span>
+@<span class="pl-smi">NgScope</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">NoteFragment</span> <span class="pl-k">extends</span> <span class="pl-e">Fragment</span> {
+    <span class="pl-c">// declare your models within your scope</span>
+    <span class="pl-k">@NgModel</span>
+    <span class="pl-smi">Note</span> note;
+}</pre>
+        </div>
+
+        <p>Any models in a scope will be insantiated when the scope is attached to a view if it is null or it is not an instance of <a href="https://github.com/davityle/ngAndroid/blob/master/lib/src/main/java/com/ngandroid/lib/ng/Model.java">Model</a>
+        </p>
+
+        <p>Models can then be used in the attribute scripts.</p>
+
+        <div class="highlight highlight-xml"><pre>
+<span class="pl-ent">&lt;EditText</span>
+    <span class="pl-e">android:id=</span><span class="pl-s">"@+id/et_title"</span>
+    <span class="pl-e">ngAndroid:ngModel=</span><span class="pl-s">"note.title"</span>
+    <span>...</span><span class="nt">/&gt;</span>
+
+<span class="pl-ent">&lt;TextView</span>
+    <span class="pl-e">android:id=</span><span class="pl-s">"@+id/tv_time"</span>
+    <span class="pl-e">ngAndroid:ngText=</span><span class="pl-s">"getTimeString(note.time)"</span>
+    <span>...</span><span class="nt">/&gt;</span>
+
+<span class="pl-ent">&lt;EditText</span>
+    <span class="pl-e">android:id=</span><span class="pl-s">"@+id/et_text"</span>
+    <span class="pl-e">ngAndroid:ngModel=</span><span class="pl-s">"note.text"</span>
+    <span>...</span><span class="nt">/&gt;</span>
+
+<span class="pl-c">// other ways they can be used</span>
+<span class="pl-s">"</span><span class="pl-k">functionName</span>(model<span class="pl-e">.</span>boolValue <span class="pl-k">?</span> <span class="pl-smi">'this string'</span> <span class="pl-k">:</span> <span class="pl-smi">'bool value was false'</span>)<span class="pl-s">"</span>
+<span class="pl-s">"</span>model<span class="pl-k">.</span>a <span class="pl-k">+</span> model<span class="pl-k">.</span>b<span class="pl-s">"</span>
+           
+</pre> </div>
+
+        <p>You can check the <a href="http://davityle.github.io/ngAndroid/">scripts</a> page for more information on the scripts.</p>
+
+        <p>Models can also be declared with interfaces</p>
+
+        <div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-k">interface</span> <span class="pl-en">Note</span> {
+    <span class="pl-k">long</span> <span class="pl-en">getTime</span>();
+    <span class="pl-k">void</span> <span class="pl-en">setTime</span>(<span class="pl-k">long</span> <span class="pl-v">time</span>);
+    <span class="pl-k">int</span> <span class="pl-en">getId</span>();
+    <span class="pl-k">void</span> <span class="pl-en">setId</span>(<span class="pl-k">int</span> <span class="pl-v">id</span>);
+    <span class="pl-smi">String</span> <span class="pl-en">getTitle</span>();
+    <span class="pl-k">void</span> <span class="pl-en">setTitle</span>(<span class="pl-smi">String</span> <span class="pl-v">title</span>);
+    <span class="pl-smi">String</span> <span class="pl-en">getText</span>();
+    <span class="pl-k">void</span> <span class="pl-en">setText</span>(<span class="pl-smi">String</span> <span class="pl-v">text</span>);
+}</pre>
+        </div>
+
+        <p>That model declared as an interface would be identical to the Note class in the NgAndroid framework.</p>
+
+        <p>The interface would be implemented at compile time.</p>
+
+
+        <footer class="site-footer">
+            <span class="site-footer-owner"><a href="https://github.com/davityle/ngAndroid">NgAndroid</a> is maintained by <a href="https://github.com/davityle">davityle</a>.</span>
+
+            <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+        </footer>
+
+    </section>
+
+
+</body>
+
+</html>
