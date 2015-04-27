@@ -69,7 +69,9 @@ public class ManifestPackageUtils {
                 for(int j = 0; j < nodeMap.getLength(); j++){
                     Matcher matcher = PACKAGE_PATTERN.matcher(nodeMap.item(j).toString());
                     if(matcher.matches()){
-                        return matcher.group(1);
+                        String packageName = matcher.group(1);
+                        if(!packageName.startsWith("android.support"))
+                            return packageName;
                     }
                 }
             }

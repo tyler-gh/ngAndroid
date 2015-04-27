@@ -75,10 +75,16 @@ public class NgProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+
+        String manifestPackageName = ManifestPackageUtils.getPackageName(processingEnv);
+
+        System.out.println("///////////////////////////////////////////////////");
+        System.out.println(manifestPackageName);
+
         if(annotations.size() == 0)
             return false;
         System.out.println(":NgAndroid:processing");
-        String manifestPackageName = ManifestPackageUtils.getPackageName(processingEnv);
+
         if(manifestPackageName == null) {
             MessageUtils.error(null, ":NgAndroid:Unable to find android manifest.");
             return false;

@@ -53,7 +53,8 @@ public class AndroidManifestFinder {
 
 	private Option<File> findManifestFile() {
 		String androidManifestFile = optionsHelper.getAndroidManifestFile();
-		if (androidManifestFile != null) {
+        System.out.println(androidManifestFile);
+        if (androidManifestFile != null) {
 			return findManifestInSpecifiedPath(androidManifestFile);
 		} else {
 			return findManifestInParentsDirectories();
@@ -77,7 +78,8 @@ public class AndroidManifestFinder {
 	 */
 	private Option<File> findManifestInParentsDirectories() {
 		Option<FileHolder> projectRootHolderOption = FileHelper.findRootProjectHolder(processingEnv);
-		if (projectRootHolderOption.isAbsent()) {
+
+        if (projectRootHolderOption.isAbsent()) {
 			return Option.absent();
 		}
 
@@ -88,18 +90,22 @@ public class AndroidManifestFinder {
 		for (int i = 0; i < MAX_PARENTS_FROM_SOURCE_FOLDER; i++) {
 			if (androidManifestFile.exists()) {
 				break;
-			} else {
-				if (projectRoot.getParentFile() != null) {
-					projectRoot = projectRoot.getParentFile();
-					androidManifestFile = new File(projectRoot, "AndroidManifest.xml");
-				} else {
-					break;
-				}
 			}
+            androidManifestFile = new File(projectRoot,"src" + File.separator + "main" + File.separator + "AndroidManifest.xml");
+            if (androidManifestFile.exists()) {
+                break;
+            }
+            if (projectRoot.getParentFile() != null) {
+                projectRoot = projectRoot.getParentFile();
+                androidManifestFile = new File(projectRoot, "AndroidManifest.xml");
+            } else {
+                break;
+            }
 		}
 
 		if (!androidManifestFile.exists()) {
-			return Option.absent();
+            System.out.println("Not Found");
+            return Option.absent();
 		}
 
 		return Option.of(androidManifestFile);
