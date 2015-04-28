@@ -10,5 +10,7 @@
     <string name="dub">Double</string>
     <string name="flt">Float</string>
     <string name="lng">Long</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Closed</string>
 
 </resources>
