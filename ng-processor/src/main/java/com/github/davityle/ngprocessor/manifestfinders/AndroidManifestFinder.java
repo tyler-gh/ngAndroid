@@ -16,7 +16,6 @@
 package com.github.davityle.ngprocessor.manifestfinders;
 
 import com.github.davityle.ngprocessor.manifestfinders.FileHelper.FileHolder;
-import com.github.davityle.ngprocessor.util.MessageUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -64,7 +63,6 @@ public class AndroidManifestFinder {
 	private Option<File> findManifestInSpecifiedPath(String androidManifestPath) {
 		File androidManifestFile = new File(androidManifestPath);
 		if (!androidManifestFile.exists()) {
-			MessageUtils.error(null, "Could not find the AndroidManifest.xml file in specified path : %s", androidManifestPath);
 			return Option.absent();
 		}
 		return Option.of(androidManifestFile);
@@ -101,7 +99,6 @@ public class AndroidManifestFinder {
 		}
 
 		if (!androidManifestFile.exists()) {
-			MessageUtils.error(null, "Could not find the AndroidManifest.xml file, going up from path [%s] found using dummy file [%s] (max atempts: %s)", projectRootHolder.sourcesGenerationFolder.getAbsolutePath(), projectRootHolder.dummySourceFilePath, MAX_PARENTS_FROM_SOURCE_FOLDER);
 			return Option.absent();
 		}
 
@@ -116,7 +113,6 @@ public class AndroidManifestFinder {
 			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 			doc = docBuilder.parse(androidManifestFile);
 		} catch (Exception e) {
-			MessageUtils.error(null, "Could not parse the AndroidManifest.xml file at path $s", androidManifestFile);
 			e.printStackTrace();
 			return Option.absent();
 		}

@@ -16,7 +16,6 @@
 
 package com.github.davityle.ngprocessor.util.xml;
 
-import com.github.davityle.ngprocessor.manifestfinders.AndroidManifest;
 import com.github.davityle.ngprocessor.manifestfinders.AndroidManifestFinder;
 import com.github.davityle.ngprocessor.manifestfinders.Option;
 import com.github.davityle.ngprocessor.util.ManifestFinder;
@@ -42,9 +41,9 @@ public class ManifestPackageUtils {
     public static String getPackageName(ProcessingEnvironment processingEnvironment){
 
         AndroidManifestFinder finder = new AndroidManifestFinder(processingEnvironment);
-        Option<AndroidManifest> option = finder.extractAndroidManifest();
+        Option<String> option = finder.extractAndroidManifest();
         if(option.isPresent()) {
-            String packageName = option.get().getApplicationPackage();
+            String packageName = option.get();
             if(packageName != null)
                 return packageName;
         }
