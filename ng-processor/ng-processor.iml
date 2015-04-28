@@ -35,5 +35,8 @@
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="truth-0.25" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="guava-17.0" level="project" />
+    <orderEntry type="library" exported="" name="ng-processor.ng-processor-1.0.3-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="ng-processor.ng-processor-1.0.3-SNAPSHOT-javadoc" level="project" />
+    <orderEntry type="library" exported="" name="ng-processor.ng-processor-1.0.3-SNAPSHOT-sources" level="project" />
   </component>
 </module>

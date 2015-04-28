@@ -78,7 +78,7 @@ public class NgProcessor extends AbstractProcessor {
         if(annotations.size() == 0)
             return false;
         System.out.println(":NgAndroid:processing");
-        String manifestPackageName = ManifestPackageUtils.getPackageName();
+        String manifestPackageName = ManifestPackageUtils.getPackageName(processingEnv);
         if(manifestPackageName == null) {
             MessageUtils.error(null, ":NgAndroid:Unable to find android manifest.");
             return false;

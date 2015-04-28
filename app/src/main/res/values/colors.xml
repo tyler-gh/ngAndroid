@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="hr_grey">#AFAFAF</color>
+    <color name="main_color">#155799</color>
+    <color name="main_dark_color">#043577</color>
+    <color name="accent_color">#159957</color>
 </resources>

@@ -16,6 +16,9 @@
 
 package com.github.davityle.ngprocessor.util.xml;
 
+import com.github.davityle.ngprocessor.manifestfinders.AndroidManifest;
+import com.github.davityle.ngprocessor.manifestfinders.AndroidManifestFinder;
+import com.github.davityle.ngprocessor.manifestfinders.Option;
 import com.github.davityle.ngprocessor.util.ManifestFinder;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 
@@ -27,6 +30,8 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.processing.ProcessingEnvironment;
+
 /**
  * Created by tyler on 4/7/15.
  */
@@ -34,7 +39,16 @@ public class ManifestPackageUtils {
 
     private static final Pattern PACKAGE_PATTERN = Pattern.compile(".*package=\"(.*)\"");
 
-    public static String getPackageName(){
+    public static String getPackageName(ProcessingEnvironment processingEnvironment){
+
+        AndroidManifestFinder finder = new AndroidManifestFinder(processingEnvironment);
+        Option<AndroidManifest> option = finder.extractAndroidManifest();
+        if(option.isPresent()) {
+            String packageName = option.get().getApplicationPackage();
+            if(packageName != null)
+                return packageName;
+        }
+
         File manifest = ManifestFinder.findManifest();
 
         if(manifest == null) {
