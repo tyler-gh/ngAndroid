@@ -18,12 +18,12 @@ class DemoAdapter extends BaseAdapter {
 
     private final NgAndroid ngAndroid = NgAndroid.getInstance();
     private final LayoutInflater inflater;
-    private final Activity activity;
+    private final DemoScope.FragmentSelectedListener fragmentSelectedListener;
     private final List<DemoItem> items;
 
-    DemoAdapter(Activity activity, List<DemoItem> items) {
+    DemoAdapter(Activity activity, DemoScope.FragmentSelectedListener fragmentSelectedListener, List<DemoItem> items) {
         this.inflater = activity.getLayoutInflater();
-        this.activity = activity;
+        this.fragmentSelectedListener = fragmentSelectedListener;
         this.items = items;
     }
 
@@ -45,7 +45,7 @@ class DemoAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if(convertView == null) {
-            DemoScope demoScope = new DemoScope(activity);
+            DemoScope demoScope = new DemoScope(fragmentSelectedListener);
             convertView = ngAndroid.inflate(demoScope, inflater, R.layout.view_demo_item, parent, false);
             convertView.setTag(demoScope);
         }

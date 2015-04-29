@@ -1,18 +1,18 @@
 package com.ngandroid.demo.ui.pages.main;
 
-import android.app.Activity;
+import android.app.Fragment;
 
 /**
  * Created by tyler on 4/23/15.
  */
 class DemoItem {
     private String text;
-    private Class<? extends Activity> activity;
+    private Class<? extends Fragment> fragment;
 
     DemoItem(){}
-    DemoItem(String text, Class<? extends Activity> activity){
+    DemoItem(String text, Class<? extends Fragment> fragment){
         this.text = text;
-        this.activity = activity;
+        this.fragment = fragment;
     }
 
     public String getText() {
@@ -23,11 +23,11 @@ class DemoItem {
         this.text = text;
     }
 
-    public Class<? extends Activity> getActivity() {
-        return activity;
+    public Class<? extends Fragment> getFragment() {
+        return fragment;
     }
 
-    public void setActivity(Class<? extends Activity> activity) {
-        this.activity = activity;
+    public void setFragment(Class<? extends Fragment> fragment) {
+        this.fragment = fragment;
     }
 }

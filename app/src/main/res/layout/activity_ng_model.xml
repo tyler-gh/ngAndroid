@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.ngandroid.demo.ui.pages.ngmodel.NgModelActivity"
+    tools:context="com.ngandroid.demo.ui.pages.ngmodel.NgModelFragment"
     tools:ignore="MissingPrefix">
 
     <LinearLayout
@@ -95,6 +95,23 @@
             style="@style/TextStyle"
             android:inputType="numberDecimal"
             ng:ngModel="mod.lon" />
+
+        <TextView
+            style="@style/Header"
+            android:text="@string/bool" />
+
+        <View style="@style/hr" />
+
+        <TextView
+            android:id="@+id/tvBool"
+            style="@style/TextStyle"
+            ng:ngModel="mod.bool" />
+
+        <CheckBox
+            android:id="@+id/cdBool"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            ng:ngModel="mod.bool"/>
 
     </LinearLayout>
 </ScrollView>

@@ -1,27 +1,9 @@
-package com.ngandroid.demo.ui.pages.ngmodel;
+package com.ngandroid.demo.models;
 
-import android.app.Activity;
-import android.os.Bundle;
-
-import com.ngandroid.demo.R;
-import com.ngandroid.lib.NgAndroid;
-import com.ngandroid.lib.annotations.NgModel;
-import com.ngandroid.lib.annotations.NgScope;
-@NgScope
-public class NgModelActivity extends Activity {
-    private final NgAndroid ng = NgAndroid.getInstance();
-
-    @NgModel
-    NgMod mod;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ng.setContentView(this, R.layout.activity_ng_model);
-    }
-}
-
-class NgMod {
+/**
+ * Created by tyler on 4/28/15.
+ */
+public class NgMod {
     private String str;
     private int integer;
     private double dub;

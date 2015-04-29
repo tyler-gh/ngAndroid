@@ -16,10 +16,5 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.pages.ngmodel.NgModelActivity"
-            android:label="@string/title_activity_ng_model" >
-        </activity>
     </application>
-
 </manifest>

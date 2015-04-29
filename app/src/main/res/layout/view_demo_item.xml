@@ -8,5 +8,5 @@
     android:textSize="23sp"
     android:fontFamily="sans-serif-thin"
     android:textStyle="bold"
-    ng:ngClick="openActivity(item.activity)"
+    ng:ngClick="showFragment(item.fragment)"
     ng:ngText="item.text"/>
