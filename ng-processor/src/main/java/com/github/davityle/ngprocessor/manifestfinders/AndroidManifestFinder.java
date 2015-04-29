@@ -53,7 +53,6 @@ public class AndroidManifestFinder {
 
 	private Option<File> findManifestFile() {
 		String androidManifestFile = optionsHelper.getAndroidManifestFile();
-        System.out.println(androidManifestFile);
         if (androidManifestFile != null) {
 			return findManifestInSpecifiedPath(androidManifestFile);
 		} else {
@@ -104,7 +103,6 @@ public class AndroidManifestFinder {
 		}
 
 		if (!androidManifestFile.exists()) {
-            System.out.println("Not Found");
             return Option.absent();
 		}
 

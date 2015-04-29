@@ -66,7 +66,6 @@ public class ElementUtils {
                 VariableElement element = methodParameters.get(i);
                 TypeMirror eleType = element.asType();
                 if (!TypeUtils.matchFirstPrecedence(eleType, typeMirror)) {
-                    System.out.println(eleType + " does not match " + typeMirror);
                     return false;
                 }
             }

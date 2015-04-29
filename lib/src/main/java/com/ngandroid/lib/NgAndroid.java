@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ngandroid.lib.exceptions.NgException;
+import com.ngandroid.lib.ng.ModelObserver;
 import com.ngandroid.lib.ng.Scope;
 import com.ngandroid.lib.ngattributes.Attrs;
 import com.ngandroid.lib.ngattributes.NgAttribute;
@@ -138,6 +139,17 @@ public class NgAndroid {
      */
     public View inflate(Object scope, LayoutInflater inflater, int resourceId, ViewGroup viewGroup){
         return inflate(scope, inflater, resourceId, viewGroup, false);
+    }
+
+    /**
+     * programmatically add model field observer
+     * @param scope the annotated scope object
+     * @param modelName the name of the annotated {@link com.ngandroid.lib.annotations.NgModel} field
+     * @param field the field within the model that will be observed
+     * @param modelObserver the {@link ModelObserver}
+     */
+    public void observeModelField(Object scope, String modelName, String field, ModelObserver modelObserver){
+        buildScope(scope).getModel(modelName).addObserver(field, modelObserver);
     }
 
     /**
