@@ -27,6 +27,7 @@ import static javax.tools.Diagnostic.Kind;
 public class MessageUtils {
 
     private static ProcessingEnvironment processingEnv;
+    private static boolean hasErrors = false;
 
     public static void setProcessingEnv(ProcessingEnvironment processingEnv){
         MessageUtils.processingEnv = processingEnv;
@@ -34,6 +35,11 @@ public class MessageUtils {
 
     public static void error(Element element, String message, Object... args) {
         printMessage(Kind.ERROR, element, message, args);
+        hasErrors = true;
+    }
+
+    public static void note(Element element, String message, Object... args){
+        printMessage(Kind.NOTE, element, message, args);
     }
 
     public static void warning(Element element, String message, Object... args) {
@@ -45,5 +51,9 @@ public class MessageUtils {
             message = String.format(message, args);
         }
         processingEnv.getMessager().printMessage(kind, message, element);
+    }
+
+    public static boolean hasErrors() {
+        return hasErrors;
     }
 }

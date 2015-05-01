@@ -57,7 +57,7 @@ public class XmlNode {
 
     @Override
     public int hashCode() {
-        return id.hashCode() * 7 + attributes.hashCode() * 31;
+        return layoutParent.hashCode() * 17 + id.hashCode() * 7 + attributes.hashCode() * 31;
     }
 }
 

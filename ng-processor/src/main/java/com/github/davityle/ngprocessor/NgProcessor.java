@@ -78,7 +78,7 @@ public class NgProcessor extends AbstractProcessor {
 
         if(annotations.size() == 0)
             return false;
-        System.out.println(":NgAndroid:processing");
+        MessageUtils.note(null, ":NgAndroid:processing");
 
         String manifestPackageName = ManifestPackageUtils.getPackageName(processingEnv);
 
@@ -104,14 +104,17 @@ public class NgProcessor extends AbstractProcessor {
         // get the model to source links
         List<NgModelSourceLink> modelSourceLinks = new ModelSourceLinker(modelMap).getSourceLinks();
         // get the scope to source links
-        ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopeMap, layoutScopeMapper.getElementNodeMap(), manifestPackageName);
+        ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopes, scopeMap, layoutScopeMapper.getElementNodeMap(), manifestPackageName);
         List<NgScopeSourceLink> scopeSourceLinks = scopeSourceLinker.getSourceLinks();
 
         // create the source files
         SourceCreator sourceCreator = new SourceCreator(filer, modelSourceLinks, scopeSourceLinks);
         sourceCreator.createSourceFiles();
 
-        System.out.println(":NgAndroid:successful");
+        if(!MessageUtils.hasErrors())
+            MessageUtils.note(null, ":NgAndroid:successful");
+        else
+            MessageUtils.note(null, ":NgAndroid:failed");
         return true;
     }
 

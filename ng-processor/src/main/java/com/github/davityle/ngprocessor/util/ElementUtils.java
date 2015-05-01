@@ -49,6 +49,9 @@ public class ElementUtils {
     public static boolean methodsMatch(Element elem, MethodSource source, Map<ModelSource,ModelSource> typedModels){
         if(elem == null || !(elem instanceof ExecutableElement) || elem.getKind() != ElementKind.METHOD)
             return false;
+        if(!elem.getSimpleName().toString().equals(source.getMethodName()))
+            return false;
+
         ExecutableElement method = (ExecutableElement) elem;
 
         List<Source> parameters = source.getParameters();
@@ -66,12 +69,13 @@ public class ElementUtils {
                 VariableElement element = methodParameters.get(i);
                 TypeMirror eleType = element.asType();
                 if (!TypeUtils.matchFirstPrecedence(eleType, typeMirror)) {
+                    MessageUtils.warning(element, "Method element matches scripted method except parameter types do not match. '%s' - '%s'", eleType, typeMirror);
                     return false;
                 }
             }
         }
 
-        return elem.getSimpleName().toString().equals(source.getMethodName()) && ElementUtils.isAccessible(elem);
+        return ElementUtils.isAccessible(elem);
     }
 
     public static boolean isSetter(Element elem){

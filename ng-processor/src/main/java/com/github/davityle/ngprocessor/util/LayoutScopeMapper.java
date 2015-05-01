@@ -58,32 +58,51 @@ public class LayoutScopeMapper {
         return elementNodeMap;
     }
 
-    private void checkLayoutsValid(Map<XmlNode, Boolean> viewScopeMap){
-        Set<Map.Entry<XmlNode, Boolean>> entries = viewScopeMap.entrySet();
-        for(Map.Entry<XmlNode, Boolean> entry : entries){
-            if(entry.getValue() == null || !entry.getValue()){
-                MessageUtils.error(null, "This view does not match any scope specifically this element did not match");
-            }
-        }
-    }
-
     private void linkLayouts(){
         final Map<XmlNode, Boolean> viewScopeMap = new HashMap<>();
 
         for (Map.Entry<File, List<XmlNode>> layout : xmlLayouts) {
             List<XmlNode> views = layout.getValue();
             for (XmlNode view : views) {
+                Map<Element, List<TypedXmlAttribute>> didMatch = new HashMap<>();
+
                 for (Element scope : scopes) {
-                    TypedXmlNode node = scopeMatchesXmlView(scope, view);
-                    if (node != null) {
-                        put(node, scope);
+                    Tuple<TypedXmlNode, List<TypedXmlAttribute>> node = scopeMatchesXmlView(scope, view);
+                    if (node.getFirst() != null) {
+                        put(node.getFirst(), scope);
                         viewScopeMap.put(view, true);
+                    }else{
+                        List<TypedXmlAttribute> matching = node.getSecond();
+                        if(matching.size() > 0){
+                            didMatch.put(scope, matching);
+                        }
                     }
+                }
+
+                Boolean found = viewScopeMap.get(view);
+                if(found == null || !found){
+                    StringBuilder matchingStr = new StringBuilder();
+
+                    if(didMatch.size() > 0){
+                        matchingStr.append("The view partially matched theses scopes:\n");
+                        Set<Map.Entry<Element, List<TypedXmlAttribute>>> entrySet = didMatch.entrySet();
+                        for(Map.Entry<Element, List<TypedXmlAttribute>> match : entrySet){
+                            matchingStr.append(match.getKey());
+                            matchingStr.append(" matched ");
+                            matchingStr.append(match.getValue());
+                            matchingStr.append(";\n");
+                        }
+                    }
+                    matchingStr.append("Make sure that all of method parameter and operator types match.");
+
+                    MessageUtils.error(null,
+                            "Xml view '%s' in layout '%s' did not match any scopes. %s",
+                            view.getId(),
+                            view.getLayoutName(),
+                            matchingStr.toString());
                 }
             }
         }
-
-        checkLayoutsValid(viewScopeMap);
         isMapped = true;
     }
 
@@ -96,18 +115,23 @@ public class LayoutScopeMapper {
             nodes.add(view);
     }
 
-    private TypedXmlNode scopeMatchesXmlView(Element scope, XmlNode view){
+    private Tuple<TypedXmlNode, List<TypedXmlAttribute>> scopeMatchesXmlView(Element scope, XmlNode view){
         boolean match = true;
         List<TypedXmlAttribute> typedAttributes = new ArrayList<>();
         for (XmlAttribute attribute : view.getAttributes()) {
+
             Map<ModelSource, ModelSource> typedModels = mapScopeToModels(scope, attribute.getModelSource());
             Map<MethodSource, MethodSource> typedMethods = mapScopeToMethods(scope, attribute.getMethodSource(), typedModels);
-            match = match && typedMethods != null;
-            if(match){
+
+            boolean thisMatch = typedMethods != null;
+
+            if(thisMatch){
                 typedAttributes.add(new TypedXmlAttribute(attribute, typedModels, typedMethods));
             }
+
+            match = match && thisMatch;
         }
-        return match ? new TypedXmlNode(view, typedAttributes) : null;
+        return match ? Tuple.of(new TypedXmlNode(view, typedAttributes), typedAttributes) : Tuple.of((TypedXmlNode)null, typedAttributes);
     }
 
     private Map<MethodSource, MethodSource> mapScopeToMethods(Element scope, List<MethodSource> methodSources, Map<ModelSource,ModelSource> typedModels){

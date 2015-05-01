@@ -41,11 +41,13 @@ public class ScopeSourceLinker {
 
     private static final TupleComparator TUPLE_COMPARATOR = new TupleComparator();
 
+    private final List<Element> scopes;
     private final Map<String, List<Element>> scopeMap;
     private final Map<Element, List<XmlNode>> elementNodeMap;
     private final String manifestPackageName;
 
-    public ScopeSourceLinker(Map<String, List<Element>> scopeMap, Map<Element, List<XmlNode>> elementNodeMap, String manifestPackageName) {
+    public ScopeSourceLinker(List<Element> scopes, Map<String, List<Element>> scopeMap, Map<Element, List<XmlNode>> elementNodeMap, String manifestPackageName) {
+        this.scopes = scopes;
         this.scopeMap = scopeMap;
         this.elementNodeMap = elementNodeMap;
         this.manifestPackageName = manifestPackageName;
@@ -55,7 +57,7 @@ public class ScopeSourceLinker {
 
         List<NgScopeSourceLink> scopeSourceLinks = new ArrayList<>();
 
-        for(Element scope : elementNodeMap.keySet()){
+        for(Element scope : scopes){
             scopeSourceLinks.add(getSourceLink(scope));
         }
 
@@ -85,6 +87,8 @@ public class ScopeSourceLinker {
         Map<String, Set<XmlNode>> layouts = new HashMap<>();
 
         if(xmlNodes != null) {
+            // This could be done by just mapping elements to the layout instead of linking to the
+            // node in LayoutScopeMapper
             for (XmlNode xmlNode : xmlNodes) {
                 String layoutName = xmlNode.getLayoutName();
                 Set<XmlNode> ids = layouts.get(layoutName);
