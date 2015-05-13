@@ -54,25 +54,25 @@ public class NgProcessorTest {
     @NgModel
     TestPoint point1, point2;
 
-    public static class TestPoint {
-        private Double x;
-        private Double y;
 
-        private Float fx;
-        private Float fy;
+}
 
-        private Integer ix;
-        private Integer iy;
+class TestPoint {
+    private Double x;
+    private Double y;
 
-        private Short sy;
-        private Short sx;
+    private Float fx;
+    private Float fy;
 
-        private Byte by;
-        private Byte bx;
+    private Integer ix;
+    private Integer iy;
 
-        private Character cy;
-        private Character cx;
-    }
+    private Short sy;
+    private Short sx;
 
+    private Byte by;
+    private Byte bx;
 
+    private Character cy;
+    private Character cx;
 }
