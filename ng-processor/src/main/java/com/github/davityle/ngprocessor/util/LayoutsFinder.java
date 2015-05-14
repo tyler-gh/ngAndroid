@@ -17,7 +17,10 @@
 package com.github.davityle.ngprocessor.util;
 
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,11 +28,47 @@ import java.util.List;
  */
 public class LayoutsFinder {
 
-    public static  List<File> findLayouts(){
+    public static  List<File> findLayouts(String dir){
+
+        if(dir != null)
+            return getFileFromPath(dir);
+
+        String path = System.getProperty("LAYOUT_PATH", null);
+
+        if(path != null){
+            return getFileFromPath(path);
+        }
+
+        path = System.getenv("NG_PROCESSOR_LAYOUT_PATH");
+
+        if(path != null){
+            return getFileFromPath(path);
+        }
+
+        URL url = Thread.currentThread().getContextClassLoader().getResource("layout/");
+        if(url != null) {
+            try {
+                File layoutDir = new File(url.toURI());
+                if(layoutDir.exists() && layoutDir.isDirectory())
+                    return Collections.singletonList(layoutDir);
+            } catch (URISyntaxException e) {
+                MessageUtils.note(null, e.getMessage());
+            }
+        }
+
         File root = new File(".");
         List<File> files = new ArrayList<>();
         findLayouts(root, files);
         return files;
+    }
+
+    private static List<File> getFileFromPath(String path){
+        File file = new File(path);
+        if(!file.exists()){
+            MessageUtils.error(null, "The layout file path '%s' does not exist", path);
+            return new ArrayList<>();
+        }
+        return Collections.singletonList(file);
     }
 
     private static void findLayouts(File f, List<File> files){
@@ -37,6 +76,7 @@ public class LayoutsFinder {
         if(kids != null) {
             for (File file : kids) {
                 String name = file.getName();
+                System.out.println(name);
                 if (file.isDirectory() && !name.equals("compile") && !name.equals("bin")) {
                     if (file.getName().equals("layout")) {
                         files.add(file);

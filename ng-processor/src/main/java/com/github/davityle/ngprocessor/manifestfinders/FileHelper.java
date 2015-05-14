@@ -63,12 +63,15 @@ public class FileHelper {
 		} catch (URISyntaxException e) {
 			return Option.absent();
 		}
+		try {
+			File dummyFile = new File(cleanURI);
+			File sourcesGenerationFolder = dummyFile.getParentFile();
+			File projectRoot = sourcesGenerationFolder.getParentFile();
 
-		File dummyFile = new File(cleanURI);
-		File sourcesGenerationFolder = dummyFile.getParentFile();
-		File projectRoot = sourcesGenerationFolder.getParentFile();
-
-		return Option.of(new FileHolder(dummySourceFilePath, sourcesGenerationFolder, projectRoot));
+			return Option.of(new FileHolder(dummySourceFilePath, sourcesGenerationFolder, projectRoot));
+		}catch(IllegalArgumentException ex){
+			return Option.absent();
+		}
 	}
 
 	static class FileHolder {

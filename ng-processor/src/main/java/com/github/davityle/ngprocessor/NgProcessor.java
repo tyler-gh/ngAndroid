@@ -62,6 +62,16 @@ import javax.lang.model.element.TypeElement;
 })
 public class NgProcessor extends AbstractProcessor {
 
+    private final String layoutDir;
+
+    public NgProcessor(){
+        layoutDir = null;
+    }
+
+    public NgProcessor(String layoutDir){
+        this.layoutDir = layoutDir;
+    }
+
     private Filer filer;
 
     @Override public synchronized void init(ProcessingEnvironment env) {
@@ -90,7 +100,7 @@ public class NgProcessor extends AbstractProcessor {
         // get the elements annotated with NgScope
         List<Element> scopes = NgScopeAnnotationUtils.getScopes(annotations, roundEnv);
         // get the xml layouts/nodes with attributes
-        Map<File, List<XmlNode>> fileNodeMap = XmlUtils.getFileNodeMap();
+        Map<File, List<XmlNode>> fileNodeMap = XmlUtils.getFileNodeMap(layoutDir);
 
         LayoutScopeMapper layoutScopeMapper = new LayoutScopeMapper(scopes, fileNodeMap);
 

@@ -81,8 +81,8 @@ public class XmlUtils {
         }
     }
 
-    public static Map<File, List<XmlNode>> getFileNodeMap(){
-        List<File> layoutDirs = LayoutsFinder.findLayouts();
+    public static Map<File, List<XmlNode>> getFileNodeMap(String dir){
+        List<File> layoutDirs = LayoutsFinder.findLayouts(dir);
         Map<File, List<XmlNode>> xmlAttrMap = new HashMap<>();
 
         for(File f : layoutDirs){

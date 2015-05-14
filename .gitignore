@@ -11,3 +11,5 @@
 *.class
 bin/
 gen/
+
+ng-processor/src/test/java/com/ngandroid/
