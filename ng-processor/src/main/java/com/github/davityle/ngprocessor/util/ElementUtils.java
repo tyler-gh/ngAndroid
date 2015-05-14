@@ -96,24 +96,25 @@ public class ElementUtils {
     public static boolean isGetterForField(Element elem, String field, TypeKind typeKind){
         return elem != null && ExecutableElement.class.isInstance(elem)
                 && elem.getKind() == ElementKind.METHOD
-                && elem.getSimpleName().toString().toLowerCase().equals("get" + field)
+                && elem.getSimpleName().toString().toLowerCase().equals("get" + field.toLowerCase())
                 && ((ExecutableElement) elem).getReturnType().getKind() == typeKind
                 && ((ExecutableElement) elem).getParameters().size() == 0;
     }
 
     public static TypeMirror getElementType(TypeElement model, String field){
         TypeMirror typeMirror = null;
+        String fieldName = field.toLowerCase();
         for(Element f : model.getEnclosedElements()){
             if(f instanceof ExecutableElement) {
                 String fName = f.getSimpleName().toString().toLowerCase();
                 ExecutableElement exec = (ExecutableElement) f;
-                if (fName.equals("set" + field) && isSetter(f)) {
+                if (fName.equals("set" + fieldName) && isSetter(f)) {
                     TypeMirror setType = exec.getParameters().get(0).asType();
                     if (typeMirror != null) {
                         checkMatch(model, field, typeMirror, setType);
                     }
                     typeMirror = setType;
-                } else if (fName.equals("get" + field) && isGetter(f)) {
+                } else if (fName.equals("get" + fieldName) && isGetter(f)) {
                     TypeMirror getType = exec.getReturnType();
                     if (typeMirror != null) {
                         checkMatch(model, field, typeMirror, getType);
@@ -132,13 +133,14 @@ public class ElementUtils {
 
     public static boolean hasGetterAndSetter(TypeElement model, String field){
         boolean hasGetter = false, hasSetter = false;
+        String fieldName = field.toLowerCase();
         for(Element f : model.getEnclosedElements()){
             String name = f.getSimpleName().toString().toLowerCase();
-            if(name.equals("set" + field)){
+            if(name.equals("set" + fieldName)){
                 hasSetter = true;
                 if(hasGetter)
                     break;
-            }else if(name.equals("get" + field)){
+            }else if(name.equals("get" + fieldName)){
                 hasGetter = true;
                 if(hasSetter)
                     break;
@@ -149,14 +151,15 @@ public class ElementUtils {
 
     public static Tuple<String,String> getGetAndSetMethodNames(TypeElement model, String field){
         String get = null, set = null;
+        String fieldName = field.toLowerCase();
         for(Element f : model.getEnclosedElements()){
             String name = f.getSimpleName().toString().toLowerCase();
             // TODO better check than this - check parameters and so forth
-            if(name.equals("get" + field)){
+            if(name.equals("get" + fieldName)){
                 get = f.getSimpleName().toString();
                 if(set != null)
                     break;
-            }else if(name.equals("set" + field)){
+            }else if(name.equals("set" + fieldName)){
                 set = f.getSimpleName().toString();
                 if(get != null)
                     break;
