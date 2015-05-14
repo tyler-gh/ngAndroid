@@ -72,6 +72,17 @@ public class NgAndroid {
     /**
      * sets the content view of the Activity to the given resourceId
      * binds the scope to the view
+     * @param scope the annotated scope object
+     * @param activity contentView set
+     * @param resourceId xml layout resource to bind to scope and set contentView of Activity
+     */
+    public void setContentView(Object scope, Activity activity, int resourceId) {
+        setContentView(buildScope(scope), activity, resourceId);
+    }
+    
+    /**
+     * sets the content view of the Activity to the given resourceId
+     * binds the scope to the view
      * @param scope scope of the binding
      * @param activity contentView set
      * @param resourceId xml layout resource to bind to scope and set contentView of Activity
