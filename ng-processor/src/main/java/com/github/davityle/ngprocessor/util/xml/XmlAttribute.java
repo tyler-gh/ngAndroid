@@ -53,13 +53,13 @@ public class XmlAttribute {
     }
 
     public List<ModelSource> getModelSource() {
-        List<ModelSource> models = new ArrayList<>();
+        List<ModelSource> models = new ArrayList<ModelSource>();
         source.getModelSource(models);
         return models;
     }
 
     public List<MethodSource> getMethodSource() {
-        List<MethodSource> methods = new ArrayList<>();
+        List<MethodSource> methods = new ArrayList<MethodSource>();
         source.getMethodSource(methods);
         return methods;
     }

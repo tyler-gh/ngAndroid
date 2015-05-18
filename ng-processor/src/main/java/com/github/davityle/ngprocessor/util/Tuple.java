@@ -47,7 +47,7 @@ public class Tuple<T,K> {
     }
 
     public static <T,K> Tuple<T,K> of(T t, K k){
-        return new Tuple<>(t,k);
+        return new Tuple<T,K>(t,k);
     }
 
     @Override

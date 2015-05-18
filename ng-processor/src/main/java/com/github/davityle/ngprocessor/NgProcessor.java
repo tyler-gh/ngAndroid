@@ -102,6 +102,9 @@ public class NgProcessor extends AbstractProcessor {
         // get the xml layouts/nodes with attributes
         Map<File, List<XmlNode>> fileNodeMap = XmlUtils.getFileNodeMap(layoutDir);
 
+        if(MessageUtils.hasErrors())
+            return false;
+
         LayoutScopeMapper layoutScopeMapper = new LayoutScopeMapper(scopes, fileNodeMap);
 
         ModelScopeMapper modelScopeMapper = new ModelScopeMapper(annotations, roundEnv, scopes);
@@ -121,11 +124,14 @@ public class NgProcessor extends AbstractProcessor {
         SourceCreator sourceCreator = new SourceCreator(filer, modelSourceLinks, scopeSourceLinks);
         sourceCreator.createSourceFiles();
 
-        if(!MessageUtils.hasErrors())
+        if(!MessageUtils.hasErrors()) {
             MessageUtils.note(null, ":NgAndroid:successful");
-        else
+            return true;
+        }
+        else {
             MessageUtils.note(null, ":NgAndroid:failed");
-        return true;
+            return false;
+        }
     }
 
     @Override

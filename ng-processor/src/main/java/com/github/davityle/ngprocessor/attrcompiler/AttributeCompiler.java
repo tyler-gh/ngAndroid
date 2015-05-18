@@ -94,8 +94,8 @@ public class AttributeCompiler {
     }
 
     public Tuple<Source, Integer> createSource(int startIndex, int endIndex, Token[] tokens){
-        List<Source> sourceList = new ArrayList<>();
-        List<TokenType.BinaryOperator> operatorList = new ArrayList<>();
+        List<Source> sourceList = new ArrayList<Source>();
+        List<TokenType.BinaryOperator> operatorList = new ArrayList<TokenType.BinaryOperator>();
         int index = startIndex;
         while (index < endIndex){
             Token token = tokens[index];
@@ -103,7 +103,7 @@ public class AttributeCompiler {
                 case FUNCTION_NAME:{
                     index += 2;
                     int end = findEndOfFunction(tokens, index);
-                    List<Source> parameters = new ArrayList<>();
+                    List<Source> parameters = new ArrayList<Source>();
                     while(index < end) {
                         int nextIndex = findEndOfParameter(tokens, index);
                         Tuple<Source, Integer> values = createSource(index, nextIndex, tokens);
@@ -229,7 +229,7 @@ public class AttributeCompiler {
     }
 
     public Source evaluatePostFixExpression(Object[] postfixExpression){
-        Stack<Source> stack = new Stack<>();
+        Stack<Source> stack = new Stack<Source>();
         for (Object obj : postfixExpression){
             if (obj instanceof Source){
                 stack.push((Source) obj);
@@ -247,7 +247,7 @@ public class AttributeCompiler {
     }
 
     private List<Object> convertToInfix(List<Source> sources, List<TokenType.BinaryOperator> operators){
-        List<Object> infixExpression = new ArrayList<>();
+        List<Object> infixExpression = new ArrayList<Object>();
         Iterator<Source> getterListIterator = sources.listIterator();
         Iterator<TokenType.BinaryOperator> operatorIterator = operators.listIterator();
         infixExpression.add(getterListIterator.next());

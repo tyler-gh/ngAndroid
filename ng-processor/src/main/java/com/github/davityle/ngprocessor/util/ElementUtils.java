@@ -178,6 +178,14 @@ public class ElementUtils {
         return type.getQualifiedName().toString().substring(packageLen).replace('.', '$');
     }
 
+    public static String stripClassName(TypeMirror type) {
+        String fullName = type.toString();
+        int pIndex = fullName.lastIndexOf('.');
+        if(pIndex == -1 || pIndex == fullName.length() - 1)
+            return fullName;
+        return fullName.substring(pIndex + 1);
+    }
+
     public static boolean hasAnnotationWithName(Element element, String simpleName) {
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             String annotationName = mirror.getAnnotationType().asElement().getSimpleName().toString();
@@ -188,7 +196,11 @@ public class ElementUtils {
         return false;
     }
 
-    public static String getPackageName(TypeElement type) {
+    public static String getFullName(TypeElement type) {
+        return type.getQualifiedName().toString();
+    }
+
+    public static String getPackageName(Element type) {
         return elementUtils.getPackageOf(type).getQualifiedName().toString();
     }
 

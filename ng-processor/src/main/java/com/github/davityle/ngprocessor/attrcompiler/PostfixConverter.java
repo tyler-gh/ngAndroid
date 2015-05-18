@@ -39,8 +39,8 @@ public class PostfixConverter {
     }
     public static Object[] convertToPostfix(List<Object> parser) {
 
-        Stack<TokenType.BinaryOperator> operatorStack = new Stack<>();
-        List<Object> postfixExpression = new ArrayList<>();
+        Stack<TokenType.BinaryOperator> operatorStack = new Stack<TokenType.BinaryOperator>();
+        List<Object> postfixExpression = new ArrayList<Object>();
 
         while (parser.size() > 0) {
 

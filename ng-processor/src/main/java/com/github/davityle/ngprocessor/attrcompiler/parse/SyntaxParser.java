@@ -25,7 +25,7 @@ public class SyntaxParser {
     private final Queue<Token> mTokens;
     private final Token[] mTokenArray;
     private int mTokenArrayIndex;
-    private Stack<TokenType> parenthesisStack = new Stack<>();
+    private Stack<TokenType> parenthesisStack = new Stack<TokenType>();
 
     public SyntaxParser(String script){
         this.mTokens = new Tokenizer(script).getTokens();

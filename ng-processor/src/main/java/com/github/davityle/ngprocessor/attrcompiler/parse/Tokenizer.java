@@ -80,7 +80,7 @@ public class Tokenizer {
     }
 
     private void generateTokens() {
-        tokens = new LinkedList<>();
+        tokens = new LinkedList<Token>();
         index = 0;
         readIndex = 0;
 
@@ -285,6 +285,8 @@ public class Tokenizer {
 
             if (Character.isDigit(currentCharacter)) {
                 switch (state){
+                    case IN_CHAR_SEQUENCE:
+                        return State.IN_CHAR_SEQUENCE;
                     case IN_FLOAT:
                         return State.IN_FLOAT;
                     case IN_NUMBER_CONSTANT:

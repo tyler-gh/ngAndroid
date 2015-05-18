@@ -39,12 +39,6 @@ public class LayoutsFinder {
             return getFileFromPath(path);
         }
 
-        path = System.getenv("NG_PROCESSOR_LAYOUT_PATH");
-
-        if(path != null){
-            return getFileFromPath(path);
-        }
-
         URL url = Thread.currentThread().getContextClassLoader().getResource("layout/");
         if(url != null) {
             try {
@@ -57,7 +51,7 @@ public class LayoutsFinder {
         }
 
         File root = new File(".");
-        List<File> files = new ArrayList<>();
+        List<File> files = new ArrayList<File>();
         findLayouts(root, files);
         return files;
     }
@@ -66,7 +60,7 @@ public class LayoutsFinder {
         File file = new File(path);
         if(!file.exists()){
             MessageUtils.error(null, "The layout file path '%s' does not exist", path);
-            return new ArrayList<>();
+            return new ArrayList<File>();
         }
         return Collections.singletonList(file);
     }

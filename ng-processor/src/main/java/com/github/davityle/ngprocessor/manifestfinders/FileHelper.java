@@ -43,7 +43,7 @@ public class FileHelper {
 
 		FileObject dummySourceFile;
 		try {
-			dummySourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, "", "dummy" + System.currentTimeMillis());
+			dummySourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, "com", "dummy" + System.currentTimeMillis());
 		} catch (IOException ignored) {
 			return Option.absent();
 		}

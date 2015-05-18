@@ -41,7 +41,7 @@ import javax.lang.model.type.TypeMirror;
 public class LayoutScopeMapper {
 
     private final Set<Map.Entry<File, List<XmlNode>>> xmlLayouts;
-    private final Map<Element, List<XmlNode>> elementNodeMap = new HashMap<>();
+    private final Map<Element, List<XmlNode>> elementNodeMap = new HashMap<Element, List<XmlNode>>();
     private final List<Element> scopes;
     private boolean isMapped;
 
@@ -59,12 +59,12 @@ public class LayoutScopeMapper {
     }
 
     private void linkLayouts(){
-        final Map<XmlNode, Boolean> viewScopeMap = new HashMap<>();
+        final Map<XmlNode, Boolean> viewScopeMap = new HashMap<XmlNode, Boolean>();
 
         for (Map.Entry<File, List<XmlNode>> layout : xmlLayouts) {
             List<XmlNode> views = layout.getValue();
             for (XmlNode view : views) {
-                Map<Element, List<TypedXmlAttribute>> didMatch = new HashMap<>();
+                Map<Element, List<TypedXmlAttribute>> didMatch = new HashMap<Element, List<TypedXmlAttribute>>();
 
                 for (Element scope : scopes) {
                     Tuple<TypedXmlNode, List<TypedXmlAttribute>> node = scopeMatchesXmlView(scope, view);
@@ -109,7 +109,7 @@ public class LayoutScopeMapper {
     private void put(XmlNode view, Element element){
             List<XmlNode> nodes =  elementNodeMap.get(element);
             if(nodes == null){
-                nodes = new ArrayList<>();
+                nodes = new ArrayList<XmlNode>();
                 elementNodeMap.put(element, nodes);
             }
             nodes.add(view);
@@ -117,7 +117,7 @@ public class LayoutScopeMapper {
 
     private Tuple<TypedXmlNode, List<TypedXmlAttribute>> scopeMatchesXmlView(Element scope, XmlNode view){
         boolean match = true;
-        List<TypedXmlAttribute> typedAttributes = new ArrayList<>();
+        List<TypedXmlAttribute> typedAttributes = new ArrayList<TypedXmlAttribute>();
         for (XmlAttribute attribute : view.getAttributes()) {
 
             Map<ModelSource, ModelSource> typedModels = mapScopeToModels(scope, attribute.getModelSource());
@@ -137,7 +137,7 @@ public class LayoutScopeMapper {
     private Map<MethodSource, MethodSource> mapScopeToMethods(Element scope, List<MethodSource> methodSources, Map<ModelSource,ModelSource> typedModels){
         if(typedModels == null)
             return null;
-        Map<MethodSource, MethodSource> methods = new HashMap<>();
+        Map<MethodSource, MethodSource> methods = new HashMap<MethodSource, MethodSource>();
         for (MethodSource methodSource : methodSources) {
             boolean found = false;
             for (Element child : scope.getEnclosedElements()) {
@@ -164,7 +164,7 @@ public class LayoutScopeMapper {
      * @return
      */
     private Map<ModelSource, ModelSource> mapScopeToModels(Element scope, List<ModelSource> modelSources){
-        Map<ModelSource, ModelSource> mappedSources = new HashMap<>();
+        Map<ModelSource, ModelSource> mappedSources = new HashMap<ModelSource, ModelSource>();
         for (ModelSource modelSource : modelSources) {
             boolean found = false;
             for (Element child : scope.getEnclosedElements()) {

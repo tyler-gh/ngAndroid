@@ -18,16 +18,16 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+allprojects {
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+}
+
 dependencies {
     compile 'org.apache.velocity:velocity:1.7'
     testCompile 'junit:junit:4.12'
     testCompile 'com.google.testing.compile:compile-testing:0.7'
     testCompile 'com.google.android:android:4.1.1.4'
-}
-
-test {
-    systemProperty "LAYOUT_PATH", "ng-processor/src/test/resources/layout"
-    environment "NG_PROCESSOR_LAYOUT_PATH", "ng-processor/src/test/resources/layout"
 }
 
 task javadocJar(type: Jar) {
@@ -50,7 +50,7 @@ signing {
 
 group = "com.github.davityle"
 archivesBaseName = "ng-processor"
-version = "1.0.7-SNAPSHOT"
+version = "1.0.9-SNAPSHOT"
 
 uploadArchives {
     repositories {

@@ -43,7 +43,7 @@ public class ModelScopeMapper {
     public ModelScopeMapper(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv, List<Element> scopes) {
         this.annotations = annotations;
         this.roundEnv = roundEnv;
-        this.modelMap = new LinkedHashMap<>();
+        this.modelMap = new LinkedHashMap<String, Element>();
         this.scopeMap = NgScopeAnnotationUtils.getScopeMap(scopes);
     }
 

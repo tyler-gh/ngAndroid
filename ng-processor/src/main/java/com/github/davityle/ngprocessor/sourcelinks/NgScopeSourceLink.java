@@ -36,15 +36,17 @@ public class NgScopeSourceLink implements SourceLink{
 
     private final String className;
     private final String packageName;
+    private final String fullName;
     private final List<SourceField> fields;
     private final Element[] elements;
     private final Map<String, Set<XmlNode>> layouts;
     private final String manifestPackageName;
     private List<Source> sources;
 
-    public NgScopeSourceLink(String className, String packageName, List<SourceField> fields, Element[] elements, Map<String, Set<XmlNode>> layouts, String manifestPackageName) {
+    public NgScopeSourceLink(String className, String packageName, String fullName, List<SourceField> fields, Element[] elements, Map<String, Set<XmlNode>> layouts, String manifestPackageName) {
         this.className = className;
         this.packageName = packageName;
+        this.fullName = fullName;
         this.fields = fields;
         this.elements = elements;
         this.layouts = layouts;
@@ -57,6 +59,7 @@ public class NgScopeSourceLink implements SourceLink{
 
         vc.put("simpleClassName", className);
         vc.put("className", packageName + '.' + className);
+        vc.put("fullName", fullName);
         vc.put("packageName", packageName);
         vc.put("fields", fields);
         vc.put("layouts", layouts);

@@ -95,7 +95,7 @@ public class MethodSource extends Source<MethodSource> {
 
     @Override
     protected MethodSource cp(TypeMirror typeMirror) {
-        ArrayList<Source> paramCopy = new ArrayList<>();
+        ArrayList<Source> paramCopy = new ArrayList<Source>();
         for(Source source : parameters){
             paramCopy.add(source.copy());
         }

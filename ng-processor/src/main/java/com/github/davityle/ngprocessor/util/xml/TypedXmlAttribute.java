@@ -30,7 +30,7 @@ public class TypedXmlAttribute extends XmlAttribute {
             return typedModels.get(source);
         }else if(source instanceof MethodSource){
             MethodSource typed = typedMethods.get(source);
-            ArrayList<Source> parameters = new ArrayList<>();
+            ArrayList<Source> parameters = new ArrayList<Source>();
             for(Source s : typed.getParameters()){
                 parameters.add(setTypedModelsAndMethods(s));
             }

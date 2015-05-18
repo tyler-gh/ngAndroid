@@ -45,7 +45,7 @@ public class ModelSourceLinker {
 
     public List<NgModelSourceLink> getSourceLinks(){
         Set<Map.Entry<String, Element>> models = modelBuilderMap.entrySet();
-        List<NgModelSourceLink> modelSourceLinks = new ArrayList<>();
+        List<NgModelSourceLink> modelSourceLinks = new ArrayList<NgModelSourceLink>();
         for(Map.Entry<String, Element> model : models){
             Element element = model.getValue();
             modelSourceLinks.add(ModelSourceLinker.getSourceLink(element));
@@ -56,14 +56,13 @@ public class ModelSourceLinker {
     private static NgModelSourceLink getSourceLink(Element element) {
 
         TypeMirror fieldType = element.asType();
-        String fieldTypeName = fieldType.toString();
-        int periodindex = fieldTypeName.lastIndexOf('.');
         TypeElement typeElement = TypeUtils.asTypeElement(fieldType);
         String packageName = ElementUtils.getPackageName(typeElement);
+        String fullName = ElementUtils.getFullName(typeElement);
 
-        List<SourceField> fields = new ArrayList<>();
+        List<SourceField> fields = new ArrayList<SourceField>();
 
-        String modelName = fieldTypeName.substring(periodindex + 1);
+        String modelName = ElementUtils.stripClassName(fieldType);
 
         List<? extends Element> enclosedElements = typeElement.getEnclosedElements();
         boolean isInterface = typeElement.getKind().isInterface();
@@ -96,11 +95,11 @@ public class ModelSourceLinker {
                     }
                 }
                 if(!getterFound){
-                    MessageUtils.error(enclosedElement, "Field '%s' is missing a corresponding getter", fName);
+                    MessageUtils.error(setter, "Field '%s' is missing a corresponding getter", fName);
                 }
                 fields.add(sourceField);
             }
         }
-        return new NgModelSourceLink(modelName, packageName, isInterface, fields, element);
+        return new NgModelSourceLink(modelName, packageName, fullName, isInterface, fields, element);
     }
 }

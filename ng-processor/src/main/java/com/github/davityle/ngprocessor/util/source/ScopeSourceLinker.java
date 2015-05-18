@@ -19,6 +19,7 @@ package com.github.davityle.ngprocessor.util.source;
 import com.github.davityle.ngprocessor.sourcelinks.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
+import com.github.davityle.ngprocessor.util.TypeUtils;
 import com.github.davityle.ngprocessor.util.xml.XmlNode;
 
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class ScopeSourceLinker {
 
     public List<NgScopeSourceLink> getSourceLinks(){
 
-        List<NgScopeSourceLink> scopeSourceLinks = new ArrayList<>();
+        List<NgScopeSourceLink> scopeSourceLinks = new ArrayList<NgScopeSourceLink>();
 
         for(Element scope : scopes){
             scopeSourceLinks.add(getSourceLink(scope));
@@ -66,25 +67,30 @@ public class ScopeSourceLinker {
 
     private NgScopeSourceLink getSourceLink(Element scopeClass){
 
-        String packageName = ElementUtils.getPackageName((TypeElement) scopeClass);
-        String className = ElementUtils.getClassName((TypeElement) scopeClass, packageName);
+        TypeElement scopeType = (TypeElement) scopeClass;
+        String packageName = ElementUtils.getPackageName(scopeType);
+        String className = ElementUtils.getClassName(scopeType, packageName);
+        String fullName = ElementUtils.getFullName(scopeType);
         String scopeName = className + NgScopeAnnotationUtils.SCOPE_APPENDAGE;
         String key = packageName + "." + scopeName;
 
         List<Element> elements = scopeMap.get(key);
 
-        List<SourceField> fields = new ArrayList<>();
+        List<SourceField> fields = new ArrayList<SourceField>();
         for(Element element : elements){
             Name fieldName = element.getSimpleName();
             TypeMirror fieldType = element.asType();
-            fields.add(new SourceField(fieldName.toString(), fieldType.toString()));
+            TypeElement typeElement = TypeUtils.asTypeElement(fieldType);
+            String pack = ElementUtils.getPackageName(typeElement);
+            String modelName = ElementUtils.stripClassName(fieldType);
+            fields.add(new SourceField(fieldName.toString(), pack + '.' + modelName));
         }
 
         Element[] els = elements.toArray(new Element[elements.size() + 1]);
         els[elements.size()] = scopeClass;
 
         List<XmlNode> xmlNodes = elementNodeMap.get(scopeClass);
-        Map<String, Set<XmlNode>> layouts = new HashMap<>();
+        Map<String, Set<XmlNode>> layouts = new HashMap<String, Set<XmlNode>>();
 
         if(xmlNodes != null) {
             // This could be done by just mapping elements to the layout instead of linking to the
@@ -93,13 +99,13 @@ public class ScopeSourceLinker {
                 String layoutName = xmlNode.getLayoutName();
                 Set<XmlNode> ids = layouts.get(layoutName);
                 if (ids == null) {
-                    ids = new TreeSet<>(TUPLE_COMPARATOR);
+                    ids = new TreeSet<XmlNode>(TUPLE_COMPARATOR);
                     layouts.put(layoutName, ids);
                 }
                 ids.add(xmlNode);
             }
         }
-        return new NgScopeSourceLink(className, packageName, fields, els, layouts, manifestPackageName);
+        return new NgScopeSourceLink(className, packageName, fullName, fields, els, layouts, manifestPackageName);
     }
 
 }

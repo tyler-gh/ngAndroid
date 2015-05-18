@@ -67,8 +67,8 @@ public class AttributeCompilerTest {
         List<ModelSource> modelSourceList = new ArrayList<>();
         source.getModelSource(modelSourceList);
         for(ModelSource modelSource : modelSourceList)
-            modelSource.setMethod("getNum");
-        assertEquals("((modelName.getNum()-(2*(7-1)))-(10/(modelName.getNum()-3)))", source.getSource());
+            modelSource.setGetter("getNum");
+        assertEquals("((scope.modelName.getNum()-(2*(7-1)))-(10/(scope.modelName.getNum()-3)))", source.getSource());
     }
 
     @Test

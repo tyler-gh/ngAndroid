@@ -32,13 +32,15 @@ public class NgModelSourceLink implements SourceLink {
 
     private final String modelName;
     private final String packageName;
+    private final String fullName;
     private final boolean isInterface;
     private final List<SourceField> fields;
     private final Element element;
 
-    public NgModelSourceLink(String modelName, String packageName, boolean isInterface, List<SourceField> fields, Element element) {
+    public NgModelSourceLink(String modelName, String packageName, String fullName, boolean isInterface, List<SourceField> fields, Element element) {
         this.modelName = modelName;
         this.packageName = packageName;
+        this.fullName = fullName;
         this.isInterface = isInterface;
         this.fields = fields;
         this.element = element;
@@ -50,6 +52,7 @@ public class NgModelSourceLink implements SourceLink {
         vc.put("simpleClassName", modelName);
         vc.put("className", packageName + '.' + modelName);
         vc.put("packageName", packageName);
+        vc.put("fullName", fullName);
         vc.put("isInterface", isInterface);
         vc.put("fields", fields);
         return vc;

@@ -205,11 +205,11 @@ public class TypeUtils {
      * Stub TypeMirror for a String
      */
     private static final TypeMirror STRING = new TypeMirror() {
-        @Override public TypeKind getKind() {return null;}
-        @Override public <R, P> R accept(TypeVisitor<R, P> v, P p) {return null;}
-        @Override public List<? extends AnnotationMirror> getAnnotationMirrors() {return null;}
-        @Override public <A extends Annotation> A getAnnotation(Class<A> annotationType) {return null;}
-        @Override public <A extends Annotation> A[] getAnnotationsByType(Class<A> annotationType) {return null;}
+        public TypeKind getKind() {return null;}
+        public <R, P> R accept(TypeVisitor<R, P> v, P p) {return null;}
+        public List<? extends AnnotationMirror> getAnnotationMirrors() {return null;}
+        public <A extends Annotation> A getAnnotation(Class<A> annotationType) {return null;}
+        public <A extends Annotation> A[] getAnnotationsByType(Class<A> annotationType) {return null;}
 
         @Override
         public String toString() {

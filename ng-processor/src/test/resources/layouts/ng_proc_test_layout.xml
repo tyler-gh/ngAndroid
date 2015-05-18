@@ -23,8 +23,36 @@
             ng:ngClick="doSomething(point1.x, point2.y)"/>
 
         <View
-            android:id="@+id/1x"
+            android:id="@+id/xId"
             ng:ngModel="point1.x"/>
+
+        <View
+            android:id="@+id/yId"
+            ng:ngModel="point2.y"/>
+
+        <View
+            android:id="@+id/fyId"
+            ng:ngModel="point2.fy"/>
+
+        <View
+            android:id="@+id/clickId2"
+            ng:ngText="addCharWithByte(point1.cx, point2.by)"/>
+
+        <View
+            android:id="@+id/clickId3"
+            ng:ngClick="passInt(point1.sy + point2.bx)"/>
+
+        <View
+            android:id="@+id/stringAdd"
+            ng:ngClick="stringAddition(point1.str + point2.x + point2.str + point2.by)"/>
+
+        <View
+            android:id="@+id/fPD"
+            ng:ngClick="floatPlusDouble(point1.x + point2.fx)"/>
+
+        <View
+            android:id="@+id/xkd"
+            ng:ngClick="floatPlusChar(point1.cx + point2.fx)"/>
 
 
     </LinearLayout>

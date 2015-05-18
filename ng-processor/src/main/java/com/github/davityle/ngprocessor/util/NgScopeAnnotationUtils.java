@@ -36,7 +36,7 @@ public class NgScopeAnnotationUtils {
     public static final String SCOPE_APPENDAGE = "$$NgScope";
 
     public static List<Element> getScopes(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
-        List<Element> scopes = new ArrayList<>();
+        List<Element> scopes = new ArrayList<Element>();
         for (TypeElement annotation : annotations) {
             if(NG_SCOPE_ANNOTATION.equals(annotation.getQualifiedName().toString())) {
                 Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
@@ -49,7 +49,7 @@ public class NgScopeAnnotationUtils {
     }
 
     public static Map<String, List<Element>> getScopeMap(List<Element> scopes){
-        Map<String, List<Element>> scopeBuilderMap = new LinkedHashMap<>();
+        Map<String, List<Element>> scopeBuilderMap = new LinkedHashMap<String, List<Element>>();
         for (Element scopeClass : scopes) {
             Set<Modifier> modifiers = scopeClass.getModifiers();
             if (modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)) {

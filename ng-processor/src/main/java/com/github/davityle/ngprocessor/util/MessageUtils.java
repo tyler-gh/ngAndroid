@@ -31,6 +31,7 @@ public class MessageUtils {
 
     public static void setProcessingEnv(ProcessingEnvironment processingEnv){
         MessageUtils.processingEnv = processingEnv;
+        hasErrors = false;
     }
 
     public static void error(Element element, String message, Object... args) {

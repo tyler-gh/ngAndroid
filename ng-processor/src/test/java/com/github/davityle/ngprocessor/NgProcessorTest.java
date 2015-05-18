@@ -28,28 +28,27 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
-import javax.annotation.processing.Processor;
-
 import static com.google.common.truth.Truth.ASSERT;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
+import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 
 @NgScope
 public class NgProcessorTest {
 
-    private static Iterable<? extends Processor> ngProcessor() {
-        return Collections.singletonList(new NgProcessor("ng-processor/src/test/resources/layout"));
-    }
-
     @Test
-    public void allTheThings() throws IOException {
+    public void boxedTypesTest() throws IOException {
 
         File file = new File("./ng-processor/src/test/java/com/github/davityle/ngprocessor/NgProcessorTest.java");
         String content = Files.toString(file, StandardCharsets.UTF_8);
 
         ASSERT.about(javaSource())
                 .that(JavaFileObjects.forSourceString("com.github.davityle.ngprocessor.NgProcessorTest", content))
-                .processedWith(ngProcessor())
-                .compilesWithoutError();
+                .processedWith(Collections.singletonList(new NgProcessor("ng-processor/src/test/resources/layouts")))
+                .compilesWithoutError()
+                .and()
+                .generatesFileNamed(SOURCE_OUTPUT, "com.github.davityle.ngprocessor", "NgProcessorTest$$NgScope.java")
+                .and()
+                .generatesFileNamed(SOURCE_OUTPUT, "com.github.davityle.ngprocessor", "TestPoint$$NgModel.java");
     }
 
     @NgModel
@@ -58,8 +57,31 @@ public class NgProcessorTest {
     void doSomething(Double x, Double y){
 
     }
+
+    int addCharWithByte(Character x, Byte y){
+        return x + y;
+    }
+
+    int passInt(Integer y){
+        return y;
+    }
+
+    void stringAddition(String str){
+
+    }
+
+    void floatPlusDouble(Double x){
+
+    }
+
+    void floatPlusChar(Float x){
+
+    }
 }
 
+/**
+ * for testing Boxed types
+ */
 class TestPoint {
     private Double x;
     private Double y;
@@ -78,6 +100,8 @@ class TestPoint {
 
     private Character cy;
     private Character cx;
+
+    private String str;
 
     public Double getX() {
         return x;
@@ -173,5 +197,13 @@ class TestPoint {
 
     public void setCx(Character cx) {
         this.cx = cx;
+    }
+
+    public String getStr() {
+        return str;
+    }
+
+    public void setStr(String str) {
+        this.str = str;
     }
 }

@@ -25,10 +25,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +39,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Created by tyler on 3/30/15.
@@ -75,7 +72,7 @@ public class XmlUtils {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             return db.parse(file);
-        } catch (ParserConfigurationException | SAXException | IOException e) {
+        } catch (Exception e) {
             MessageUtils.error(null, e.getMessage());
             return null;
         }
@@ -83,7 +80,7 @@ public class XmlUtils {
 
     public static Map<File, List<XmlNode>> getFileNodeMap(String dir){
         List<File> layoutDirs = LayoutsFinder.findLayouts(dir);
-        Map<File, List<XmlNode>> xmlAttrMap = new HashMap<>();
+        Map<File, List<XmlNode>> xmlAttrMap = new HashMap<File, List<XmlNode>>();
 
         for(File f : layoutDirs){
             for(File kid : f.listFiles()){
@@ -98,7 +95,7 @@ public class XmlUtils {
                     if(nameSpace != null){
                         String pattern = String.format(NAMESPACE_ATTRIBUTE_REG, nameSpace);
                         Pattern nameSpaceAttributePattern = Pattern.compile(pattern);
-                        List<XmlNode> nodeList = new ArrayList<>();
+                        List<XmlNode> nodeList = new ArrayList<XmlNode>();
                         getNgAttrNodes(doc, nameSpaceAttributePattern, nodeList, kid.getName());
                         for(XmlNode xmlNode : nodeList){
                             for(XmlAttribute xmlAttribute : xmlNode.getAttributes()){
@@ -148,7 +145,7 @@ public class XmlUtils {
                     Matcher matcher = attributePattern.matcher(node.toString());
                     if(matcher.matches()){
                         if(attributeList == null)
-                            attributeList = new ArrayList<>();
+                            attributeList = new ArrayList<XmlAttribute>();
                         String attr = matcher.group(1);
                         if(NG_ATTRS.contains(attr)) {
                             attributeList.add(new XmlAttribute(attr, matcher.group(2)));

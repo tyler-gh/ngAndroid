@@ -3,7 +3,7 @@ package ${packageName};
 import android.view.View;
 import android.widget.*;
 
-public class ${simpleClassName}$$NgScope <T extends ${className}> implements com.ngandroid.lib.ng.Scope {
+public class ${simpleClassName}$$NgScope <T extends ${fullName}> implements com.ngandroid.lib.ng.Scope {
 
 	private T scope;
 	private com.ngandroid.lib.NgAndroid ngandroid_;
