@@ -22,6 +22,7 @@ import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.TypeUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,6 +68,8 @@ public class ModelSourceLinker {
         List<? extends Element> enclosedElements = typeElement.getEnclosedElements();
         boolean isInterface = typeElement.getKind().isInterface();
 
+        Set<String> duplicateCheck = new HashSet<>();
+
         for(int index = 0; index < enclosedElements.size(); index++){
             Element enclosedElement = enclosedElements.get(index);
             if(ElementUtils.isSetter(enclosedElement)) {
@@ -77,10 +80,17 @@ public class ModelSourceLinker {
                 }
                 Set<Modifier> modifiers = setter.getModifiers();
                 if(modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)){
-                    MessageUtils.error(element, "Unable to access field '%s' from scope '%s'. Must have default or public access", element.toString(), element.getEnclosingElement().toString());
+                    MessageUtils.error(setter, "Unable to access field '%s' from scope '%s'. Must have default or public access", element.toString(), element.getEnclosingElement().toString());
                     continue;
                 }
                 String fName = setter.getSimpleName().toString().substring(3).toLowerCase();
+
+                if(duplicateCheck.contains(fName)){
+                    MessageUtils.error(setter, "Field '%s' in model '%s' is a duplicate.", setter.getSimpleName().toString().substring(3), fullName);
+                    continue;
+                }
+                duplicateCheck.add(fName);
+
                 TypeMirror typeMirror = setter.getParameters().get(0).asType();
                 String type = typeMirror.toString();
                 SourceField sourceField = new SourceField(fName, type);

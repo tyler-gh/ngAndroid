@@ -142,6 +142,9 @@ public class LayoutScopeMapper {
             boolean found = false;
             for (Element child : scope.getEnclosedElements()) {
                 if(ElementUtils.methodsMatch(child, methodSource, typedModels)){
+                    if(!ElementUtils.isAccessible(child)){
+                        MessageUtils.error(child, "Method '%s' matches source '%s' but is not accessible.", child, methodSource);
+                    }
                     MethodSource copy = methodSource.copy(((ExecutableElement) child).getReturnType());
                     methods.put(copy, copy);
                     found = true;
