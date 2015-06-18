@@ -16,6 +16,8 @@
 
 package com.github.davityle.ngprocessor.util;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +91,24 @@ public class ModelScopeMapper {
                 }
             }
         }
+//        checkDuplicates();
         mapped = true;
+    }
+
+    private void checkDuplicates(){
+        Collection<List<Element>> scopeModels = scopeMap.values();
+
+        for(List<Element> models : scopeModels){
+            Set<String> modelSet = new HashSet<>();
+            for(Element model : models){
+                String name = model.getSimpleName().toString().toLowerCase();
+                if(modelSet.contains(name)){
+                    MessageUtils.error(model, "Model '%s' has duplicate name. Names are checked by lowercase value.", name);
+                }else{
+                    modelSet.add(name);
+                }
+            }
+        }
     }
 
 }

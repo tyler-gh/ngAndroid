@@ -1,0 +1,10 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ng="http://schemas.android.com/apk/res-auto">
+    <LinearLayout>
+
+        <View
+            android:id="@+id/caseId"
+            ng:ngModel="cafe.Case_doesntMatter"/>
+
+    </LinearLayout>
+</ScrollView>

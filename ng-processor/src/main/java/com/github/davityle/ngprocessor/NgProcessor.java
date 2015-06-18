@@ -45,17 +45,6 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
-/**
- * this class is currently experimental.
- * Looking at it too closely might make your eyes bleed....
- *
- * Parse xml
- * valid syntax of attributes
- * map models to scopes
- * check to see if each xml file containing ngattributes matches at least 1 scope
- *
- */
-
 @SupportedAnnotationTypes({
     ModelScopeMapper.NG_MODEL_ANNOTATION,
     NgScopeAnnotationUtils.NG_SCOPE_ANNOTATION

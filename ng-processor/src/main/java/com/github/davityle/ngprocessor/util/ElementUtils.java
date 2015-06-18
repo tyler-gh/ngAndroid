@@ -75,20 +75,30 @@ public class ElementUtils {
             }
         }
 
-        return ElementUtils.isAccessible(elem);
+        return true;
     }
 
     public static boolean isSetter(Element elem){
-        return elem != null && ExecutableElement.class.isInstance(elem)
+        if(elem == null)
+            return false;
+        String name = elem.getSimpleName().toString();
+        return ExecutableElement.class.isInstance(elem)
                 && elem.getKind() == ElementKind.METHOD
-                && elem.getSimpleName().toString().startsWith("set")
+                && name.startsWith("set")
+                && name.length() > 3
+                && Character.isUpperCase(name.charAt(3))
                 && ((ExecutableElement) elem).getParameters().size() == 1;
     }
 
     public static boolean isGetter(Element elem){
-        return elem != null && ExecutableElement.class.isInstance(elem)
+        if(elem == null)
+            return false;
+        String name = elem.getSimpleName().toString();
+        return ExecutableElement.class.isInstance(elem)
                 && elem.getKind() == ElementKind.METHOD
-                && elem.getSimpleName().toString().startsWith("get")
+                && name.startsWith("get")
+                && name.length() > 3
+                && Character.isUpperCase(name.charAt(3))
                 && ((ExecutableElement) elem).getReturnType().getKind() != TypeKind.VOID
                 && ((ExecutableElement) elem).getParameters().size() == 0;
     }
