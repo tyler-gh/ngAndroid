@@ -96,163 +96,132 @@ public class Tokenizer {
     }
 
     private State nextState() {
-        State result;
         switch (state){
             case BEGIN:
             case EQUALS_START:
-                result = getNextState();
-                break;
+                return getNextState();
             case IN_STRING:
                 if(peek() == '\\'){
-                    result = State.IN_STRING_SLASH;
-                }else
-                    result = getNextState();
-                break;
+                    return State.IN_STRING_SLASH;
+                }
+                return getNextState();
             case IN_STRING_SLASH:
-                result = getNextState();
-                break;
+                return getNextState();
             case STRING_SLASH_END:
-                result = getNextState();
-                break;
+                return getNextState();
             case IN_CHAR_SEQUENCE: {
                 char c = peek();
                 switch (c) {
                     case '.':
-                        result = State.MODEL_NAME_END;
-                        break;
+                        return State.MODEL_NAME_END;
                     case '(':
-                        result = State.FUNCTION_NAME_END;
-                        break;
+                        return State.FUNCTION_NAME_END;
                     default:
-                        result = getNextState();
-                        break;
+                        return getNextState();
                 }
-                break;
             }
             case END:
-                result = State.END;
-                break;
+                return State.END;
             case MODEL_NAME_END:
                 emit(TokenType.MODEL_NAME);
-                result = getNextState();
-                break;
+                return getNextState();
             case FUNCTION_NAME_END:
                 emit(TokenType.FUNCTION_NAME);
-                result = getNextState();
-                break;
+                return getNextState();
             case MODEL_PERIOD:
                 emit(TokenType.PERIOD);
-                result = State.IN_MODEL_FIELD;
-                break;
+                return State.IN_MODEL_FIELD;
             case FUNCTION_PARAMETER_START:
                 emit(TokenType.OPEN_PARENTHESIS);
-                result = getNextState();
-                break;
+                return getNextState();
             case CLOSE_PARENTHESIS:
                 emit(TokenType.CLOSE_PARENTHESIS);
-                result = getNextState();
-                break;
+                return getNextState();
             case TERNARY_QUESTION:
                 emit(TokenType.TERNARY_QUESTION_MARK);
-                result = getNextState();
-                break;
+                return getNextState();
             case TERNARY_COLON:
                 emit(TokenType.TERNARY_COLON);
-                result = getNextState();
-                break;
+                return getNextState();
             case STRING_START:
-                result = State.IN_STRING;
-                break;
+                return State.IN_STRING;
             case STRING_END:
                 emit(TokenType.STRING);
-                result = getNextState();
-                break;
+                return getNextState();
             case IN_FLOAT: {
                 if (!Character.isDigit(peek())){
-                    result = State.FLOAT_END;
+                    return State.FLOAT_END;
                 }else
-                    result = getNextState();
-                break;
+                    return getNextState();
             }
             case IN_NUMBER_CONSTANT: {
                 char c = peek();
                 if (!Character.isDigit(c) && c != '.')
-                    result = State.NUMBER_CONSTANT_END;
+                    return State.NUMBER_CONSTANT_END;
                 else
-                    result = getNextState();
-                break;
+                    return getNextState();
             }
             case FLOAT_END: {
                 char c = peek();
-                if (c != 'd' && c != 'D' && c != 'f' && c != 'F')
+                if ("dDfF".indexOf(c) == -1) {
                     emit(TokenType.FLOAT_CONSTANT);
-                result = getNextState();
-                break;
+                }
+                return getNextState();
             }
             case NUMBER_CONSTANT_END: {
                 char c = peek();
-                if (c != 'l' && c != 'L' && c != 'f' && c != 'F' && c != 'd' && c != 'D')
+                if ("lLfFdD".indexOf(c) == -1) {
                     emit(TokenType.INTEGER_CONSTANT);
+                }
 
-                result = getNextState();
-                break;
+                return getNextState();
             }
             case FLOAT_F_END:
                 emit(TokenType.FLOAT_CONSTANT);
-                result = getNextState();
-                break;
+                return getNextState();
             case DOUBLE_END:
                 emit(TokenType.DOUBLE_CONSTANT);
-                result = getNextState();
-                break;
+                return getNextState();
             case LONG_END:
                 emit(TokenType.LONG_CONSTANT);
-                result = getNextState();
-                break;
+                return getNextState();
             case FUNCTION_PARAMETER_DELIMINATOR:
                 emit(TokenType.COMMA);
-                result = getNextState();
-                break;
-            case IN_MODEL_FIELD:
-                if(!Character.isLetter(peek())){
-                    result = State.MODEL_FIELD_END;
-                }else{
-                    result = getNextState();
+                return getNextState();
+            case IN_MODEL_FIELD: {
+                char c = peek();
+                if (c != '_' && !Character.isLetter(c)) {
+                    return State.MODEL_FIELD_END;
+                } else {
+                    return getNextState();
                 }
-                break;
+            }
             case NESTED_EXPRESSION:
                 emit(TokenType.OPEN_PARENTHESIS_EXP);
-                result = getNextState();
-                break;
+                return getNextState();
             case KNOT_EQUALS_START:
                 if(peek() != '='){
-                    result = State.KNOT_VALUE;
+                    return State.KNOT_VALUE;
                 }else{
-                    result = getNextState();
+                    return getNextState();
                 }
-                break;
             case KNOT_VALUE:
                 emit(TokenType.KNOT);
-                result = State.IN_CHAR_SEQUENCE;
-                break;
+                return State.IN_CHAR_SEQUENCE;
             case MODEL_FIELD_END:
                 emit(TokenType.MODEL_FIELD);
-                result = getNextState();
-                break;
+                return getNextState();
             case KNOT_EQUALS:
             case EQUALS:
             case OPERATOR:
                 emit(TokenType.BINARY_OPERATOR);
-                result = getNextState();
-                break;
+                return getNextState();
             case WHITESPACE:
                 emit(TokenType.WHITESPACE);
-                result = getNextState();
-                break;
+                return getNextState();
             default:
                 throw new RuntimeException("This shouldn't happen. Please submit an issue at github.com/davityle/ngAndroid/issues");
         }
-        return result;
     }
 
     private void advance() {
@@ -276,8 +245,9 @@ public class Tokenizer {
 
             char currentCharacter = script.charAt(index);
 
-            if(state == State.IN_STRING && currentCharacter != '\'')
+            if(state == State.IN_STRING && currentCharacter != '\'') {
                 return state;
+            }
 
             if(state == State.IN_NUMBER_CONSTANT && currentCharacter == '.'){
                 return State.IN_FLOAT;
@@ -365,6 +335,11 @@ public class Tokenizer {
                 case '-':
                 case '/':
                     return State.OPERATOR;
+                case '_':{
+                    if(state == State.IN_MODEL_FIELD)
+                        return state;
+                }
+
             }
 
             if(Character.isWhitespace(currentCharacter)){
