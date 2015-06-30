@@ -23,8 +23,8 @@ import com.github.davityle.ngprocessor.attrcompiler.parse.TokenType;
 import com.github.davityle.ngprocessor.attrcompiler.sources.BinaryOperatorSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.KnotSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
+import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import com.github.davityle.ngprocessor.attrcompiler.sources.StaticSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.TernarySource;
 import com.github.davityle.ngprocessor.util.Tuple;
@@ -35,22 +35,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-/**
- * Created by tyler on 2/2/15.
- */
+import javax.inject.Inject;
+
 public class AttributeCompiler {
 
-    private final Token[] tokens;
 
-    public AttributeCompiler(String expression){
-        this(new SyntaxParser(expression).parseScript());
+    private final TypeUtils typeUtils;
+
+    @Inject
+    public AttributeCompiler(TypeUtils typeUtils){
+        this.typeUtils = typeUtils;
     }
 
-    public AttributeCompiler(Token[] tokens) {
-        this.tokens = tokens;
-    }
-
-    public Source compile(){
+    public Source compile(String expression){
+        Token[] tokens = new SyntaxParser(expression).parseScript();
         return createSource(0, tokens.length - 1, tokens).getFirst();
     }
 
@@ -62,7 +60,7 @@ public class AttributeCompiler {
         throw new RuntimeException("Function is not closed properly");
     }
 
-    private int findCloseParenthesis(int startIndex) {
+    private int findCloseParenthesis(int startIndex, Token[] tokens) {
         int openCount = 1;
         for(int index = startIndex; index < tokens.length; index++){
             Token token = tokens[index];
@@ -94,8 +92,8 @@ public class AttributeCompiler {
     }
 
     public Tuple<Source, Integer> createSource(int startIndex, int endIndex, Token[] tokens){
-        List<Source> sourceList = new ArrayList<Source>();
-        List<TokenType.BinaryOperator> operatorList = new ArrayList<TokenType.BinaryOperator>();
+        List<Source> sourceList = new ArrayList<>();
+        List<TokenType.BinaryOperator> operatorList = new ArrayList<>();
         int index = startIndex;
         while (index < endIndex){
             Token token = tokens[index];
@@ -103,7 +101,7 @@ public class AttributeCompiler {
                 case FUNCTION_NAME:{
                     index += 2;
                     int end = findEndOfFunction(tokens, index);
-                    List<Source> parameters = new ArrayList<Source>();
+                    List<Source> parameters = new ArrayList<>();
                     while(index < end) {
                         int nextIndex = findEndOfParameter(tokens, index);
                         Tuple<Source, Integer> values = createSource(index, nextIndex, tokens);
@@ -111,24 +109,24 @@ public class AttributeCompiler {
                         index = values.getSecond() + 1;
                     }
                     String methodName = token.getScript();
-                    sourceList.add(new MethodSource(methodName, parameters));
+                    sourceList.add(new MethodSource(typeUtils, methodName, parameters));
                     break;
                 }
                 case KNOT:{
                     // TODO take a closer look at whether or not this can trail off and grab multiple getters
                     Tuple<Source, Integer> value = createSource(index + 1, endIndex, tokens);
-                    KnotSource getter = new KnotSource(value.getFirst());
+                    KnotSource getter = new KnotSource(typeUtils, value.getFirst());
                     index = value.getSecond();
                     sourceList.add(getter);
                     break;
                 }
                 case INTEGER_CONSTANT: {
-                    sourceList.add(new StaticSource(token.getScript(), TypeUtils.getIntegerType()));
+                    sourceList.add(new StaticSource(typeUtils, token.getScript(), typeUtils.getIntegerType()));
                     index++;
                     break;
                 }
                 case LONG_CONSTANT: {
-                    sourceList.add(new StaticSource(token.getScript(), TypeUtils.getLongType()));
+                    sourceList.add(new StaticSource(typeUtils, token.getScript(), typeUtils.getLongType()));
                     index++;
                     break;
                 }
@@ -137,31 +135,31 @@ public class AttributeCompiler {
                     String script = token.getScript();
                     if(!script.endsWith("f") && !script.endsWith("F"))
                         script += "f";
-                    sourceList.add(new StaticSource(script, TypeUtils.getFloatType()));
+                    sourceList.add(new StaticSource(typeUtils, script, typeUtils.getFloatType()));
                     index++;
                     break;
                 }
                 case DOUBLE_CONSTANT: {
-                    sourceList.add(new StaticSource(token.getScript(), TypeUtils.getDoubleType()));
+                    sourceList.add(new StaticSource(typeUtils, token.getScript(), typeUtils.getDoubleType()));
                     index++;
                     break;
                 }
                 case MODEL_NAME: {
                     String modelName = token.getScript();
                     String fieldName = tokens[index + 2].getScript();
-                    sourceList.add(new ModelSource(modelName, fieldName));
+                    sourceList.add(new ModelSource(typeUtils, modelName, fieldName));
                     index += 3;
                     break;
                 }
                 case STRING: {
                     String script = token.getScript().replace("\"", "\\\"").replace("\\'","'");
-                    sourceList.add(new StaticSource('"' + script.substring(1, script.length() - 1) + '"', TypeUtils.getStringType()));
+                    sourceList.add(new StaticSource(typeUtils, '"' + script.substring(1, script.length() - 1) + '"', typeUtils.getStringType()));
                     index++;
                     break;
                 }
                 case OPEN_PARENTHESIS_EXP:{
                     index++;
-                    int end = findCloseParenthesis(index);
+                    int end = findCloseParenthesis(index, tokens);
                     Tuple<Source, Integer> values = createSource(index, end, tokens);
                     sourceList.add(values.getFirst());
                     index = values.getSecond();
@@ -180,7 +178,7 @@ public class AttributeCompiler {
                     values = createSource(ternaryColonIndex + 1, endIndex, tokens);
                     Source falseSource = values.getFirst();
                     index = values.getSecond();
-                    sourceList.add(new TernarySource(source, trueSource, falseSource));
+                    sourceList.add(new TernarySource(typeUtils, source, trueSource, falseSource));
                     break;
                 }
                 case BINARY_OPERATOR: {
@@ -216,7 +214,7 @@ public class AttributeCompiler {
     }
 
     private Source compareGetters(Source leftgetter, Source rightgetter, TokenType.BinaryOperator operator){
-        return BinaryOperatorSource.getOperator(leftgetter, rightgetter, operator);
+        return BinaryOperatorSource.getOperator(typeUtils, leftgetter, rightgetter, operator);
     }
 
     private Source getMostRecentGetter(List<Source> sources, String error){
@@ -229,7 +227,7 @@ public class AttributeCompiler {
     }
 
     public Source evaluatePostFixExpression(Object[] postfixExpression){
-        Stack<Source> stack = new Stack<Source>();
+        Stack<Source> stack = new Stack<>();
         for (Object obj : postfixExpression){
             if (obj instanceof Source){
                 stack.push((Source) obj);
@@ -247,7 +245,7 @@ public class AttributeCompiler {
     }
 
     private List<Object> convertToInfix(List<Source> sources, List<TokenType.BinaryOperator> operators){
-        List<Object> infixExpression = new ArrayList<Object>();
+        List<Object> infixExpression = new ArrayList<>();
         Iterator<Source> getterListIterator = sources.listIterator();
         Iterator<TokenType.BinaryOperator> operatorIterator = operators.listIterator();
         infixExpression.add(getterListIterator.next());

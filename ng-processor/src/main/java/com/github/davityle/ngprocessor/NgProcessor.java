@@ -18,18 +18,17 @@ package com.github.davityle.ngprocessor;
 
 import com.github.davityle.ngprocessor.sourcelinks.NgModelSourceLink;
 import com.github.davityle.ngprocessor.sourcelinks.NgScopeSourceLink;
-import com.github.davityle.ngprocessor.util.ElementUtils;
+import com.github.davityle.ngprocessor.util.DefaultLayoutDirProvider;
 import com.github.davityle.ngprocessor.util.LayoutScopeMapper;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.ModelScopeMapper;
 import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
-import com.github.davityle.ngprocessor.util.TypeUtils;
+import com.github.davityle.ngprocessor.util.Option;
 import com.github.davityle.ngprocessor.util.source.ModelSourceLinker;
 import com.github.davityle.ngprocessor.util.source.ScopeSourceLinker;
 import com.github.davityle.ngprocessor.util.source.SourceCreator;
 import com.github.davityle.ngprocessor.util.xml.ManifestPackageUtils;
 import com.github.davityle.ngprocessor.util.xml.XmlNode;
-import com.github.davityle.ngprocessor.util.xml.XmlUtils;
 
 import java.io.File;
 import java.util.List;
@@ -44,6 +43,11 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+
+import dagger.Module;
+import dagger.Provides;
 
 @SupportedAnnotationTypes({
     ModelScopeMapper.NG_MODEL_ANNOTATION,
@@ -51,25 +55,30 @@ import javax.lang.model.element.TypeElement;
 })
 public class NgProcessor extends AbstractProcessor {
 
-    private final String layoutDir;
+    private final LayoutModule layoutModule;
+    private ProcessingEnvironment env;
 
     public NgProcessor(){
-        layoutDir = null;
+        this(Option.<String>absent());
     }
 
-    public NgProcessor(String layoutDir){
-        this.layoutDir = layoutDir;
+    public NgProcessor(final Option<String> option){
+        this(new LayoutModule(new DefaultLayoutDirProvider() {
+            @Override
+            public Option<String> getDefaultLayoutDir() {
+                return option;
+            }
+        }));
     }
 
-    private Filer filer;
+    public NgProcessor(LayoutModule layoutModule){
+        this.layoutModule = layoutModule;
+    }
 
-    @Override public synchronized void init(ProcessingEnvironment env) {
+    @Override
+    public synchronized void init(ProcessingEnvironment env) {
         super.init(env);
-
-        ElementUtils.setElements(env.getElementUtils());
-        MessageUtils.setProcessingEnv(processingEnv);
-        TypeUtils.setTypeUtils(env.getTypeUtils());
-        filer = env.getFiler();
+        this.env = env;
     }
 
     @Override
@@ -77,48 +86,65 @@ public class NgProcessor extends AbstractProcessor {
 
         if(annotations.size() == 0)
             return false;
-        MessageUtils.note(null, ":NgAndroid:processing");
 
-        String manifestPackageName = ManifestPackageUtils.getPackageName(processingEnv);
+        final DependencyComponent dependencyComponent = DaggerDependencyComponent
+                .builder()
+                .layoutModule(layoutModule)
+                .environmentModule(new EnvironmentModule(roundEnv))
+                .build();
+
+        MessageUtils messageUtils = dependencyComponent.createMessageUtils();
+
+        ManifestPackageUtils manifestPackageUtils = dependencyComponent.createManifestPackageUtils();
+
+        messageUtils.note(null, ":NgAndroid:processing");
+
+        String manifestPackageName = manifestPackageUtils.getPackageName();
 
         if(manifestPackageName == null) {
-            MessageUtils.error(null, ":NgAndroid:Unable to find android manifest.");
+            messageUtils.error(null, ":NgAndroid:Unable to find android manifest.");
             return false;
         }
 
         // get the elements annotated with NgScope
-        List<Element> scopes = NgScopeAnnotationUtils.getScopes(annotations, roundEnv);
-        // get the xml layouts/nodes with attributes
-        Map<File, List<XmlNode>> fileNodeMap = XmlUtils.getFileNodeMap(layoutDir);
+        List<Element> scopes = dependencyComponent.createNgScopeAnnotationUtils().getScopes(annotations);
 
-        if(MessageUtils.hasErrors())
+        // get the xml layouts/nodes with attributes
+        Map<File, List<XmlNode>> fileNodeMap = dependencyComponent.createXmlUtils().getFileNodeMap();
+
+        if(messageUtils.hasErrors())
             return false;
 
         LayoutScopeMapper layoutScopeMapper = new LayoutScopeMapper(scopes, fileNodeMap);
+        ModelScopeMapper modelScopeMapper = new ModelScopeMapper(annotations, scopes);
 
-        ModelScopeMapper modelScopeMapper = new ModelScopeMapper(annotations, roundEnv, scopes);
+        dependencyComponent.inject(layoutScopeMapper);
+        dependencyComponent.inject(modelScopeMapper);
 
         // get the mapped models
         Map<String, Element> modelMap = modelScopeMapper.getModels();
         // get the mapped scopes
         Map<String, List<Element>> scopeMap = modelScopeMapper.getScopeMap();
 
+        ModelSourceLinker sourceLinker = new ModelSourceLinker(modelMap);
+        dependencyComponent.inject(sourceLinker);
         // get the model to source links
-        List<NgModelSourceLink> modelSourceLinks = new ModelSourceLinker(modelMap).getSourceLinks();
+        List<NgModelSourceLink> modelSourceLinks = sourceLinker.getSourceLinks();
         // get the scope to source links
         ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopes, scopeMap, layoutScopeMapper.getElementNodeMap(), manifestPackageName);
+        dependencyComponent.inject(scopeSourceLinker);
         List<NgScopeSourceLink> scopeSourceLinks = scopeSourceLinker.getSourceLinks();
 
         // create the source files
-        SourceCreator sourceCreator = new SourceCreator(filer, modelSourceLinks, scopeSourceLinks);
+        SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, scopeSourceLinks);
+        dependencyComponent.inject(sourceCreator);
         sourceCreator.createSourceFiles();
 
-        if(!MessageUtils.hasErrors()) {
-            MessageUtils.note(null, ":NgAndroid:successful");
+        if(!messageUtils.hasErrors()) {
+            messageUtils.note(null, ":NgAndroid:successful");
             return true;
-        }
-        else {
-            MessageUtils.note(null, ":NgAndroid:failed");
+        } else {
+            messageUtils.note(null, ":NgAndroid:failed");
             return false;
         }
     }
@@ -126,5 +152,39 @@ public class NgProcessor extends AbstractProcessor {
     @Override
     public SourceVersion getSupportedSourceVersion() {
         return SourceVersion.latestSupported();
+    }
+
+    @Module
+    public class EnvironmentModule {
+        private final RoundEnvironment roundEnv;
+
+        public EnvironmentModule(RoundEnvironment roundEnv){
+            this.roundEnv = roundEnv;
+        }
+
+        @Provides
+        public ProcessingEnvironment getProcessingEnvironment() {
+            return processingEnv;
+        }
+
+        @Provides
+        public Filer getFiler(){
+            return env.getFiler();
+        }
+
+        @Provides
+        public Types getTypeUtils(){
+            return env.getTypeUtils();
+        }
+
+        @Provides
+        public Elements getElementUtils(){
+            return env.getElementUtils();
+        }
+
+        @Provides
+        public RoundEnvironment getRoundEnv(){
+            return roundEnv;
+        }
     }
 }

@@ -17,6 +17,8 @@
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
 
+import com.github.davityle.ngprocessor.util.TypeUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,12 +35,12 @@ public class MethodSource extends Source<MethodSource> {
     private List<Source> parameters;
     private String parametersSource;
 
-    public MethodSource(String source, List<Source> parameters) {
-        this(source, parameters, null);
+    public MethodSource(TypeUtils typeUtils, String source, List<Source> parameters) {
+        this(typeUtils, source, parameters, null);
     }
 
-    public MethodSource(String source, List<Source> parameters, TypeMirror typeMirror) {
-        super(typeMirror);
+    public MethodSource(TypeUtils typeUtils, String source, List<Source> parameters, TypeMirror typeMirror) {
+        super(typeUtils, typeMirror);
         this.methodName = source;
         this.parameters = parameters;
     }
@@ -99,7 +101,7 @@ public class MethodSource extends Source<MethodSource> {
         for(Source source : parameters){
             paramCopy.add(source.copy());
         }
-        return new MethodSource(methodName, paramCopy, typeMirror);
+        return new MethodSource(typeUtils, methodName, paramCopy, typeMirror);
     }
 
     @Override

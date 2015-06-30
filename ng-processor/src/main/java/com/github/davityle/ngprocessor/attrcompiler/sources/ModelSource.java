@@ -35,12 +35,12 @@ public class ModelSource extends Source<ModelSource> {
     private String getter;
     private String setter;
 
-    public ModelSource(String modelName, String fieldName) {
-        this(modelName, fieldName, null);
+    public ModelSource(TypeUtils typeUtils, String modelName, String fieldName) {
+        this(typeUtils, modelName, fieldName, null);
     }
 
-    public ModelSource(String modelName, String fieldName, TypeMirror typeMirror) {
-        super(typeMirror);
+    public ModelSource(TypeUtils typeUtils, String modelName, String fieldName, TypeMirror typeMirror) {
+        super(typeUtils, typeMirror);
         this.modelName = modelName;
         this.fieldName = fieldName;
     }
@@ -71,9 +71,9 @@ public class ModelSource extends Source<ModelSource> {
     @Override
     protected ModelSource cp(TypeMirror typeMirror) {
         TypeMirror current = getTypeMirror();
-        if(current != null && !TypeUtils.match(current, typeMirror))
+        if(current != null && !typeUtils.match(current, typeMirror))
             throw new IllegalArgumentException(current + " cannot be assigned to " + typeMirror);
-        return new ModelSource(modelName, fieldName, typeMirror);
+        return new ModelSource(typeUtils, modelName, fieldName, typeMirror);
     }
 
     public String getModelName(){

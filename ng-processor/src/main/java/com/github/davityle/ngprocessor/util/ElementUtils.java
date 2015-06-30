@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -40,13 +41,18 @@ import javax.lang.model.util.Elements;
  */
 public class ElementUtils {
 
-    private static Elements elementUtils;
+    private final Elements elementUtils;
+    private final MessageUtils messageUtils;
+    private final TypeUtils typeUtils;
 
-    public static void setElements(Elements elements){
-        elementUtils = elements;
+    @Inject
+    public ElementUtils(Elements elementUtils, MessageUtils messageUtils, TypeUtils typeUtils){
+        this.elementUtils = elementUtils;
+        this.messageUtils = messageUtils;
+        this.typeUtils = typeUtils;
     }
 
-    public static boolean methodsMatch(Element elem, MethodSource source, Map<ModelSource,ModelSource> typedModels){
+    public boolean methodsMatch(Element elem, MethodSource source, Map<ModelSource,ModelSource> typedModels){
         if(elem == null || !(elem instanceof ExecutableElement) || elem.getKind() != ElementKind.METHOD)
             return false;
         if(!elem.getSimpleName().toString().equals(source.getMethodName()))
@@ -68,8 +74,8 @@ public class ElementUtils {
             if(typeMirror != null){
                 VariableElement element = methodParameters.get(i);
                 TypeMirror eleType = element.asType();
-                if (!TypeUtils.matchFirstPrecedence(eleType, typeMirror)) {
-                    MessageUtils.warning(element, "Method element matches scripted method except parameter types do not match. '%s' - '%s'", eleType, typeMirror);
+                if (!typeUtils.matchFirstPrecedence(eleType, typeMirror)) {
+                    messageUtils.warning(element, "Method element matches scripted method except parameter types do not match. '%s' - '%s'", eleType, typeMirror);
                     return false;
                 }
             }
@@ -78,7 +84,7 @@ public class ElementUtils {
         return true;
     }
 
-    public static boolean isSetter(Element elem){
+    public boolean isSetter(Element elem){
         if(elem == null)
             return false;
         String name = elem.getSimpleName().toString();
@@ -90,7 +96,7 @@ public class ElementUtils {
                 && ((ExecutableElement) elem).getParameters().size() == 1;
     }
 
-    public static boolean isGetter(Element elem){
+    public boolean isGetter(Element elem){
         if(elem == null)
             return false;
         String name = elem.getSimpleName().toString();
@@ -103,7 +109,7 @@ public class ElementUtils {
                 && ((ExecutableElement) elem).getParameters().size() == 0;
     }
 
-    public static boolean isGetterForField(Element elem, String field, TypeKind typeKind){
+    public boolean isGetterForField(Element elem, String field, TypeKind typeKind){
         return elem != null && ExecutableElement.class.isInstance(elem)
                 && elem.getKind() == ElementKind.METHOD
                 && elem.getSimpleName().toString().toLowerCase().equals("get" + field.toLowerCase())
@@ -111,7 +117,7 @@ public class ElementUtils {
                 && ((ExecutableElement) elem).getParameters().size() == 0;
     }
 
-    public static TypeMirror getElementType(TypeElement model, String field){
+    public TypeMirror getElementType(TypeElement model, String field){
         TypeMirror typeMirror = null;
         String fieldName = field.toLowerCase();
         for(Element f : model.getEnclosedElements()){
@@ -136,12 +142,12 @@ public class ElementUtils {
         return typeMirror;
     }
 
-    private static void checkMatch(TypeElement model, String field, TypeMirror typeMirror, TypeMirror t){
-        if(!TypeUtils.isSameType(typeMirror, t))
-            MessageUtils.error(model, "Getter and Setter for field '%s' do not match", field);
+    private void checkMatch(TypeElement model, String field, TypeMirror typeMirror, TypeMirror t){
+        if(!typeUtils.isSameType(typeMirror, t))
+            messageUtils.error(model, "Getter and Setter for field '%s' do not match", field);
     }
 
-    public static boolean hasGetterAndSetter(TypeElement model, String field){
+    public boolean hasGetterAndSetter(TypeElement model, String field){
         boolean hasGetter = false, hasSetter = false;
         String fieldName = field.toLowerCase();
         for(Element f : model.getEnclosedElements()){
@@ -159,7 +165,7 @@ public class ElementUtils {
         return hasGetter && hasSetter;
     }
 
-    public static Tuple<String,String> getGetAndSetMethodNames(TypeElement model, String field){
+    public Tuple<String,String> getGetAndSetMethodNames(TypeElement model, String field){
         String get = null, set = null;
         String fieldName = field.toLowerCase();
         for(Element f : model.getEnclosedElements()){
@@ -178,17 +184,17 @@ public class ElementUtils {
         return Tuple.of(get, set);
     }
 
-    public static boolean returnsVoid(ExecutableElement method){
+    public boolean returnsVoid(ExecutableElement method){
         TypeMirror type = method.getReturnType();
         return (type != null && type.getKind() == TypeKind.VOID);
     }
 
-    public static String getClassName(TypeElement type, String packageName) {
+    public String getClassName(TypeElement type, String packageName) {
         int packageLen = packageName.length() + 1;
         return type.getQualifiedName().toString().substring(packageLen).replace('.', '$');
     }
 
-    public static String stripClassName(TypeMirror type) {
+    public String stripClassName(TypeMirror type) {
         String fullName = type.toString();
         int pIndex = fullName.lastIndexOf('.');
         if(pIndex == -1 || pIndex == fullName.length() - 1)
@@ -196,7 +202,7 @@ public class ElementUtils {
         return fullName.substring(pIndex + 1);
     }
 
-    public static boolean hasAnnotationWithName(Element element, String simpleName) {
+    public boolean hasAnnotationWithName(Element element, String simpleName) {
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             String annotationName = mirror.getAnnotationType().asElement().getSimpleName().toString();
             if (simpleName.equals(annotationName)) {
@@ -206,15 +212,15 @@ public class ElementUtils {
         return false;
     }
 
-    public static String getFullName(TypeElement type) {
+    public String getFullName(TypeElement type) {
         return type.getQualifiedName().toString();
     }
 
-    public static String getPackageName(Element type) {
+    public String getPackageName(Element type) {
         return elementUtils.getPackageOf(type).getQualifiedName().toString();
     }
 
-    public static boolean isAccessible(Element element) {
+    public boolean isAccessible(Element element) {
         Set<Modifier> modifiers = element.getModifiers();
         return !(modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED));
     }

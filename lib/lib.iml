@@ -12,9 +12,12 @@
         <option name="SELECTED_TEST_ARTIFACT" value="_unit_test_" />
         <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
         <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
-        <option name="SOURCE_GEN_TASK_NAME" value="generateDebugSources" />
         <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDebugUnitTest" />
         <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileDebugUnitTestSources" />
+        <afterSyncTasks>
+          <task>generateDebugSources</task>
+          <task>mockableAndroidJar</task>
+        </afterSyncTasks>
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
         <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
@@ -24,7 +27,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/intermediates/classes/debug" />
     <output-test url="file://$MODULE_DIR$/build/intermediates/classes/test/debug" />
     <exclude-output />
@@ -108,7 +111,7 @@
     <orderEntry type="library" exported="" scope="TEST" name="asm-util-5.0.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="bcprov-jdk16-1.46" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="robolectric-utils-3.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="robolectric-resources-3.0-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="shadows-core-3.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="robolectric-resources-3.0-SNAPSHOT" level="project" />
   </component>
 </module>

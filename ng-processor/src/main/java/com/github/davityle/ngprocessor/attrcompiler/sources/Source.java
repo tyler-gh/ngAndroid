@@ -27,9 +27,11 @@ import javax.lang.model.type.TypeMirror;
  */
 public abstract class Source <T extends Source> {
 
+    protected final TypeUtils typeUtils;
     private TypeMirror typeMirror;
 
-    protected Source(TypeMirror typeMirror) {
+    protected Source(TypeUtils typeUtils, TypeMirror typeMirror) {
+        this.typeUtils = typeUtils;
         this.typeMirror = typeMirror;
     }
 
@@ -41,7 +43,7 @@ public abstract class Source <T extends Source> {
 
     public T copy(TypeMirror typeMirror) throws IllegalArgumentException{
         TypeMirror current = getTypeMirror();
-        if(current != null && !TypeUtils.match(current, typeMirror))
+        if(current != null && !typeUtils.match(current, typeMirror))
             throw new IllegalArgumentException(current + " cannot be assigned to " + typeMirror);
         return cp(typeMirror);
     }

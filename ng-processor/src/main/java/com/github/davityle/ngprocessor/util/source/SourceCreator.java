@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.processing.Filer;
+import javax.inject.Inject;
 import javax.lang.model.element.Element;
 import javax.tools.JavaFileObject;
 
@@ -38,12 +39,13 @@ import javax.tools.JavaFileObject;
  */
 public class SourceCreator {
 
-    private final Filer filer;
     private final List<NgModelSourceLink> modelSourceLinks;
     private final List<NgScopeSourceLink> scopeSourceLinks;
 
-    public SourceCreator(Filer filer, List<NgModelSourceLink> modelSourceLinks, List<NgScopeSourceLink> scopeSourceLinks) {
-        this.filer = filer;
+    @Inject MessageUtils messageUtils;
+    @Inject Filer filer;
+
+    public SourceCreator(List<NgModelSourceLink> modelSourceLinks, List<NgScopeSourceLink> scopeSourceLinks) {
         this.modelSourceLinks = modelSourceLinks;
         this.scopeSourceLinks = scopeSourceLinks;
     }
@@ -70,7 +72,7 @@ public class SourceCreator {
                 writer.flush();
                 writer.close();
             }catch (IOException e){
-                MessageUtils.error(ms.getElements()[0], e.getMessage());
+                messageUtils.error(ms.getElements()[0], e.getMessage());
             }
         }
 
@@ -83,7 +85,7 @@ public class SourceCreator {
                 writer.close();
             }catch (IOException e){
                 Element[] elements = ns.getElements();
-                MessageUtils.error(elements[elements.length - 1], e.getMessage());
+                messageUtils.error(elements[elements.length - 1], e.getMessage());
             }
         }
     }

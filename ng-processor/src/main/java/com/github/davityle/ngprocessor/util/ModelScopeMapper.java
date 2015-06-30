@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.RoundEnvironment;
+import javax.inject.Inject;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
@@ -37,16 +38,21 @@ public class ModelScopeMapper {
     public static final String MODEL_APPENDAGE = "$$NgModel";
 
     private final Set<? extends TypeElement> annotations;
-    private final RoundEnvironment roundEnv;
-    private final Map<String, List<Element>> scopeMap;
+    private final List<Element> scopes;
     private final Map<String, Element> modelMap;
+
+    private Map<String, List<Element>> scopeMap;
     private boolean mapped;
 
-    public ModelScopeMapper(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv, List<Element> scopes) {
+    @Inject ElementUtils elementUtils;
+    @Inject RoundEnvironment roundEnv;
+    @Inject NgScopeAnnotationUtils ngScopeAnnotationUtils;
+    @Inject MessageUtils messageUtils;
+
+    public ModelScopeMapper(Set<? extends TypeElement> annotations, List<Element> scopes) {
         this.annotations = annotations;
-        this.roundEnv = roundEnv;
-        this.modelMap = new LinkedHashMap<String, Element>();
-        this.scopeMap = NgScopeAnnotationUtils.getScopeMap(scopes);
+        this.modelMap = new LinkedHashMap<>();
+        this.scopes = scopes;
     }
 
     public Map<String, Element> getModels(){
@@ -64,12 +70,14 @@ public class ModelScopeMapper {
     }
 
     private void map(){
+        scopeMap = ngScopeAnnotationUtils.getScopeMap(scopes);
+
         for (TypeElement annotation : annotations) {
             if(NG_MODEL_ANNOTATION.equals(annotation.getQualifiedName().toString())) {
                 Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
                 for (Element element : elements) {
-                    if (!ElementUtils.isAccessible(element)) {
-                        MessageUtils.error(element, "Unable to access field '%s' from scope '%s'. Must have default or public access", element.toString(), element.getEnclosingElement().toString());
+                    if (!elementUtils.isAccessible(element)) {
+                        messageUtils.error(element, "Unable to access field '%s' from scope '%s'. Must have default or public access", element.toString(), element.getEnclosingElement().toString());
                         continue;
                     }
 
@@ -78,13 +86,13 @@ public class ModelScopeMapper {
                     modelMap.put(fieldTypeName, element);
 
                     Element scopeClass = element.getEnclosingElement();
-                    String packageName = ElementUtils.getPackageName((TypeElement) scopeClass);
-                    String className = ElementUtils.getClassName((TypeElement) scopeClass, packageName);
+                    String packageName = elementUtils.getPackageName((TypeElement) scopeClass);
+                    String className = elementUtils.getClassName((TypeElement) scopeClass, packageName);
                     String scopeName = className + NgScopeAnnotationUtils.SCOPE_APPENDAGE;
                     String key = packageName + "." + scopeName;
                     List<Element> els = scopeMap.get(key);
                     if (els == null) {
-                        MessageUtils.error(scopeClass, "Missing NgScope annotation on Scope '%s'.", scopeClass.toString());
+                        messageUtils.error(scopeClass, "Missing NgScope annotation on Scope '%s'.", scopeClass.toString());
                     }else {
                         els.add(element);
                     }
@@ -103,7 +111,7 @@ public class ModelScopeMapper {
             for(Element model : models){
                 String name = model.getSimpleName().toString().toLowerCase();
                 if(modelSet.contains(name)){
-                    MessageUtils.error(model, "Model '%s' has duplicate name. Names are checked by lowercase value.", name);
+                    messageUtils.error(model, "Model '%s' has duplicate name. Names are checked by lowercase value.", name);
                 }else{
                     modelSet.add(name);
                 }

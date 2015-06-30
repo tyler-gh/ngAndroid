@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -67,20 +68,31 @@ public class XmlUtils {
         add("ngOnItemClickListener");
     }});
 
-    public static Document getDocumentFromFile(File file){
+    private final MessageUtils messageUtils;
+    private final LayoutsFinder layoutsFinder;
+    private final AttributeCompiler attributeCompiler;
+
+    @Inject
+    public XmlUtils(MessageUtils messageUtils, LayoutsFinder layoutsFinder, AttributeCompiler attributeCompiler){
+        this.messageUtils = messageUtils;
+        this.layoutsFinder = layoutsFinder;
+        this.attributeCompiler = attributeCompiler;
+    }
+
+    public Document getDocumentFromFile(File file){
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             return db.parse(file);
         } catch (Exception e) {
-            MessageUtils.error(null, e.getMessage());
+            messageUtils.error(null, e.getMessage());
             return null;
         }
     }
 
-    public static Map<File, List<XmlNode>> getFileNodeMap(String dir){
-        List<File> layoutDirs = LayoutsFinder.findLayouts(dir);
-        Map<File, List<XmlNode>> xmlAttrMap = new HashMap<File, List<XmlNode>>();
+    public Map<File, List<XmlNode>> getFileNodeMap(){
+        List<File> layoutDirs = layoutsFinder.findLayouts();
+        Map<File, List<XmlNode>> xmlAttrMap = new HashMap<>();
 
         for(File f : layoutDirs){
             for(File kid : f.listFiles()){
@@ -95,15 +107,15 @@ public class XmlUtils {
                     if(nameSpace != null){
                         String pattern = String.format(NAMESPACE_ATTRIBUTE_REG, nameSpace);
                         Pattern nameSpaceAttributePattern = Pattern.compile(pattern);
-                        List<XmlNode> nodeList = new ArrayList<XmlNode>();
+                        List<XmlNode> nodeList = new ArrayList<>();
                         getNgAttrNodes(doc, nameSpaceAttributePattern, nodeList, kid.getName());
                         for(XmlNode xmlNode : nodeList){
                             for(XmlAttribute xmlAttribute : xmlNode.getAttributes()){
                                 try {
-                                    Source source = new AttributeCompiler(xmlAttribute.getValue()).compile();
+                                    Source source = attributeCompiler.compile(xmlAttribute.getValue());
                                     xmlAttribute.setSource(source);
                                 }catch(RuntimeException e){
-                                    MessageUtils.error(null,
+                                    messageUtils.error(null,
                                             "Layout file '%s' has an invalid attribute '%s' in view '%s' with value '%s' because '%s'",
                                             kid,
                                             xmlAttribute.getName(),
@@ -122,7 +134,7 @@ public class XmlUtils {
         return xmlAttrMap;
     }
 
-    private static void getNgAttrNodes(Node n, Pattern attributePattern, List<XmlNode> ngAttrNodes, String fileName){
+    private void getNgAttrNodes(Node n, Pattern attributePattern, List<XmlNode> ngAttrNodes, String fileName){
         if(n == null || !n.hasChildNodes())
             return;
 
@@ -145,7 +157,7 @@ public class XmlUtils {
                     Matcher matcher = attributePattern.matcher(node.toString());
                     if(matcher.matches()){
                         if(attributeList == null)
-                            attributeList = new ArrayList<XmlAttribute>();
+                            attributeList = new ArrayList<>();
                         String attr = matcher.group(1);
                         if(NG_ATTRS.contains(attr)) {
                             attributeList.add(new XmlAttribute(attr, matcher.group(2)));
@@ -155,7 +167,7 @@ public class XmlUtils {
                 }
                 if(attributeList != null && !attributeList.isEmpty()){
                     if(id == null){
-                        MessageUtils.error(null, "xml attributes '%s' in node '%s' in layout file '%s' need an id", attributeList.toString(), childNode.toString(), fileName);
+                        messageUtils.error(null, "xml attributes '%s' in node '%s' in layout file '%s' need an id", attributeList.toString(), childNode.toString(), fileName);
                     }else {
                         ngAttrNodes.add(new XmlNode(id, attributeList, fileName, childNode.getNodeName()));
                     }
@@ -165,7 +177,7 @@ public class XmlUtils {
         }
     }
 
-    private static String getNameSpace(NodeList nodes){
+    private String getNameSpace(NodeList nodes){
         for(int index = 0; index < nodes.getLength(); index++) {
             NamedNodeMap nodeMap = nodes.item(index).getAttributes();
             if(nodeMap != null){

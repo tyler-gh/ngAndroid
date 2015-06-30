@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.inject.Inject;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
@@ -47,6 +48,9 @@ public class ScopeSourceLinker {
     private final Map<Element, List<XmlNode>> elementNodeMap;
     private final String manifestPackageName;
 
+    @Inject ElementUtils elementUtils;
+    @Inject TypeUtils typeUtils;
+
     public ScopeSourceLinker(List<Element> scopes, Map<String, List<Element>> scopeMap, Map<Element, List<XmlNode>> elementNodeMap, String manifestPackageName) {
         this.scopes = scopes;
         this.scopeMap = scopeMap;
@@ -56,7 +60,7 @@ public class ScopeSourceLinker {
 
     public List<NgScopeSourceLink> getSourceLinks(){
 
-        List<NgScopeSourceLink> scopeSourceLinks = new ArrayList<NgScopeSourceLink>();
+        List<NgScopeSourceLink> scopeSourceLinks = new ArrayList<>();
 
         for(Element scope : scopes){
             scopeSourceLinks.add(getSourceLink(scope));
@@ -68,21 +72,21 @@ public class ScopeSourceLinker {
     private NgScopeSourceLink getSourceLink(Element scopeClass){
 
         TypeElement scopeType = (TypeElement) scopeClass;
-        String packageName = ElementUtils.getPackageName(scopeType);
-        String className = ElementUtils.getClassName(scopeType, packageName);
-        String fullName = ElementUtils.getFullName(scopeType);
+        String packageName = elementUtils.getPackageName(scopeType);
+        String className = elementUtils.getClassName(scopeType, packageName);
+        String fullName = elementUtils.getFullName(scopeType);
         String scopeName = className + NgScopeAnnotationUtils.SCOPE_APPENDAGE;
         String key = packageName + "." + scopeName;
 
         List<Element> elements = scopeMap.get(key);
 
-        List<SourceField> fields = new ArrayList<SourceField>();
+        List<SourceField> fields = new ArrayList<>();
         for(Element element : elements){
             Name fieldName = element.getSimpleName();
             TypeMirror fieldType = element.asType();
-            TypeElement typeElement = TypeUtils.asTypeElement(fieldType);
-            String pack = ElementUtils.getPackageName(typeElement);
-            String modelName = ElementUtils.stripClassName(fieldType);
+            TypeElement typeElement = typeUtils.asTypeElement(fieldType);
+            String pack = elementUtils.getPackageName(typeElement);
+            String modelName = elementUtils.stripClassName(fieldType);
             fields.add(new SourceField(fieldName.toString(), pack + '.' + modelName));
         }
 
@@ -90,7 +94,7 @@ public class ScopeSourceLinker {
         els[elements.size()] = scopeClass;
 
         List<XmlNode> xmlNodes = elementNodeMap.get(scopeClass);
-        Map<String, Set<XmlNode>> layouts = new HashMap<String, Set<XmlNode>>();
+        Map<String, Set<XmlNode>> layouts = new HashMap<>();
 
         if(xmlNodes != null) {
             // This could be done by just mapping elements to the layout instead of linking to the
@@ -99,7 +103,7 @@ public class ScopeSourceLinker {
                 String layoutName = xmlNode.getLayoutName();
                 Set<XmlNode> ids = layouts.get(layoutName);
                 if (ids == null) {
-                    ids = new TreeSet<XmlNode>(TUPLE_COMPARATOR);
+                    ids = new TreeSet<>(TUPLE_COMPARATOR);
                     layouts.put(layoutName, ids);
                 }
                 ids.add(xmlNode);

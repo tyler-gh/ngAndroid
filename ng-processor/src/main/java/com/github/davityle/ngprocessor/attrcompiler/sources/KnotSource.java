@@ -30,8 +30,8 @@ public class KnotSource extends Source<KnotSource> {
 
     private Source source;
 
-    public KnotSource(Source source) {
-        super(TypeUtils.getBooleanType());
+    public KnotSource(TypeUtils typeUtils, Source source) {
+        super(typeUtils, typeUtils.getBooleanType());
         this.source = source;
     }
 
@@ -57,7 +57,7 @@ public class KnotSource extends Source<KnotSource> {
 
     @Override
     protected KnotSource cp(TypeMirror typeMirror) throws IllegalArgumentException {
-        return new KnotSource(source.copy());
+        return new KnotSource(typeUtils, source.copy());
     }
 
     public Source getBooleanSource(){
