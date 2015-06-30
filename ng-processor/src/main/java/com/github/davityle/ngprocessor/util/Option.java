@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.github.davityle.ngprocessor.manifestfinders;
+package com.github.davityle.ngprocessor.util;
 
 /**
  * I'd love to use Guava's Optional, but we're trying to keep the dependency
@@ -54,5 +54,18 @@ public class Option<T> {
 			throw new IllegalStateException("value is absent");
 		}
 		return reference;
+	}
+
+	public <R> R fold(OptionCB<T,R> cb){
+		if(isPresent){
+			return cb.present(reference);
+		} else {
+			return cb.absent();
+		}
+	}
+
+	public interface OptionCB<T,R> {
+		R absent();
+		R present(T t);
 	}
 }

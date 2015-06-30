@@ -22,7 +22,7 @@ import org.w3c.dom.Element;
 
 import java.io.File;
 
-import javax.annotation.processing.ProcessingEnvironment;
+import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -30,19 +30,20 @@ public class AndroidManifestFinder {
 
 	private static final int MAX_PARENTS_FROM_SOURCE_FOLDER = 10;
 
-	private final ProcessingEnvironment processingEnv;
+	private final FileHelper fileHelper;
 	private final OptionsHelper optionsHelper;
 
-	public AndroidManifestFinder(ProcessingEnvironment processingEnv) {
-		this.processingEnv = processingEnv;
-		optionsHelper = new OptionsHelper(processingEnv);
+	@Inject
+	public AndroidManifestFinder(OptionsHelper optionsHelper, FileHelper fileHelper) {
+		this.optionsHelper = optionsHelper;
+		this.fileHelper = fileHelper;
 	}
 
-	public Option<String> extractAndroidManifest() {
-		Option<File> androidManifestFileOption = findManifestFile();
+	public com.github.davityle.ngprocessor.util.Option<String> extractAndroidManifest() {
+		com.github.davityle.ngprocessor.util.Option<File> androidManifestFileOption = findManifestFile();
 
 		if (androidManifestFileOption.isAbsent()) {
-			return Option.absent();
+			return com.github.davityle.ngprocessor.util.Option.absent();
 		}
 
 		File androidManifestFile = androidManifestFileOption.get();
@@ -51,7 +52,7 @@ public class AndroidManifestFinder {
 		return parse(androidManifestFile);
 	}
 
-	private Option<File> findManifestFile() {
+	private com.github.davityle.ngprocessor.util.Option<File> findManifestFile() {
 		String androidManifestFile = optionsHelper.getAndroidManifestFile();
         if (androidManifestFile != null) {
 			return findManifestInSpecifiedPath(androidManifestFile);
@@ -60,12 +61,12 @@ public class AndroidManifestFinder {
 		}
 	}
 
-	private Option<File> findManifestInSpecifiedPath(String androidManifestPath) {
+	private com.github.davityle.ngprocessor.util.Option<File> findManifestInSpecifiedPath(String androidManifestPath) {
 		File androidManifestFile = new File(androidManifestPath);
 		if (!androidManifestFile.exists()) {
-			return Option.absent();
+			return com.github.davityle.ngprocessor.util.Option.absent();
 		}
-		return Option.of(androidManifestFile);
+		return com.github.davityle.ngprocessor.util.Option.of(androidManifestFile);
 	}
 
 	/**
@@ -75,11 +76,11 @@ public class AndroidManifestFinder {
 	 * find the AndroidManifest.xml file. Any better solution will be
 	 * appreciated.
 	 */
-	private Option<File> findManifestInParentsDirectories() {
-		Option<FileHolder> projectRootHolderOption = FileHelper.findRootProjectHolder(processingEnv);
+	private com.github.davityle.ngprocessor.util.Option<File> findManifestInParentsDirectories() {
+		com.github.davityle.ngprocessor.util.Option<FileHolder> projectRootHolderOption = fileHelper.findRootProjectHolder();
 
         if (projectRootHolderOption.isAbsent()) {
-			return Option.absent();
+			return com.github.davityle.ngprocessor.util.Option.absent();
 		}
 
 		FileHolder projectRootHolder = projectRootHolderOption.get();
@@ -103,13 +104,13 @@ public class AndroidManifestFinder {
 		}
 
 		if (!androidManifestFile.exists()) {
-            return Option.absent();
+            return com.github.davityle.ngprocessor.util.Option.absent();
 		}
 
-		return Option.of(androidManifestFile);
+		return com.github.davityle.ngprocessor.util.Option.of(androidManifestFile);
 	}
 
-	private Option<String> parse(File androidManifestFile) {
+	private com.github.davityle.ngprocessor.util.Option<String> parse(File androidManifestFile) {
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
 		Document doc;
@@ -118,12 +119,12 @@ public class AndroidManifestFinder {
 			doc = docBuilder.parse(androidManifestFile);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Option.absent();
+			return com.github.davityle.ngprocessor.util.Option.absent();
 		}
 
 		Element documentElement = doc.getDocumentElement();
 		documentElement.normalize();
 
-		return Option.of(documentElement.getAttribute("package"));
+		return com.github.davityle.ngprocessor.util.Option.of(documentElement.getAttribute("package"));
 	}
 }

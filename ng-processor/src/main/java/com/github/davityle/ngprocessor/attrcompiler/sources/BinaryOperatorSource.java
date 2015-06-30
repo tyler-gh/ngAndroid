@@ -32,15 +32,15 @@ public class BinaryOperatorSource extends Source<BinaryOperatorSource> {
     protected Source rightSide;
     protected final TokenType.BinaryOperator operator;
 
-    private BinaryOperatorSource(Source leftSide, Source rightSide, TokenType.BinaryOperator operator, TypeMirror typeMirror) {
-        super(typeMirror);
+    private BinaryOperatorSource(TypeUtils typeUtils, Source leftSide, Source rightSide, TokenType.BinaryOperator operator, TypeMirror typeMirror) {
+        super(typeUtils, typeMirror);
         this.leftSide = leftSide;
         this.rightSide = rightSide;
         this.operator = operator;
     }
 
-    public static BinaryOperatorSource getOperator(Source leftSide, Source rightSide, TokenType.BinaryOperator operator){
-        return new BinaryOperatorSource(leftSide, rightSide, operator, TypeUtils.getOperatorKind(leftSide, rightSide, operator));
+    public static BinaryOperatorSource getOperator(TypeUtils typeUtils, Source leftSide, Source rightSide, TokenType.BinaryOperator operator){
+        return new BinaryOperatorSource(typeUtils, leftSide, rightSide, operator, typeUtils.getOperatorKind(leftSide, rightSide, operator));
     }
 
     @Override
@@ -67,7 +67,7 @@ public class BinaryOperatorSource extends Source<BinaryOperatorSource> {
 
     @Override
     protected BinaryOperatorSource cp(TypeMirror typeMirror) throws IllegalArgumentException {
-        return new BinaryOperatorSource(leftSide.copy(), rightSide.copy(), operator, typeMirror);
+        return new BinaryOperatorSource(typeUtils, leftSide.copy(), rightSide.copy(), operator, typeMirror);
     }
 
     public Source getRightSide() {

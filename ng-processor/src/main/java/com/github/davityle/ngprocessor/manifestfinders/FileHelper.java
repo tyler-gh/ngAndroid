@@ -22,13 +22,18 @@ import java.net.URISyntaxException;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.inject.Inject;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
 
 public class FileHelper {
 
-	private FileHelper() {
+	private final ProcessingEnvironment processingEnv;
+
+	@Inject
+	public FileHelper(ProcessingEnvironment processingEnv) {
+		this.processingEnv = processingEnv;
 	}
 
 	/**
@@ -38,14 +43,14 @@ public class FileHelper {
 	 * find the AndroidManifest.xml file. Any better solution will be
 	 * appreciated.
 	 */
-	public static Option<FileHolder> findRootProjectHolder(ProcessingEnvironment processingEnv) {
+	public com.github.davityle.ngprocessor.util.Option<FileHolder> findRootProjectHolder() {
 		Filer filer = processingEnv.getFiler();
 
 		FileObject dummySourceFile;
 		try {
 			dummySourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, "com", "dummy" + System.currentTimeMillis());
 		} catch (IOException ignored) {
-			return Option.absent();
+			return com.github.davityle.ngprocessor.util.Option.absent();
 		}
 		String dummySourceFilePath = dummySourceFile.toUri().toString();
 
@@ -61,16 +66,16 @@ public class FileHelper {
 		try {
 			cleanURI = new URI(dummySourceFilePath);
 		} catch (URISyntaxException e) {
-			return Option.absent();
+			return com.github.davityle.ngprocessor.util.Option.absent();
 		}
 		try {
 			File dummyFile = new File(cleanURI);
 			File sourcesGenerationFolder = dummyFile.getParentFile();
 			File projectRoot = sourcesGenerationFolder.getParentFile();
 
-			return Option.of(new FileHolder(dummySourceFilePath, sourcesGenerationFolder, projectRoot));
+			return com.github.davityle.ngprocessor.util.Option.of(new FileHolder(dummySourceFilePath, sourcesGenerationFolder, projectRoot));
 		}catch(IllegalArgumentException ex){
-			return Option.absent();
+			return com.github.davityle.ngprocessor.util.Option.absent();
 		}
 	}
 

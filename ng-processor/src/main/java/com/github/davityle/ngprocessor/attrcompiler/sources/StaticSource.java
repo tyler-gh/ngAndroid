@@ -17,6 +17,8 @@
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
 
+import com.github.davityle.ngprocessor.util.TypeUtils;
+
 import java.util.List;
 
 import javax.lang.model.type.TypeMirror;
@@ -27,8 +29,8 @@ import javax.lang.model.type.TypeMirror;
 public class StaticSource extends Source<StaticSource> {
     private final String source;
 
-    public StaticSource(String source, TypeMirror typeMirror) {
-        super(typeMirror);
+    public StaticSource(TypeUtils typeUtils, String source, TypeMirror typeMirror) {
+        super(typeUtils, typeMirror);
         this.source = source;
     }
 
@@ -47,6 +49,6 @@ public class StaticSource extends Source<StaticSource> {
 
     @Override
     protected StaticSource cp(TypeMirror typeMirror) throws IllegalArgumentException {
-        return new StaticSource(source, typeMirror);
+        return new StaticSource(typeUtils, source, typeMirror);
     }
 }

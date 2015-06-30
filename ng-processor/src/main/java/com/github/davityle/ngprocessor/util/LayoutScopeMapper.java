@@ -30,20 +30,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
-/**
- * Created by tyler on 4/7/15.
- */
 public class LayoutScopeMapper {
 
     private final Set<Map.Entry<File, List<XmlNode>>> xmlLayouts;
-    private final Map<Element, List<XmlNode>> elementNodeMap = new HashMap<Element, List<XmlNode>>();
+    private final Map<Element, List<XmlNode>> elementNodeMap = new HashMap<>();
     private final List<Element> scopes;
     private boolean isMapped;
+
+    @Inject ElementUtils elementUtils;
+    @Inject MessageUtils messageUtils;
+    @Inject TypeUtils typeUtils;
 
     public LayoutScopeMapper(List<Element> scopes, Map<File, List<XmlNode>> fileNodeMap){
         this.scopes = scopes;
@@ -59,12 +61,12 @@ public class LayoutScopeMapper {
     }
 
     private void linkLayouts(){
-        final Map<XmlNode, Boolean> viewScopeMap = new HashMap<XmlNode, Boolean>();
+        final Map<XmlNode, Boolean> viewScopeMap = new HashMap<>();
 
         for (Map.Entry<File, List<XmlNode>> layout : xmlLayouts) {
             List<XmlNode> views = layout.getValue();
             for (XmlNode view : views) {
-                Map<Element, List<TypedXmlAttribute>> didMatch = new HashMap<Element, List<TypedXmlAttribute>>();
+                Map<Element, List<TypedXmlAttribute>> didMatch = new HashMap<>();
 
                 for (Element scope : scopes) {
                     Tuple<TypedXmlNode, List<TypedXmlAttribute>> node = scopeMatchesXmlView(scope, view);
@@ -95,7 +97,7 @@ public class LayoutScopeMapper {
                     }
                     matchingStr.append("Make sure that all of method parameter and operator types match.");
 
-                    MessageUtils.error(null,
+                    messageUtils.error(null,
                             "Xml view '%s' in layout '%s' did not match any scopes. %s",
                             view.getId(),
                             view.getLayoutName(),
@@ -109,7 +111,7 @@ public class LayoutScopeMapper {
     private void put(XmlNode view, Element element){
             List<XmlNode> nodes =  elementNodeMap.get(element);
             if(nodes == null){
-                nodes = new ArrayList<XmlNode>();
+                nodes = new ArrayList<>();
                 elementNodeMap.put(element, nodes);
             }
             nodes.add(view);
@@ -117,7 +119,7 @@ public class LayoutScopeMapper {
 
     private Tuple<TypedXmlNode, List<TypedXmlAttribute>> scopeMatchesXmlView(Element scope, XmlNode view){
         boolean match = true;
-        List<TypedXmlAttribute> typedAttributes = new ArrayList<TypedXmlAttribute>();
+        List<TypedXmlAttribute> typedAttributes = new ArrayList<>();
         for (XmlAttribute attribute : view.getAttributes()) {
 
             Map<ModelSource, ModelSource> typedModels = mapScopeToModels(scope, attribute.getModelSource());
@@ -141,9 +143,9 @@ public class LayoutScopeMapper {
         for (MethodSource methodSource : methodSources) {
             boolean found = false;
             for (Element child : scope.getEnclosedElements()) {
-                if(ElementUtils.methodsMatch(child, methodSource, typedModels)){
-                    if(!ElementUtils.isAccessible(child)){
-                        MessageUtils.error(child, "Method '%s' matches source '%s' but is not accessible.", child, methodSource);
+                if(elementUtils.methodsMatch(child, methodSource, typedModels)){
+                    if(!elementUtils.isAccessible(child)){
+                        messageUtils.error(child, "Method '%s' matches source '%s' but is not accessible.", child, methodSource);
                     }
                     MethodSource copy = methodSource.copy(((ExecutableElement) child).getReturnType());
                     methods.put(copy, copy);
@@ -167,17 +169,17 @@ public class LayoutScopeMapper {
      * @return
      */
     private Map<ModelSource, ModelSource> mapScopeToModels(Element scope, List<ModelSource> modelSources){
-        Map<ModelSource, ModelSource> mappedSources = new HashMap<ModelSource, ModelSource>();
+        Map<ModelSource, ModelSource> mappedSources = new HashMap<>();
         for (ModelSource modelSource : modelSources) {
             boolean found = false;
             for (Element child : scope.getEnclosedElements()) {
                 if (child.getSimpleName().toString().equals(modelSource.getModelName())) {
                     TypeMirror childType = child.asType();
-                    TypeElement typeElement = TypeUtils.asTypeElement(childType);
+                    TypeElement typeElement = typeUtils.asTypeElement(childType);
                     String fieldName = modelSource.getFieldName();
-                    Tuple<String, String> methods = ElementUtils.getGetAndSetMethodNames(typeElement, fieldName);
+                    Tuple<String, String> methods = elementUtils.getGetAndSetMethodNames(typeElement, fieldName);
                     if(methods.getFirst() != null && methods.getSecond() != null) {
-                        ModelSource copy = modelSource.copy(ElementUtils.getElementType(typeElement, fieldName));
+                        ModelSource copy = modelSource.copy(elementUtils.getElementType(typeElement, fieldName));
                         copy.setGetter(methods.getFirst());
                         copy.setSetter(methods.getSecond());
                         mappedSources.put(copy, copy);

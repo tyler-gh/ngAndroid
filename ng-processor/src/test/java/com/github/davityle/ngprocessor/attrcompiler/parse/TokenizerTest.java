@@ -49,7 +49,6 @@ public class TokenizerTest {
 
         tokenizer = new Tokenizer("234l");
         tokenqueue = tokenizer.getTokens();
-        System.out.println(tokenqueue);
         assertEquals(2, tokenqueue.size());
 
         token = tokenqueue.poll();
@@ -59,7 +58,6 @@ public class TokenizerTest {
 
         tokenizer = new Tokenizer("234L");
         tokenqueue = tokenizer.getTokens();
-        System.out.println(tokenqueue);
         assertEquals(2, tokenqueue.size());
 
         token = tokenqueue.poll();
@@ -68,16 +66,14 @@ public class TokenizerTest {
 
         tokenizer = new Tokenizer("234f");
         tokenqueue = tokenizer.getTokens();
-        System.out.println(tokenqueue);
+        
         assertEquals(2, tokenqueue.size());
-
         token = tokenqueue.poll();
         assertEquals(TokenType.FLOAT_CONSTANT, token.getTokenType());
         assertEquals("234f", token.getScript());
 
         tokenizer = new Tokenizer("234D");
         tokenqueue = tokenizer.getTokens();
-        System.out.println(tokenqueue);
         assertEquals(2, tokenqueue.size());
 
         token = tokenqueue.poll();
@@ -86,7 +82,6 @@ public class TokenizerTest {
 
         tokenizer = new Tokenizer("234.0d");
         tokenqueue = tokenizer.getTokens();
-        System.out.println(tokenqueue);
         assertEquals(2, tokenqueue.size());
 
         token = tokenqueue.poll();
@@ -95,7 +90,6 @@ public class TokenizerTest {
 
         tokenizer = new Tokenizer("234.0f");
         tokenqueue = tokenizer.getTokens();
-        System.out.println(tokenqueue);
         assertEquals(2, tokenqueue.size());
 
         token = tokenqueue.poll();
@@ -281,7 +275,6 @@ public class TokenizerTest {
 
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == TokenType.TERNARY_QUESTION_MARK);
-        System.out.println(token.getScript());
         assertTrue(token.getScript().equals("?"));
 
         token = tokenqueue.poll();
@@ -408,7 +401,6 @@ public class TokenizerTest {
         assertEquals(2, tokenqueue.size());
         token = tokenqueue.poll();
         assertTrue(token.getTokenType() == TokenType.STRING);
-        System.out.println(token.getScript());
         assertTrue(token.getScript().equals("'this is a test string with \"quotes\" in it'"));
 
         tokenizer = new Tokenizer("model}thing");

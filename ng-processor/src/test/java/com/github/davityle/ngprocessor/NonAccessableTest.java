@@ -1,5 +1,6 @@
 package com.github.davityle.ngprocessor;
 
+import com.github.davityle.ngprocessor.util.Option;
 import com.google.testing.compile.JavaFileObjects;
 
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class NonAccessableTest {
 
         ASSERT.about(javaSource())
                 .that(JavaFileObjects.forSourceString("com.yella.PrivateScope", content))
-                .processedWith(Collections.singletonList(new NgProcessor("ng-processor/src/test/resources/emptylayout")))
+                .processedWith(Collections.singletonList(new NgProcessor(Option.of("ng-processor/src/test/resources/emptylayout"))))
                 .compilesWithoutError()
                 .and()
                 .generatesFileNamed(SOURCE_OUTPUT, "com.yella", "PrivateScope$$NgScope.java");
@@ -54,7 +55,7 @@ public class NonAccessableTest {
 
         ASSERT.about(javaSource())
                 .that(fileObject)
-                .processedWith(Collections.singletonList(new NgProcessor("ng-processor/src/test/resources/test_private_method")))
+                .processedWith(Collections.singletonList(new NgProcessor(Option.of("ng-processor/src/test/resources/test_private_method"))))
                 .failsToCompile()
                 .withErrorContaining("is not accessible")
                 .in(fileObject)
@@ -78,7 +79,7 @@ public class NonAccessableTest {
 
         ASSERT.about(javaSource())
                 .that(fileObject)
-                .processedWith(Collections.singletonList(new NgProcessor("ng-processor/src/test/resources/emptylayout")))
+                .processedWith(Collections.singletonList(new NgProcessor(Option.of("ng-processor/src/test/resources/emptylayout"))))
                 .failsToCompile()
                 .withErrorContaining("Unable to access field")
                 .in(fileObject)
@@ -108,7 +109,7 @@ public class NonAccessableTest {
 
         ASSERT.about(javaSource())
                 .that(fileObject)
-                .processedWith(Collections.singletonList(new NgProcessor("ng-processor/src/test/resources/emptylayout")))
+                .processedWith(Collections.singletonList(new NgProcessor(Option.of("ng-processor/src/test/resources/emptylayout"))))
                 .failsToCompile()
                 .withErrorContaining("Unable to access field")
                 .in(fileObject)
@@ -138,7 +139,7 @@ public class NonAccessableTest {
 
         ASSERT.about(javaSource())
                 .that(fileObject)
-                .processedWith(Collections.singletonList(new NgProcessor("ng-processor/src/test/resources/emptylayout")))
+                .processedWith(Collections.singletonList(new NgProcessor(Option.of("ng-processor/src/test/resources/emptylayout"))))
                 .failsToCompile()
                 .withErrorContaining("Unable to access field")
                 .in(fileObject)

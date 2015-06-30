@@ -18,6 +18,7 @@ package com.github.davityle.ngprocessor.manifestfinders;
 import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.inject.Inject;
 
 public class OptionsHelper {
 
@@ -43,6 +44,7 @@ public class OptionsHelper {
 
 	private final Map<String, String> options;
 
+	@Inject
 	public OptionsHelper(ProcessingEnvironment processingEnvironment) {
 		options = processingEnvironment.getOptions();
 	}

@@ -23,54 +23,70 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Created by tyler on 3/30/15.
  */
 public class LayoutsFinder {
 
-    public static  List<File> findLayouts(String dir){
+    private final MessageUtils messageUtils;
+    private final DefaultLayoutDirProvider defaultLayoutDirProvider;
 
-        if(dir != null)
-            return getFileFromPath(dir);
-
-        String path = System.getProperty("LAYOUT_PATH", null);
-
-        if(path != null){
-            return getFileFromPath(path);
-        }
-
-        URL url = Thread.currentThread().getContextClassLoader().getResource("layout/");
-        if(url != null) {
-            try {
-                File layoutDir = new File(url.toURI());
-                if(layoutDir.exists() && layoutDir.isDirectory())
-                    return Collections.singletonList(layoutDir);
-            } catch (URISyntaxException e) {
-                MessageUtils.note(null, e.getMessage());
-            }
-        }
-
-        File root = new File(".");
-        List<File> files = new ArrayList<File>();
-        findLayouts(root, files);
-        return files;
+    @Inject
+    public LayoutsFinder(MessageUtils messageUtils, DefaultLayoutDirProvider defaultLayoutDirProvider){
+        this.messageUtils = messageUtils;
+        this.defaultLayoutDirProvider = defaultLayoutDirProvider;
     }
 
-    private static List<File> getFileFromPath(String path){
+    public List<File> findLayouts(){
+        return defaultLayoutDirProvider.getDefaultLayoutDir().fold(new Option.OptionCB<String, List<File>>() {
+            @Override
+            public List<File> absent() {
+                String path = System.getProperty("LAYOUT_PATH", null);
+
+                if(path != null){
+                    return getFileFromPath(path);
+                }
+
+                URL url = Thread.currentThread().getContextClassLoader().getResource("layout/");
+                if(url != null) {
+                    try {
+                        File layoutDir = new File(url.toURI());
+                        if(layoutDir.exists() && layoutDir.isDirectory())
+                            return Collections.singletonList(layoutDir);
+                    } catch (URISyntaxException e) {
+                        messageUtils.note(null, e.getMessage());
+                    }
+                }
+
+                File root = new File(".");
+                List<File> files = new ArrayList<>();
+                findLayouts(root, files);
+                return files;
+            }
+
+            @Override
+            public List<File> present(String s) {
+                return getFileFromPath(s);
+            }
+        });
+    }
+
+    private List<File> getFileFromPath(String path){
         File file = new File(path);
         if(!file.exists()){
-            MessageUtils.error(null, "The layout file path '%s' does not exist", path);
-            return new ArrayList<File>();
+            messageUtils.error(null, "The layout file path '%s' does not exist", path);
+            return new ArrayList<>();
         }
         return Collections.singletonList(file);
     }
 
-    private static void findLayouts(File f, List<File> files){
+    private void findLayouts(File f, List<File> files){
         File[] kids = f.listFiles();
         if(kids != null) {
             for (File file : kids) {
                 String name = file.getName();
-                System.out.println(name);
                 if (file.isDirectory() && !name.equals("compile") && !name.equals("bin")) {
                     if (file.getName().equals("layout")) {
                         files.add(file);

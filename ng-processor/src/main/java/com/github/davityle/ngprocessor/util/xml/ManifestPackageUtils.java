@@ -17,7 +17,7 @@
 package com.github.davityle.ngprocessor.util.xml;
 
 import com.github.davityle.ngprocessor.manifestfinders.AndroidManifestFinder;
-import com.github.davityle.ngprocessor.manifestfinders.Option;
+import com.github.davityle.ngprocessor.util.Option;
 import com.github.davityle.ngprocessor.util.ManifestFinder;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 
@@ -30,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.inject.Inject;
 
 /**
  * Created by tyler on 4/7/15.
@@ -38,9 +39,21 @@ public class ManifestPackageUtils {
 
     private static final Pattern PACKAGE_PATTERN = Pattern.compile(".*package=\"(.*)\"");
 
-    public static String getPackageName(ProcessingEnvironment processingEnvironment){
+    private final ProcessingEnvironment processingEnvironment;
+    private final MessageUtils messageUtils;
+    private final XmlUtils xmlUtils;
+    private final AndroidManifestFinder finder;
 
-        AndroidManifestFinder finder = new AndroidManifestFinder(processingEnvironment);
+    @Inject
+    public ManifestPackageUtils(ProcessingEnvironment processingEnvironment, MessageUtils messageUtils, XmlUtils xmlUtils, AndroidManifestFinder finder){
+        this.processingEnvironment = processingEnvironment;
+        this.messageUtils = messageUtils;
+        this.xmlUtils = xmlUtils;
+        this.finder = finder;
+    }
+
+    public String getPackageName(){
+
         Option<String> option = finder.extractAndroidManifest();
         if(option.isPresent()) {
             String packageName = option.get();
@@ -51,11 +64,11 @@ public class ManifestPackageUtils {
         File manifest = ManifestFinder.findManifest();
 
         if(manifest == null) {
-            MessageUtils.error(null, "Unable to find android manifest.");
+            messageUtils.error(null, "Unable to find android manifest.");
             return null;
         }
 
-        Document doc = XmlUtils.getDocumentFromFile(manifest);
+        Document doc = xmlUtils.getDocumentFromFile(manifest);
         if(doc == null)
             return null;
 

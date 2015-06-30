@@ -30,8 +30,8 @@ public class TernarySource extends Source<TernarySource> {
     private Source booleanSource;
     private Source valTrue, valFalse;
 
-    public TernarySource(Source booleanSource, Source valTrue, Source valFalse) {
-        super(TypeUtils.getOperatorKind(valTrue, valFalse));
+    public TernarySource(TypeUtils typeUtils, Source booleanSource, Source valTrue, Source valFalse) {
+        super(typeUtils, typeUtils.getOperatorKind(valTrue, valFalse));
         this.booleanSource = booleanSource;
         this.valTrue = valTrue;
         this.valFalse = valFalse;
@@ -63,7 +63,7 @@ public class TernarySource extends Source<TernarySource> {
 
     @Override
     protected TernarySource cp(TypeMirror typeMirror) throws IllegalArgumentException {
-        return new TernarySource(booleanSource, valTrue, valFalse);
+        return new TernarySource(typeUtils, booleanSource, valTrue, valFalse);
     }
 
     public Source getBooleanSource() {

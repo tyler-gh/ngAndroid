@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -40,30 +41,34 @@ public class ModelSourceLinker {
 
     private final Map<String, Element> modelBuilderMap;
 
+    @Inject ElementUtils elementUtils;
+    @Inject MessageUtils messageUtils;
+    @Inject TypeUtils typeUtils;
+
     public ModelSourceLinker(Map<String, Element> modelBuilderMap) {
         this.modelBuilderMap = modelBuilderMap;
     }
 
     public List<NgModelSourceLink> getSourceLinks(){
         Set<Map.Entry<String, Element>> models = modelBuilderMap.entrySet();
-        List<NgModelSourceLink> modelSourceLinks = new ArrayList<NgModelSourceLink>();
-        for(Map.Entry<String, Element> model : models){
+        List<NgModelSourceLink> modelSourceLinks = new ArrayList<>();
+        for(Map.Entry<String, Element> model : models) {
             Element element = model.getValue();
-            modelSourceLinks.add(ModelSourceLinker.getSourceLink(element));
+            modelSourceLinks.add(getSourceLink(element));
         }
         return modelSourceLinks;
     }
 
-    private static NgModelSourceLink getSourceLink(Element element) {
+    private NgModelSourceLink getSourceLink(Element element) {
 
         TypeMirror fieldType = element.asType();
-        TypeElement typeElement = TypeUtils.asTypeElement(fieldType);
-        String packageName = ElementUtils.getPackageName(typeElement);
-        String fullName = ElementUtils.getFullName(typeElement);
+        TypeElement typeElement = typeUtils.asTypeElement(fieldType);
+        String packageName = elementUtils.getPackageName(typeElement);
+        String fullName = elementUtils.getFullName(typeElement);
 
         List<SourceField> fields = new ArrayList<SourceField>();
 
-        String modelName = ElementUtils.stripClassName(fieldType);
+        String modelName = elementUtils.stripClassName(fieldType);
 
         List<? extends Element> enclosedElements = typeElement.getEnclosedElements();
         boolean isInterface = typeElement.getKind().isInterface();
@@ -72,21 +77,21 @@ public class ModelSourceLinker {
 
         for(int index = 0; index < enclosedElements.size(); index++){
             Element enclosedElement = enclosedElements.get(index);
-            if(ElementUtils.isSetter(enclosedElement)) {
+            if(elementUtils.isSetter(enclosedElement)) {
                 ExecutableElement setter = (ExecutableElement) enclosedElement;
-                if (!ElementUtils.returnsVoid(setter)) {
-                    MessageUtils.error(element, "Setter '%s' must not return a value", element.toString());
+                if (!elementUtils.returnsVoid(setter)) {
+                    messageUtils.error(element, "Setter '%s' must not return a value", element.toString());
                     continue;
                 }
                 Set<Modifier> modifiers = setter.getModifiers();
                 if(modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)){
-                    MessageUtils.error(setter, "Unable to access field '%s' from scope '%s'. Must have default or public access", element.toString(), element.getEnclosingElement().toString());
+                    messageUtils.error(setter, "Unable to access field '%s' from scope '%s'. Must have default or public access", element.toString(), element.getEnclosingElement().toString());
                     continue;
                 }
                 String fName = setter.getSimpleName().toString().substring(3).toLowerCase();
 
                 if(duplicateCheck.contains(fName)){
-                    MessageUtils.error(setter, "Field '%s' in model '%s' is a duplicate.", setter.getSimpleName().toString().substring(3), fullName);
+                    messageUtils.error(setter, "Field '%s' in model '%s' is a duplicate.", setter.getSimpleName().toString().substring(3), fullName);
                     continue;
                 }
                 duplicateCheck.add(fName);
@@ -98,14 +103,14 @@ public class ModelSourceLinker {
                 // TODO O(n^2) is the best
                 boolean getterFound = false;
                 for(Element possGetter : enclosedElements) {
-                    if(ElementUtils.isGetterForField(possGetter, fName, typeMirror.getKind())){
+                    if(elementUtils.isGetterForField(possGetter, fName, typeMirror.getKind())){
                         sourceField.setGetter(possGetter.getSimpleName().toString());
                         getterFound = true;
                         break;
                     }
                 }
                 if(!getterFound){
-                    MessageUtils.error(setter, "Field '%s' is missing a corresponding getter", fName);
+                    messageUtils.error(setter, "Field '%s' is missing a corresponding getter", fName);
                 }
                 fields.add(sourceField);
             }
