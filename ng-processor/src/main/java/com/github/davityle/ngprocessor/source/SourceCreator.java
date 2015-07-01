@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.util.source;
+package com.github.davityle.ngprocessor.source;
 
-import com.github.davityle.ngprocessor.sourcelinks.NgModelSourceLink;
-import com.github.davityle.ngprocessor.sourcelinks.NgScopeSourceLink;
+import com.github.davityle.ngprocessor.source.links.NgModelSourceLink;
+import com.github.davityle.ngprocessor.source.links.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 
 import org.apache.velocity.Template;

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.util.xml;
+package com.github.davityle.ngprocessor.xml;
 
 import java.util.List;
 

@@ -14,14 +14,18 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.util;
+package com.github.davityle.ngprocessor.map;
 
 import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
-import com.github.davityle.ngprocessor.util.xml.TypedXmlAttribute;
-import com.github.davityle.ngprocessor.util.xml.TypedXmlNode;
-import com.github.davityle.ngprocessor.util.xml.XmlAttribute;
-import com.github.davityle.ngprocessor.util.xml.XmlNode;
+import com.github.davityle.ngprocessor.util.ElementUtils;
+import com.github.davityle.ngprocessor.util.MessageUtils;
+import com.github.davityle.ngprocessor.util.Tuple;
+import com.github.davityle.ngprocessor.util.TypeUtils;
+import com.github.davityle.ngprocessor.xml.TypedXmlAttribute;
+import com.github.davityle.ngprocessor.xml.TypedXmlNode;
+import com.github.davityle.ngprocessor.xml.XmlAttribute;
+import com.github.davityle.ngprocessor.xml.XmlNode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,9 +47,12 @@ public class LayoutScopeMapper {
     private final List<Element> scopes;
     private boolean isMapped;
 
-    @Inject ElementUtils elementUtils;
-    @Inject MessageUtils messageUtils;
-    @Inject TypeUtils typeUtils;
+    @Inject
+    ElementUtils elementUtils;
+    @Inject
+    MessageUtils messageUtils;
+    @Inject
+    TypeUtils typeUtils;
 
     public LayoutScopeMapper(List<Element> scopes, Map<File, List<XmlNode>> fileNodeMap){
         this.scopes = scopes;

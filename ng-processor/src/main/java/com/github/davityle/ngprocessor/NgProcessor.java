@@ -16,19 +16,22 @@
 
 package com.github.davityle.ngprocessor;
 
-import com.github.davityle.ngprocessor.sourcelinks.NgModelSourceLink;
-import com.github.davityle.ngprocessor.sourcelinks.NgScopeSourceLink;
-import com.github.davityle.ngprocessor.util.DefaultLayoutDirProvider;
-import com.github.davityle.ngprocessor.util.LayoutScopeMapper;
+import com.github.davityle.ngprocessor.deps.DaggerDependencyComponent;
+import com.github.davityle.ngprocessor.deps.DependencyComponent;
+import com.github.davityle.ngprocessor.deps.LayoutModule;
+import com.github.davityle.ngprocessor.finders.DefaultLayoutDirProvider;
+import com.github.davityle.ngprocessor.map.LayoutScopeMapper;
+import com.github.davityle.ngprocessor.map.ModelScopeMapper;
+import com.github.davityle.ngprocessor.source.SourceCreator;
+import com.github.davityle.ngprocessor.source.linkers.ModelSourceLinker;
+import com.github.davityle.ngprocessor.source.linkers.ScopeSourceLinker;
+import com.github.davityle.ngprocessor.source.links.NgModelSourceLink;
+import com.github.davityle.ngprocessor.source.links.NgScopeSourceLink;
+import com.github.davityle.ngprocessor.util.ManifestPackageUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
-import com.github.davityle.ngprocessor.util.ModelScopeMapper;
 import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 import com.github.davityle.ngprocessor.util.Option;
-import com.github.davityle.ngprocessor.util.source.ModelSourceLinker;
-import com.github.davityle.ngprocessor.util.source.ScopeSourceLinker;
-import com.github.davityle.ngprocessor.util.source.SourceCreator;
-import com.github.davityle.ngprocessor.util.xml.ManifestPackageUtils;
-import com.github.davityle.ngprocessor.util.xml.XmlNode;
+import com.github.davityle.ngprocessor.xml.XmlNode;
 
 import java.io.File;
 import java.util.List;
@@ -55,7 +58,7 @@ import dagger.Provides;
 })
 public class NgProcessor extends AbstractProcessor {
 
-    private final LayoutModule layoutModule;
+    private final com.github.davityle.ngprocessor.deps.LayoutModule layoutModule;
     private ProcessingEnvironment env;
 
     public NgProcessor(){
@@ -63,7 +66,7 @@ public class NgProcessor extends AbstractProcessor {
     }
 
     public NgProcessor(final Option<String> option){
-        this(new LayoutModule(new DefaultLayoutDirProvider() {
+        this(new com.github.davityle.ngprocessor.deps.LayoutModule(new DefaultLayoutDirProvider() {
             @Override
             public Option<String> getDefaultLayoutDir() {
                 return option;

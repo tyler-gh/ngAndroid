@@ -1,4 +1,4 @@
-package com.github.davityle.ngprocessor.util.xml;
+package com.github.davityle.ngprocessor.xml;
 
 import com.github.davityle.ngprocessor.attrcompiler.sources.BinaryOperatorSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.KnotSource;

@@ -14,13 +14,13 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.util.source;
+package com.github.davityle.ngprocessor.source.linkers;
 
-import com.github.davityle.ngprocessor.sourcelinks.NgScopeSourceLink;
+import com.github.davityle.ngprocessor.source.links.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 import com.github.davityle.ngprocessor.util.TypeUtils;
-import com.github.davityle.ngprocessor.util.xml.XmlNode;
+import com.github.davityle.ngprocessor.xml.XmlNode;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -80,14 +80,14 @@ public class ScopeSourceLinker {
 
         List<Element> elements = scopeMap.get(key);
 
-        List<SourceField> fields = new ArrayList<>();
+        List<com.github.davityle.ngprocessor.source.SourceField> fields = new ArrayList<>();
         for(Element element : elements){
             Name fieldName = element.getSimpleName();
             TypeMirror fieldType = element.asType();
             TypeElement typeElement = typeUtils.asTypeElement(fieldType);
             String pack = elementUtils.getPackageName(typeElement);
             String modelName = elementUtils.stripClassName(fieldType);
-            fields.add(new SourceField(fieldName.toString(), pack + '.' + modelName));
+            fields.add(new com.github.davityle.ngprocessor.source.SourceField(fieldName.toString(), pack + '.' + modelName));
         }
 
         Element[] els = elements.toArray(new Element[elements.size() + 1]);

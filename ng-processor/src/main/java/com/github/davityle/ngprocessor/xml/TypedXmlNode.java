@@ -1,10 +1,6 @@
-package com.github.davityle.ngprocessor.util.xml;
-
-import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
+package com.github.davityle.ngprocessor.xml;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by tyler on 4/22/15.

@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.util.source;
+package com.github.davityle.ngprocessor.source.linkers;
 
-import com.github.davityle.ngprocessor.sourcelinks.NgModelSourceLink;
+import com.github.davityle.ngprocessor.source.links.NgModelSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.TypeUtils;
@@ -66,7 +66,7 @@ public class ModelSourceLinker {
         String packageName = elementUtils.getPackageName(typeElement);
         String fullName = elementUtils.getFullName(typeElement);
 
-        List<SourceField> fields = new ArrayList<SourceField>();
+        List<com.github.davityle.ngprocessor.source.SourceField> fields = new ArrayList<com.github.davityle.ngprocessor.source.SourceField>();
 
         String modelName = elementUtils.stripClassName(fieldType);
 
@@ -98,7 +98,7 @@ public class ModelSourceLinker {
 
                 TypeMirror typeMirror = setter.getParameters().get(0).asType();
                 String type = typeMirror.toString();
-                SourceField sourceField = new SourceField(fName, type);
+                com.github.davityle.ngprocessor.source.SourceField sourceField = new com.github.davityle.ngprocessor.source.SourceField(fName, type);
                 sourceField.setSetter(setter.getSimpleName().toString());
                 // TODO O(n^2) is the best
                 boolean getterFound = false;

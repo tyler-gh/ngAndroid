@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.util;
+package com.github.davityle.ngprocessor.finders;
 
 import java.io.File;
 

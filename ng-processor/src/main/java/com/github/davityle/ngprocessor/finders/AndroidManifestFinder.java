@@ -13,9 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.github.davityle.ngprocessor.manifestfinders;
-
-import com.github.davityle.ngprocessor.manifestfinders.FileHelper.FileHolder;
+package com.github.davityle.ngprocessor.finders;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -77,13 +75,13 @@ public class AndroidManifestFinder {
 	 * appreciated.
 	 */
 	private com.github.davityle.ngprocessor.util.Option<File> findManifestInParentsDirectories() {
-		com.github.davityle.ngprocessor.util.Option<FileHolder> projectRootHolderOption = fileHelper.findRootProjectHolder();
+		com.github.davityle.ngprocessor.util.Option<FileHelper.FileHolder> projectRootHolderOption = fileHelper.findRootProjectHolder();
 
         if (projectRootHolderOption.isAbsent()) {
 			return com.github.davityle.ngprocessor.util.Option.absent();
 		}
 
-		FileHolder projectRootHolder = projectRootHolderOption.get();
+		FileHelper.FileHolder projectRootHolder = projectRootHolderOption.get();
 		File projectRoot = projectRootHolder.projectRoot;
 
 		File androidManifestFile = new File(projectRoot, "AndroidManifest.xml");

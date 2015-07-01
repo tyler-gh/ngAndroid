@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.sourcelinks;
+package com.github.davityle.ngprocessor.source.links;
 
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
-import com.github.davityle.ngprocessor.util.source.SourceField;
-import com.github.davityle.ngprocessor.util.xml.XmlNode;
+import com.github.davityle.ngprocessor.source.SourceField;
+import com.github.davityle.ngprocessor.xml.XmlNode;
 
 import org.apache.velocity.VelocityContext;
 

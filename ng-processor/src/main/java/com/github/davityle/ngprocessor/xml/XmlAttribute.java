@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.util.xml;
+package com.github.davityle.ngprocessor.xml;
 
 import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;

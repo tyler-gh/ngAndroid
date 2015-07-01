@@ -17,21 +17,34 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'idea'
 
 allprojects {
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
 }
 
+configurations{
+    provided
+}
+
 dependencies {
     compile 'org.apache.velocity:velocity:1.7'
     compile 'com.google.dagger:dagger:2.0'
-    compile 'com.google.dagger:dagger-compiler:2.0'
+    provided 'com.google.dagger:dagger-compiler:2.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'com.google.testing.compile:compile-testing:0.7'
     testCompile 'com.google.android:android:4.1.1.4'
     testCompile 'org.mockito:mockito-core:1.+'
+}
+
+sourceSets.main.compileClasspath += [configurations.provided]
+
+idea {
+    module{
+        scopes.PROVIDED.plus += [configurations.provided]
+    }
 }
 
 task javadocJar(type: Jar) {

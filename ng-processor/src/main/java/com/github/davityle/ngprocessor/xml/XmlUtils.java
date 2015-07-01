@@ -14,11 +14,11 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.util.xml;
+package com.github.davityle.ngprocessor.xml;
 
 import com.github.davityle.ngprocessor.attrcompiler.AttributeCompiler;
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
-import com.github.davityle.ngprocessor.util.LayoutsFinder;
+import com.github.davityle.ngprocessor.finders.LayoutsFinder;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 
 import org.w3c.dom.Document;
@@ -90,9 +90,9 @@ public class XmlUtils {
         }
     }
 
-    public Map<File, List<XmlNode>> getFileNodeMap(){
+    public Map<File, List<com.github.davityle.ngprocessor.xml.XmlNode>> getFileNodeMap(){
         List<File> layoutDirs = layoutsFinder.findLayouts();
-        Map<File, List<XmlNode>> xmlAttrMap = new HashMap<>();
+        Map<File, List<com.github.davityle.ngprocessor.xml.XmlNode>> xmlAttrMap = new HashMap<>();
 
         for(File f : layoutDirs){
             for(File kid : f.listFiles()){
@@ -107,9 +107,9 @@ public class XmlUtils {
                     if(nameSpace != null){
                         String pattern = String.format(NAMESPACE_ATTRIBUTE_REG, nameSpace);
                         Pattern nameSpaceAttributePattern = Pattern.compile(pattern);
-                        List<XmlNode> nodeList = new ArrayList<>();
+                        List<com.github.davityle.ngprocessor.xml.XmlNode> nodeList = new ArrayList<>();
                         getNgAttrNodes(doc, nameSpaceAttributePattern, nodeList, kid.getName());
-                        for(XmlNode xmlNode : nodeList){
+                        for(com.github.davityle.ngprocessor.xml.XmlNode xmlNode : nodeList){
                             for(XmlAttribute xmlAttribute : xmlNode.getAttributes()){
                                 try {
                                     Source source = attributeCompiler.compile(xmlAttribute.getValue());
@@ -134,7 +134,7 @@ public class XmlUtils {
         return xmlAttrMap;
     }
 
-    private void getNgAttrNodes(Node n, Pattern attributePattern, List<XmlNode> ngAttrNodes, String fileName){
+    private void getNgAttrNodes(Node n, Pattern attributePattern, List<com.github.davityle.ngprocessor.xml.XmlNode> ngAttrNodes, String fileName){
         if(n == null || !n.hasChildNodes())
             return;
 
@@ -169,7 +169,7 @@ public class XmlUtils {
                     if(id == null){
                         messageUtils.error(null, "xml attributes '%s' in node '%s' in layout file '%s' need an id", attributeList.toString(), childNode.toString(), fileName);
                     }else {
-                        ngAttrNodes.add(new XmlNode(id, attributeList, fileName, childNode.getNodeName()));
+                        ngAttrNodes.add(new com.github.davityle.ngprocessor.xml.XmlNode(id, attributeList, fileName, childNode.getNodeName()));
                     }
                 }
             }

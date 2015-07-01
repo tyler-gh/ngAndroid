@@ -1,14 +1,15 @@
-package com.github.davityle.ngprocessor;
+package com.github.davityle.ngprocessor.deps;
 
-import com.github.davityle.ngprocessor.util.LayoutScopeMapper;
+import com.github.davityle.ngprocessor.NgProcessor;
+import com.github.davityle.ngprocessor.map.LayoutScopeMapper;
 import com.github.davityle.ngprocessor.util.MessageUtils;
-import com.github.davityle.ngprocessor.util.ModelScopeMapper;
+import com.github.davityle.ngprocessor.map.ModelScopeMapper;
 import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
-import com.github.davityle.ngprocessor.util.source.ModelSourceLinker;
-import com.github.davityle.ngprocessor.util.source.ScopeSourceLinker;
-import com.github.davityle.ngprocessor.util.source.SourceCreator;
-import com.github.davityle.ngprocessor.util.xml.ManifestPackageUtils;
-import com.github.davityle.ngprocessor.util.xml.XmlUtils;
+import com.github.davityle.ngprocessor.source.linkers.ModelSourceLinker;
+import com.github.davityle.ngprocessor.source.linkers.ScopeSourceLinker;
+import com.github.davityle.ngprocessor.source.SourceCreator;
+import com.github.davityle.ngprocessor.util.ManifestPackageUtils;
+import com.github.davityle.ngprocessor.xml.XmlUtils;
 
 import dagger.Component;
 

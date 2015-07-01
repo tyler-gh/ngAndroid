@@ -27,14 +27,14 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="dagger-2.0" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="javax.inject-1" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="dagger-compiler-2.0" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="dagger-producers-2.0-beta" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="guava-18.0" level="project" />
     <orderEntry type="library" exported="" name="velocity-1.7" level="project" />
-    <orderEntry type="library" exported="" name="dagger-2.0" level="project" />
-    <orderEntry type="library" exported="" name="dagger-compiler-2.0" level="project" />
     <orderEntry type="library" exported="" name="commons-collections-3.2.1" level="project" />
     <orderEntry type="library" exported="" name="commons-lang-2.4" level="project" />
-    <orderEntry type="library" exported="" name="javax.inject-1" level="project" />
-    <orderEntry type="library" exported="" name="dagger-producers-2.0-beta" level="project" />
-    <orderEntry type="library" exported="" name="guava-18.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.12" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="compile-testing-0.7" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="android-4.1.1.4" level="project" />
@@ -50,6 +50,7 @@
     <orderEntry type="library" exported="" scope="TEST" name="objenesis-2.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="httpcore-4.0.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="commons-codec-1.3" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="guava-17.0" level="project" />
     <orderEntry type="library" exported="" name="ng-processor.ng-processor-1.0.9-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="ng-processor.ng-processor-1.0.9-SNAPSHOT-javadoc" level="project" />
     <orderEntry type="library" exported="" name="ng-processor.ng-processor-1.0.9-SNAPSHOT-sources" level="project" />

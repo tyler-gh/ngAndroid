@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.sourcelinks;
+package com.github.davityle.ngprocessor.source.links;
 
 import org.apache.velocity.VelocityContext;
 

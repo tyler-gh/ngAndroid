@@ -1,6 +1,6 @@
-package com.github.davityle.ngprocessor;
+package com.github.davityle.ngprocessor.deps;
 
-import com.github.davityle.ngprocessor.util.DefaultLayoutDirProvider;
+import com.github.davityle.ngprocessor.finders.DefaultLayoutDirProvider;
 
 import dagger.Module;
 import dagger.Provides;

@@ -14,12 +14,10 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.util.xml;
+package com.github.davityle.ngprocessor.util;
 
-import com.github.davityle.ngprocessor.manifestfinders.AndroidManifestFinder;
-import com.github.davityle.ngprocessor.util.Option;
-import com.github.davityle.ngprocessor.util.ManifestFinder;
-import com.github.davityle.ngprocessor.util.MessageUtils;
+import com.github.davityle.ngprocessor.finders.AndroidManifestFinder;
+import com.github.davityle.ngprocessor.xml.XmlUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -29,8 +27,8 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Created by tyler on 4/7/15.
@@ -39,14 +37,13 @@ public class ManifestPackageUtils {
 
     private static final Pattern PACKAGE_PATTERN = Pattern.compile(".*package=\"(.*)\"");
 
-    private final ProcessingEnvironment processingEnvironment;
     private final MessageUtils messageUtils;
     private final XmlUtils xmlUtils;
     private final AndroidManifestFinder finder;
 
     @Inject
-    public ManifestPackageUtils(ProcessingEnvironment processingEnvironment, MessageUtils messageUtils, XmlUtils xmlUtils, AndroidManifestFinder finder){
-        this.processingEnvironment = processingEnvironment;
+    @Singleton
+    public ManifestPackageUtils(MessageUtils messageUtils, XmlUtils xmlUtils, AndroidManifestFinder finder){
         this.messageUtils = messageUtils;
         this.xmlUtils = xmlUtils;
         this.finder = finder;
@@ -61,7 +58,7 @@ public class ManifestPackageUtils {
                 return packageName;
         }
 
-        File manifest = ManifestFinder.findManifest();
+        File manifest = com.github.davityle.ngprocessor.finders.ManifestFinder.findManifest();
 
         if(manifest == null) {
             messageUtils.error(null, "Unable to find android manifest.");

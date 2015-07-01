@@ -14,7 +14,11 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.util;
+package com.github.davityle.ngprocessor.map;
+
+import com.github.davityle.ngprocessor.util.ElementUtils;
+import com.github.davityle.ngprocessor.util.MessageUtils;
+import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,10 +48,13 @@ public class ModelScopeMapper {
     private Map<String, List<Element>> scopeMap;
     private boolean mapped;
 
-    @Inject ElementUtils elementUtils;
+    @Inject
+    ElementUtils elementUtils;
     @Inject RoundEnvironment roundEnv;
-    @Inject NgScopeAnnotationUtils ngScopeAnnotationUtils;
-    @Inject MessageUtils messageUtils;
+    @Inject
+    NgScopeAnnotationUtils ngScopeAnnotationUtils;
+    @Inject
+    MessageUtils messageUtils;
 
     public ModelScopeMapper(Set<? extends TypeElement> annotations, List<Element> scopes) {
         this.annotations = annotations;

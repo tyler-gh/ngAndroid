@@ -14,7 +14,10 @@
  *    limitations under the License.
  */
 
-package com.github.davityle.ngprocessor.util;
+package com.github.davityle.ngprocessor.finders;
+
+import com.github.davityle.ngprocessor.util.MessageUtils;
+import com.github.davityle.ngprocessor.util.Option;
 
 import java.io.File;
 import java.net.URISyntaxException;
