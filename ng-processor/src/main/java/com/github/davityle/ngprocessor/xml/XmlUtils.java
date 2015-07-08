@@ -18,8 +18,10 @@ package com.github.davityle.ngprocessor.xml;
 
 import com.github.davityle.ngprocessor.attrcompiler.AttributeCompiler;
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
+import com.github.davityle.ngprocessor.attributes.Attributes;
 import com.github.davityle.ngprocessor.finders.LayoutsFinder;
 import com.github.davityle.ngprocessor.util.MessageUtils;
+import com.github.davityle.ngprocessor.util.Option;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -28,12 +30,9 @@ import org.w3c.dom.NodeList;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,43 +49,27 @@ public class XmlUtils {
     private static final Pattern ID_ATTR_PATTERN = Pattern.compile("android:id=\"@\\+id/(.+)\"");
     private static final String NAMESPACE_ATTRIBUTE_REG = "%s:(.+)=\"(.+)\"";
 
-    private static final Set<String> NG_ATTRS = Collections.unmodifiableSet(new HashSet<String>() {{
-        add("ngModel");
-        add("ngClick");
-        add("ngLongClick");
-        add("ngBlur");
-        add("ngChange");
-        add("ngDisabled");
-        add("ngFocus");
-        add("ngInvisible");
-        add("ngGone");
-        add("ngIf");
-        add("ngRepeat");
-        add("ngSrc");
-        add("ngJsonSrc");
-        add("ngText");
-        add("ngOnItemClickListener");
-    }});
-
     private final MessageUtils messageUtils;
     private final LayoutsFinder layoutsFinder;
     private final AttributeCompiler attributeCompiler;
+    private final Attributes attributes;
 
     @Inject
-    public XmlUtils(MessageUtils messageUtils, LayoutsFinder layoutsFinder, AttributeCompiler attributeCompiler){
+    public XmlUtils(MessageUtils messageUtils, LayoutsFinder layoutsFinder, AttributeCompiler attributeCompiler, Attributes attributes){
         this.messageUtils = messageUtils;
         this.layoutsFinder = layoutsFinder;
         this.attributeCompiler = attributeCompiler;
+        this.attributes = attributes;
     }
 
-    public Document getDocumentFromFile(File file){
+    public Option<Document> getDocumentFromFile(File file){
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            return db.parse(file);
+            return Option.of(db.parse(file));
         } catch (Exception e) {
             messageUtils.error(null, e.getMessage());
-            return null;
+            return Option.absent();
         }
     }
 
@@ -97,18 +80,18 @@ public class XmlUtils {
         for(File f : layoutDirs){
             for(File kid : f.listFiles()){
                 if(kid.getName().endsWith(".xml")){
-                    Document doc = getDocumentFromFile(kid);
-                    if(doc == null){
+                    Option<Document> doc = getDocumentFromFile(kid);
+                    if(doc.isAbsent()){
                         continue;
                     }
 
-                    NodeList children = doc.getChildNodes();
+                    NodeList children = doc.get().getChildNodes();
                     String nameSpace = getNameSpace(children);
                     if(nameSpace != null){
                         String pattern = String.format(NAMESPACE_ATTRIBUTE_REG, nameSpace);
                         Pattern nameSpaceAttributePattern = Pattern.compile(pattern);
                         List<com.github.davityle.ngprocessor.xml.XmlNode> nodeList = new ArrayList<>();
-                        getNgAttrNodes(doc, nameSpaceAttributePattern, nodeList, kid.getName());
+                        getNgAttrNodes(doc.get(), nameSpaceAttributePattern, nodeList, kid.getName());
                         for(com.github.davityle.ngprocessor.xml.XmlNode xmlNode : nodeList){
                             for(XmlAttribute xmlAttribute : xmlNode.getAttributes()){
                                 try {
@@ -159,7 +142,7 @@ public class XmlUtils {
                         if(attributeList == null)
                             attributeList = new ArrayList<>();
                         String attr = matcher.group(1);
-                        if(NG_ATTRS.contains(attr)) {
+                        if(attributes.containsKey(attr)) {
                             attributeList.add(new XmlAttribute(attr, matcher.group(2)));
                         }
                     }

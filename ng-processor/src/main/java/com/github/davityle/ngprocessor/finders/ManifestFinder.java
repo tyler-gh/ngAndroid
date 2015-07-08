@@ -16,33 +16,39 @@
 
 package com.github.davityle.ngprocessor.finders;
 
+import com.github.davityle.ngprocessor.util.Option;
+
 import java.io.File;
 
-/**
- * Created by tyler on 4/7/15.
- */
+import javax.inject.Inject;
+
 public class ManifestFinder {
 
-    public static File findManifest(){
+    @Inject
+    public ManifestFinder(){
+
+    }
+
+    public Option<File> findManifest(){
         return findManifest(new File("."));
     }
 
-    private static File findManifest(File dir){
+    private Option<File> findManifest(File dir){
         File[] kids = dir.listFiles();
         if(kids != null) {
             for (File file : kids) {
                 String name = file.getName();
                 if (file.isDirectory()) {
-                    File f = findManifest(file);
-                    if(f != null)
+                    Option<File> f = findManifest(file);
+                    if(f.isPresent())
                         return f;
                 }else{
                     if(name.equals("AndroidManifest.xml")){
-                        return file;
+                        return Option.of(file);
                     }
                 }
             }
         }
-        return null;
+        return Option.absent();
     }
 }

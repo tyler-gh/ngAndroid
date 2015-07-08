@@ -16,6 +16,8 @@
 
 package com.github.davityle.ngprocessor;
 
+import com.github.davityle.ngprocessor.attributes.AttrDependency;
+import com.github.davityle.ngprocessor.deps.AttrModule;
 import com.github.davityle.ngprocessor.deps.DaggerDependencyComponent;
 import com.github.davityle.ngprocessor.deps.DependencyComponent;
 import com.github.davityle.ngprocessor.deps.LayoutModule;
@@ -27,10 +29,12 @@ import com.github.davityle.ngprocessor.source.linkers.ModelSourceLinker;
 import com.github.davityle.ngprocessor.source.linkers.ScopeSourceLinker;
 import com.github.davityle.ngprocessor.source.links.NgModelSourceLink;
 import com.github.davityle.ngprocessor.source.links.NgScopeSourceLink;
+import com.github.davityle.ngprocessor.util.AttrDependencyUtils;
 import com.github.davityle.ngprocessor.util.ManifestPackageUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 import com.github.davityle.ngprocessor.util.Option;
+import com.github.davityle.ngprocessor.util.XmlNodeUtils;
 import com.github.davityle.ngprocessor.xml.XmlNode;
 
 import java.io.File;
@@ -58,7 +62,7 @@ import dagger.Provides;
 })
 public class NgProcessor extends AbstractProcessor {
 
-    private final com.github.davityle.ngprocessor.deps.LayoutModule layoutModule;
+    private final LayoutModule layoutModule;
     private ProcessingEnvironment env;
 
     public NgProcessor(){
@@ -66,7 +70,7 @@ public class NgProcessor extends AbstractProcessor {
     }
 
     public NgProcessor(final Option<String> option){
-        this(new com.github.davityle.ngprocessor.deps.LayoutModule(new DefaultLayoutDirProvider() {
+        this(new LayoutModule(new DefaultLayoutDirProvider() {
             @Override
             public Option<String> getDefaultLayoutDir() {
                 return option;
@@ -94,6 +98,7 @@ public class NgProcessor extends AbstractProcessor {
                 .builder()
                 .layoutModule(layoutModule)
                 .environmentModule(new EnvironmentModule(roundEnv))
+                .attrModule(new AttrModule())
                 .build();
 
         MessageUtils messageUtils = dependencyComponent.createMessageUtils();
@@ -102,9 +107,9 @@ public class NgProcessor extends AbstractProcessor {
 
         messageUtils.note(null, ":NgAndroid:processing");
 
-        String manifestPackageName = manifestPackageUtils.getPackageName();
+        Option<String> manifestPackageName = manifestPackageUtils.getPackageName();
 
-        if(manifestPackageName == null) {
+        if(manifestPackageName.isAbsent()) {
             messageUtils.error(null, ":NgAndroid:Unable to find android manifest.");
             return false;
         }
@@ -134,12 +139,17 @@ public class NgProcessor extends AbstractProcessor {
         // get the model to source links
         List<NgModelSourceLink> modelSourceLinks = sourceLinker.getSourceLinks();
         // get the scope to source links
-        ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopes, scopeMap, layoutScopeMapper.getElementNodeMap(), manifestPackageName);
+        ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopes, scopeMap, layoutScopeMapper.getElementNodeMap(), manifestPackageName.get());
         dependencyComponent.inject(scopeSourceLinker);
         List<NgScopeSourceLink> scopeSourceLinks = scopeSourceLinker.getSourceLinks();
 
+        AttrDependencyUtils attrDependencyUtils = dependencyComponent.createAttrDependencyUtils();
+        XmlNodeUtils xmlNodeUtils = dependencyComponent.createXmlNodeUtils();
+
+        Set<AttrDependency> dependencySet = attrDependencyUtils.getDependencies(xmlNodeUtils.getAttributes(fileNodeMap));
+
         // create the source files
-        SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, scopeSourceLinks);
+        SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, scopeSourceLinks, dependencySet);
         dependencyComponent.inject(sourceCreator);
         sourceCreator.createSourceFiles();
 

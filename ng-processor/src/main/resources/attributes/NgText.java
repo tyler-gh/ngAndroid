@@ -66,21 +66,4 @@ class NgText implements NgAttribute {
     public int getAttribute() {
         return R.styleable.ngAndroid_ngText;
     }
-
-//    @Override
-//    public void typeCheck(Token[] tokens, Getter getter) throws Exception {
-//        if(getter.getType() != TypeUtils.STRING)
-//            throw new RuntimeException("NgText type must be STRING");
-//    }
-//
-//    @Override
-//    public void attach(Getter getter, ModelGetter[] modelGetters, Model[] models, View view) throws Throwable {
-//        Method method = view.getClass().getDeclaredMethod("setText", CharSequence.class);
-//        for(int index = 0; index < modelGetters.length; index++){
-//            ModelGetter modelGetter = modelGetters[index];
-//            Model model = models[index];
-//            model.addObserver(modelGetter.getFieldName(), new SetTextModelMethod(method, view, getter));
-//        }
-//    }
-
 }

@@ -80,7 +80,7 @@ public class Tokenizer {
     }
 
     private void generateTokens() {
-        tokens = new LinkedList<Token>();
+        tokens = new LinkedList<>();
         index = 0;
         readIndex = 0;
 

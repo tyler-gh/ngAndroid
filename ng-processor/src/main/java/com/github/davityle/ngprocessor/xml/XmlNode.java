@@ -16,7 +16,9 @@
 
 package com.github.davityle.ngprocessor.xml;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by tyler on 3/25/15.
@@ -48,6 +50,16 @@ public class XmlNode {
 
     public String getId() {
         return id;
+    }
+
+    public Set<String> getAttrs() {
+        Set<String> dependencies = new HashSet<>();
+
+        for(XmlAttribute attribute : attributes) {
+            dependencies.add(attribute.getName());
+        }
+
+        return dependencies;
     }
 
     @Override

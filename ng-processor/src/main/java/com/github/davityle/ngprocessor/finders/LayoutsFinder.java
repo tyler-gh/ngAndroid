@@ -52,7 +52,7 @@ public class LayoutsFinder {
                     return getFileFromPath(path);
                 }
 
-                URL url = Thread.currentThread().getContextClassLoader().getResource("layout/");
+                URL url = Thread.currentThread().getContextClassLoader().getResource("/src/main/res/layout/");
                 if(url != null) {
                     try {
                         File layoutDir = new File(url.toURI());

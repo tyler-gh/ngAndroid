@@ -17,6 +17,7 @@
 package com.github.davityle.ngprocessor.util;
 
 import com.github.davityle.ngprocessor.finders.AndroidManifestFinder;
+import com.github.davityle.ngprocessor.finders.ManifestFinder;
 import com.github.davityle.ngprocessor.xml.XmlUtils;
 
 import org.w3c.dom.Document;
@@ -28,7 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * Created by tyler on 4/7/15.
@@ -40,39 +40,50 @@ public class ManifestPackageUtils {
     private final MessageUtils messageUtils;
     private final XmlUtils xmlUtils;
     private final AndroidManifestFinder finder;
+    private final ManifestFinder manifestFinder;
 
     @Inject
-    @Singleton
-    public ManifestPackageUtils(MessageUtils messageUtils, XmlUtils xmlUtils, AndroidManifestFinder finder){
+    public ManifestPackageUtils(MessageUtils messageUtils, XmlUtils xmlUtils, AndroidManifestFinder finder, ManifestFinder manifestFinder){
         this.messageUtils = messageUtils;
         this.xmlUtils = xmlUtils;
         this.finder = finder;
+        this.manifestFinder = manifestFinder;
     }
 
-    public String getPackageName(){
+    public Option<String> getPackageName(){
+        return finder.extractAndroidManifest().fold(new Option.OptionCB<String, Option<String>>() {
+            @Override
+            public Option<String> absent() {
+                return findManifest();
+            }
 
-        Option<String> option = finder.extractAndroidManifest();
-        if(option.isPresent()) {
-            String packageName = option.get();
-            if(packageName != null)
-                return packageName;
-        }
-
-        File manifest = com.github.davityle.ngprocessor.finders.ManifestFinder.findManifest();
-
-        if(manifest == null) {
-            messageUtils.error(null, "Unable to find android manifest.");
-            return null;
-        }
-
-        Document doc = xmlUtils.getDocumentFromFile(manifest);
-        if(doc == null)
-            return null;
-
-        return getPackagePattern(doc.getChildNodes());
+            @Override
+            public Option<String> present(String s) {
+                return s != null ? Option.of(s) : findManifest();
+            }
+        });
     }
 
-    private static String getPackagePattern(NodeList nodes){
+    private Option<String> findManifest(){
+        return manifestFinder.findManifest().fold(new Option.OptionCB<File, Option<String>>() {
+            @Override
+            public Option<String> absent() {
+                messageUtils.error(null, "Unable to find android manifest.");
+                return Option.absent();
+            }
+
+            @Override
+            public Option<String> present(File file) {
+                Option<Document> doc = xmlUtils.getDocumentFromFile(file);
+                if(doc.isAbsent())
+                    return Option.absent();
+
+                return getPackagePattern(doc.get().getChildNodes());
+            }
+        });
+    }
+
+    private static Option<String> getPackagePattern(NodeList nodes){
         for(int index = 0; index < nodes.getLength(); index++) {
             NamedNodeMap nodeMap = nodes.item(index).getAttributes();
             if(nodeMap != null){
@@ -81,7 +92,7 @@ public class ManifestPackageUtils {
                     if(matcher.matches()){
                         String packageName = matcher.group(1);
                         if(!packageName.startsWith("android.support"))
-                            return packageName;
+                            return Option.of(packageName);
                     }
                 }
             }
@@ -89,11 +100,11 @@ public class ManifestPackageUtils {
         for(int index = 0; index < nodes.getLength(); index++) {
             NodeList nodeList = nodes.item(index).getChildNodes();
             if(nodeList != null){
-                String namespace = getPackagePattern(nodeList);
-                if(namespace != null)
+                Option<String> namespace = getPackagePattern(nodeList);
+                if(namespace.isPresent())
                     return namespace;
             }
         }
-        return null;
+        return Option.absent();
     }
 }

@@ -25,14 +25,14 @@ import com.ngandroid.lib.ng.ModelObserver;
 /**
 * Created by tyler on 2/24/15.
 */
-final class CompundButtonInteracter implements CompoundButton.OnCheckedChangeListener, ModelObserver {
+final class CompoundButtonInteractor implements CompoundButton.OnCheckedChangeListener, ModelObserver {
 
     private final Model model;
     private final String field;
     private final CompoundButton compoundButton;
     private boolean isFromSelf;
 
-    public CompundButtonInteracter(Model model, String field, CompoundButton compoundButton) {
+    public CompoundButtonInteractor(Model model, String field, CompoundButton compoundButton) {
         this.model = model;
         this.field = field;
         this.compoundButton = compoundButton;

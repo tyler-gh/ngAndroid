@@ -61,21 +61,11 @@ public enum TokenType {
         }
 
         public static BinaryOperator getOperator(String op){
-            if("+".equals(op)){
-                return ADDITION;
-            }else if("-".equals(op)){
-                return SUBTRACTION;
-            }else if("/".equals(op)){
-                return DIVISION;
-            }else if("*".equals(op)){
-                return MULTIPLICATION;
-            }else if("==".equals(op)){
-                return EQUALS_EQUALS;
-            }else if("!=".equals(op)){
-                return KNOT_EQUALS;
-            }else{
-                throw new RuntimeException("Unrecognized operator '" + op + "'");
+            for(BinaryOperator biOp : values()){
+                if(biOp.source.equals(op))
+                    return biOp;
             }
+            throw new RuntimeException("Unrecognized operator '" + op + "'");
         }
     }
 }

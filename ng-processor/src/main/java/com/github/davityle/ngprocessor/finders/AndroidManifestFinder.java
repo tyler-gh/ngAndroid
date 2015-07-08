@@ -15,6 +15,8 @@
  */
 package com.github.davityle.ngprocessor.finders;
 
+import com.github.davityle.ngprocessor.util.Option;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -37,11 +39,11 @@ public class AndroidManifestFinder {
 		this.fileHelper = fileHelper;
 	}
 
-	public com.github.davityle.ngprocessor.util.Option<String> extractAndroidManifest() {
-		com.github.davityle.ngprocessor.util.Option<File> androidManifestFileOption = findManifestFile();
+	public Option<String> extractAndroidManifest() {
+		Option<File> androidManifestFileOption = findManifestFile();
 
 		if (androidManifestFileOption.isAbsent()) {
-			return com.github.davityle.ngprocessor.util.Option.absent();
+			return Option.absent();
 		}
 
 		File androidManifestFile = androidManifestFileOption.get();
@@ -50,7 +52,7 @@ public class AndroidManifestFinder {
 		return parse(androidManifestFile);
 	}
 
-	private com.github.davityle.ngprocessor.util.Option<File> findManifestFile() {
+	private Option<File> findManifestFile() {
 		String androidManifestFile = optionsHelper.getAndroidManifestFile();
         if (androidManifestFile != null) {
 			return findManifestInSpecifiedPath(androidManifestFile);
@@ -59,12 +61,12 @@ public class AndroidManifestFinder {
 		}
 	}
 
-	private com.github.davityle.ngprocessor.util.Option<File> findManifestInSpecifiedPath(String androidManifestPath) {
+	private Option<File> findManifestInSpecifiedPath(String androidManifestPath) {
 		File androidManifestFile = new File(androidManifestPath);
 		if (!androidManifestFile.exists()) {
-			return com.github.davityle.ngprocessor.util.Option.absent();
+			return Option.absent();
 		}
-		return com.github.davityle.ngprocessor.util.Option.of(androidManifestFile);
+		return Option.of(androidManifestFile);
 	}
 
 	/**
@@ -74,11 +76,11 @@ public class AndroidManifestFinder {
 	 * find the AndroidManifest.xml file. Any better solution will be
 	 * appreciated.
 	 */
-	private com.github.davityle.ngprocessor.util.Option<File> findManifestInParentsDirectories() {
-		com.github.davityle.ngprocessor.util.Option<FileHelper.FileHolder> projectRootHolderOption = fileHelper.findRootProjectHolder();
+	private Option<File> findManifestInParentsDirectories() {
+		Option<FileHelper.FileHolder> projectRootHolderOption = fileHelper.findRootProjectHolder();
 
         if (projectRootHolderOption.isAbsent()) {
-			return com.github.davityle.ngprocessor.util.Option.absent();
+			return Option.absent();
 		}
 
 		FileHelper.FileHolder projectRootHolder = projectRootHolderOption.get();
@@ -102,13 +104,13 @@ public class AndroidManifestFinder {
 		}
 
 		if (!androidManifestFile.exists()) {
-            return com.github.davityle.ngprocessor.util.Option.absent();
+            return Option.absent();
 		}
 
-		return com.github.davityle.ngprocessor.util.Option.of(androidManifestFile);
+		return Option.of(androidManifestFile);
 	}
 
-	private com.github.davityle.ngprocessor.util.Option<String> parse(File androidManifestFile) {
+	private Option<String> parse(File androidManifestFile) {
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 
 		Document doc;
@@ -117,12 +119,12 @@ public class AndroidManifestFinder {
 			doc = docBuilder.parse(androidManifestFile);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return com.github.davityle.ngprocessor.util.Option.absent();
+			return Option.absent();
 		}
 
 		Element documentElement = doc.getDocumentElement();
 		documentElement.normalize();
 
-		return com.github.davityle.ngprocessor.util.Option.of(documentElement.getAttribute("package"));
+		return Option.of(documentElement.getAttribute("package"));
 	}
 }

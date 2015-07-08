@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.ng.ModelObserver;
 import com.ngandroid.lib.ng.Scope;
-import com.ngandroid.lib.ngattributes.Attrs;
+import com.ngandroid.lib.ngattributes.AttrsResolver;
 import com.ngandroid.lib.ngattributes.NgAttribute;
 import com.ngandroid.lib.utils.DefaultValueFormatter;
 import com.ngandroid.lib.utils.Tuple;
@@ -227,7 +227,7 @@ public class NgAndroid {
             if(valueFormatter == null)
                 valueFormatter = new DefaultValueFormatter();
 
-            return new NgAndroid(Attrs.getAttributes(valueFormatter));
+            return new NgAndroid(AttrsResolver.getAttrsImpl().getAttributes(valueFormatter));
         }
     }
 }

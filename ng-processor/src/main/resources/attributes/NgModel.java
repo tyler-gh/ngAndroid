@@ -60,9 +60,9 @@ class NgModel implements NgAttribute {
         }
         boolean isChecked = compoundButton.isChecked();
         model.setValue(field, isChecked);
-        CompundButtonInteracter compundButtonInteracter = new CompundButtonInteracter(model, field, compoundButton);
-        compoundButton.setOnCheckedChangeListener(compundButtonInteracter);
-        model.addObserver(field, compundButtonInteracter);
+        CompoundButtonInteractor compoundButtonInteractor = new CompoundButtonInteractor(model, field, compoundButton);
+        compoundButton.setOnCheckedChangeListener(compoundButtonInteractor);
+        model.addObserver(field, compoundButtonInteractor);
     }
 
     private void bindModelToTextView(final TextView textView, Model model, String field) {
