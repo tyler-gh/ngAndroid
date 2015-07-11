@@ -16,7 +16,14 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
+import com.github.davityle.ngprocessor.attrcompiler.GetExpressionVisitor;
+import com.github.davityle.ngprocessor.attrcompiler.SetExpressionVisitor;
+import com.github.davityle.ngprocessor.attrcompiler.node.Node;
+import com.github.davityle.ngprocessor.attrcompiler.parse.ParseException;
+import com.github.davityle.ngprocessor.attrcompiler.parse.Parser;
 import com.github.davityle.ngprocessor.util.TypeUtils;
+
+import org.apache.velocity.runtime.directive.Parse;
 
 import java.util.List;
 
@@ -25,41 +32,18 @@ import javax.lang.model.type.TypeMirror;
 /**
  * Created by davityle on 1/24/15.
  */
-public abstract class Source <T extends Source> {
+public class Source {
+    private final Node node;
 
-    private TypeMirror typeMirror;
-
-    protected Source(TypeMirror typeMirror) {
-        this.typeMirror = typeMirror;
+    public Source(String source) throws ParseException {
+        this.node = Parser.parse(source);
     }
 
-    public abstract String getSource();
-    public abstract void getModelSource(List<ModelSource> models);
-    public abstract void getMethodSource(List<MethodSource> methods);
-    public abstract boolean isVoid();
-    protected abstract T cp(TypeMirror typeMirror) throws IllegalArgumentException;
-
-    public T copy(TypeMirror typeMirror) throws IllegalArgumentException{
-        TypeMirror current = getTypeMirror();
-        if(current != null && !TypeUtils.match(current, typeMirror))
-            throw new IllegalArgumentException(current + " cannot be assigned to " + typeMirror);
-        return cp(typeMirror);
+    public String getSetterSource() {
+        return GetExpressionVisitor.generateGetExpression(node);
     }
 
-    public T copy() throws IllegalArgumentException{
-        return copy(getTypeMirror());
-    }
-    public String toString(){
-        return getSource();
-    }
-
-    public void setTypeMirror(TypeMirror typeMirror){
-        this.typeMirror = typeMirror;
-    }
-
-    public TypeMirror getTypeMirror(){
-//        if(typeMirror == null)
-//            throw new IllegalStateException("TypeMirror is null for source '" + this + "'");
-        return typeMirror;
+    public String getSetterSource(String value) {
+        return SetExpressionVisitor.generateSetExpression(node, value);
     }
 }

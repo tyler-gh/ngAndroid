@@ -29,15 +29,7 @@ public class SourceTest {
 
     @Test
     public void testGetModelSource() throws Exception {
-        AttributeCompiler builder = new AttributeCompiler("(modelName.num - (2*(7-1))) - 10/(modelName.num-3)");
-        Source source = builder.compile();
-        List<ModelSource> modelSourceList = new ArrayList<>();
-        source.getModelSource(modelSourceList);
-        assertEquals(2, modelSourceList.size());
-        for(ModelSource modelSource : modelSourceList){
-            assertEquals("modelName", modelSource.getModelName());
-            assertEquals("num", modelSource.getFieldName());
-        }
+
     }
 
     @Test

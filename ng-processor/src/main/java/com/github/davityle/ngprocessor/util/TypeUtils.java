@@ -46,7 +46,7 @@ public class TypeUtils {
         return getOperatorKind(leftSide, rightSide, null);
     }
     public static TypeMirror getOperatorKind(Source leftSide, Source rightSide, TokenType.BinaryOperator operator){
-        return getOperatorKind(leftSide.getTypeMirror(), rightSide.getTypeMirror(), operator);
+        return null;
     }
     public static TypeMirror getOperatorKind(TypeMirror leftMirror, TypeMirror rightMirror){
         return getOperatorKind(leftMirror, rightMirror, null);

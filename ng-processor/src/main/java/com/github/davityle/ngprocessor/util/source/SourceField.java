@@ -47,4 +47,8 @@ public final class SourceField {
     public void setGetter(String getter) {
         this.getter = getter;
     }
+
+    public static String capitalize(final String line) {
+        return Character.toUpperCase(line.charAt(0)) + line.substring(1);
+    }
 }

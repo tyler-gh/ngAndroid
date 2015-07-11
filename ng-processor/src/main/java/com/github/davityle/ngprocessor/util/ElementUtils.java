@@ -16,8 +16,6 @@
 
 package com.github.davityle.ngprocessor.util;
 
-import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 
 import java.util.List;
@@ -44,38 +42,6 @@ public class ElementUtils {
 
     public static void setElements(Elements elements){
         elementUtils = elements;
-    }
-
-    public static boolean methodsMatch(Element elem, MethodSource source, Map<ModelSource,ModelSource> typedModels){
-        if(elem == null || !(elem instanceof ExecutableElement) || elem.getKind() != ElementKind.METHOD)
-            return false;
-        if(!elem.getSimpleName().toString().equals(source.getMethodName()))
-            return false;
-
-        ExecutableElement method = (ExecutableElement) elem;
-
-        List<Source> parameters = source.getParameters();
-        List<? extends VariableElement> methodParameters = method.getParameters();
-        if(methodParameters.size() != parameters.size())
-            return false;
-
-        for(int i = 0; i < parameters.size(); i++){
-            Source parameter = parameters.get(i);
-            if(parameter instanceof ModelSource)
-                parameter = typedModels.get(parameter);
-            TypeMirror typeMirror = parameter.getTypeMirror();
-
-            if(typeMirror != null){
-                VariableElement element = methodParameters.get(i);
-                TypeMirror eleType = element.asType();
-                if (!TypeUtils.matchFirstPrecedence(eleType, typeMirror)) {
-                    MessageUtils.warning(element, "Method element matches scripted method except parameter types do not match. '%s' - '%s'", eleType, typeMirror);
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 
     public static boolean isSetter(Element elem){

@@ -21,9 +21,8 @@ package com.github.davityle.ngprocessor.attrcompiler.parse;
 * Created by davityle on 1/15/15.
 */
 public enum TokenType {
-    MODEL_NAME,
-    MODEL_FIELD,
-    FUNCTION_NAME,
+    NONE,
+    IDENTIFIER,
     TERNARY_QUESTION_MARK,
     TERNARY_COLON,
     OPEN_PARENTHESIS,
@@ -31,33 +30,65 @@ public enum TokenType {
     COMMA,
     PERIOD,
     BINARY_OPERATOR,
+    UNARY_OPERATOR,
     INTEGER_CONSTANT,
     RUBBISH,
     EOF,
     STRING,
     KNOT,
+    INT_CONSTANT,
     LONG_CONSTANT,
     FLOAT_CONSTANT,
     DOUBLE_CONSTANT,
     OPEN_PARENTHESIS_EXP, WHITESPACE;
 
+    public static final int TERNARY_PRECEDENCE = 1;
+
+    public  static boolean isNumberConstant(TokenType type) {
+        return type == INT_CONSTANT || type == LONG_CONSTANT || type == FLOAT_CONSTANT || type == DOUBLE_CONSTANT;
+    }
+
+    public  static boolean isPostfixOperator(TokenType type) {
+        return type == OPEN_PARENTHESIS || type == PERIOD;
+    }
+
     public enum BinaryOperator {
-        ADDITION("+"),
-        SUBTRACTION("-"),
-        KNOT_EQUALS("!="),
-        MULTIPLICATION("*"),
-        DIVISION("/"),
-        EQUALS_EQUALS("==");
+        MULTIPLICATION("*", 5),
+        DIVISION("/", 5),
+        ADDITION("+", 4),
+        SUBTRACTION("-", 4),
+        KNOT_EQUALS("!=", 3),
+        EQUALS_EQUALS("==", 3),
+        LESS_THAN("<", 1),
+        GREATER_THAN(">", 1),
+        LESS_EQUAL_THAN("<=", 1),
+        GREATER_EQUAL_THAN(">=", 1);
 
         final String source;
+        final int precedence;
 
-        BinaryOperator(String source){
+        BinaryOperator(String source, int precedence){
             this.source = source;
+            this.precedence = precedence;
+        }
+
+        public int getPrecedence() {
+            return precedence;
         }
 
         @Override
         public String toString() {
             return source;
+        }
+
+        public static boolean isBinaryOperator(String source) {
+            for (BinaryOperator op : BinaryOperator.values()) {
+                if (op.source.equals(source)) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static BinaryOperator getOperator(String op){
@@ -76,6 +107,42 @@ public enum TokenType {
             }else{
                 throw new RuntimeException("Unrecognized operator '" + op + "'");
             }
+        }
+    }
+
+    public enum UnaryOperator {
+        NEGATE("-"),
+        NOT("!");
+
+        final String source;
+
+        UnaryOperator(String source) {
+            this.source = source;
+        }
+
+        @Override
+        public String toString() {
+            return source;
+        }
+
+        public static boolean isUnaryOperator(String source) {
+            for (UnaryOperator op : UnaryOperator.values()) {
+                if (op.source.equals(source)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static UnaryOperator getOperator(String source) {
+            for (UnaryOperator op : UnaryOperator.values()) {
+                if (op.source.equals(source)) {
+                    return op;
+                }
+            }
+
+            throw new RuntimeException("Unrecognized operator '" + source + "'");
         }
     }
 }

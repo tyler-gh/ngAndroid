@@ -17,6 +17,7 @@
 package com.github.davityle.ngprocessor.util.xml;
 
 import com.github.davityle.ngprocessor.attrcompiler.AttributeCompiler;
+import com.github.davityle.ngprocessor.attrcompiler.parse.ParseException;
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import com.github.davityle.ngprocessor.util.LayoutsFinder;
 import com.github.davityle.ngprocessor.util.MessageUtils;
@@ -100,9 +101,19 @@ public class XmlUtils {
                         for(XmlNode xmlNode : nodeList){
                             for(XmlAttribute xmlAttribute : xmlNode.getAttributes()){
                                 try {
-                                    Source source = new AttributeCompiler(xmlAttribute.getValue()).compile();
+                                    Source source = new Source(xmlAttribute.getValue());
                                     xmlAttribute.setSource(source);
-                                }catch(RuntimeException e){
+                                }
+                                catch (ParseException e) {
+                                    MessageUtils.error(null,
+                                            "Layout file '%s' has an invalid attribute '%s' in view '%s' with value '%s' because '%s'",
+                                            kid,
+                                            xmlAttribute.getName(),
+                                            xmlNode.getId(),
+                                            xmlAttribute.getValue(),
+                                            e.getMessage()
+                                    );
+                                } catch(RuntimeException e){
                                     MessageUtils.error(null,
                                             "Layout file '%s' has an invalid attribute '%s' in view '%s' with value '%s' because '%s'",
                                             kid,

@@ -16,8 +16,6 @@
 
 package com.github.davityle.ngprocessor.util.xml;
 
-import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 
 import java.util.ArrayList;
@@ -50,18 +48,6 @@ public class XmlAttribute {
 
     public Source getSource() {
         return source;
-    }
-
-    public List<ModelSource> getModelSource() {
-        List<ModelSource> models = new ArrayList<ModelSource>();
-        source.getModelSource(models);
-        return models;
-    }
-
-    public List<MethodSource> getMethodSource() {
-        List<MethodSource> methods = new ArrayList<MethodSource>();
-        source.getMethodSource(methods);
-        return methods;
     }
 
     public void setSource(Source source) {
