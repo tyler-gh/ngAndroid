@@ -16,13 +16,10 @@
 
 package com.github.davityle.ngprocessor.attrcompiler;
 
-import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
+//import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
+//import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
