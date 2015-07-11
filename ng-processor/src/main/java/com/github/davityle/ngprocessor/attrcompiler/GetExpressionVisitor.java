@@ -1,7 +1,15 @@
 package com.github.davityle.ngprocessor.attrcompiler;
 
-import com.github.davityle.ngprocessor.attrcompiler.node.*;
-import com.github.davityle.ngprocessor.util.source.SourceField;
+import com.github.davityle.ngprocessor.attrcompiler.node.AVisitor;
+import com.github.davityle.ngprocessor.attrcompiler.node.BinaryOperator;
+import com.github.davityle.ngprocessor.attrcompiler.node.Expression;
+import com.github.davityle.ngprocessor.attrcompiler.node.FunctionCall;
+import com.github.davityle.ngprocessor.attrcompiler.node.Identifier;
+import com.github.davityle.ngprocessor.attrcompiler.node.Node;
+import com.github.davityle.ngprocessor.attrcompiler.node.ObjectField;
+import com.github.davityle.ngprocessor.attrcompiler.node.TernaryOperator;
+import com.github.davityle.ngprocessor.attrcompiler.node.UnaryOperator;
+import com.github.davityle.ngprocessor.source.SourceField;
 
 public class GetExpressionVisitor extends AVisitor {
     private StringBuilder result;

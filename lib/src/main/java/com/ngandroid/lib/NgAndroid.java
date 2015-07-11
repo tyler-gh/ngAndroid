@@ -26,8 +26,10 @@ import android.view.ViewGroup;
 import com.ngandroid.lib.exceptions.NgException;
 import com.ngandroid.lib.ng.ModelObserver;
 import com.ngandroid.lib.ng.Scope;
-import com.ngandroid.lib.ngattributes.Attrs;
+import com.ngandroid.lib.ngattributes.AttrsResolver;
 import com.ngandroid.lib.ngattributes.NgAttribute;
+import com.ngandroid.lib.utils.Blur;
+import com.ngandroid.lib.utils.DefaultBlur;
 import com.ngandroid.lib.utils.DefaultValueFormatter;
 import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.ValueFormatter;
@@ -206,6 +208,9 @@ public class NgAndroid {
     public static final class Builder {
 
         private ValueFormatter valueFormatter;
+        private Blur blur;
+        private float scaleRatio = 5;
+        private float blurRadius = 5;
 
         /**
          * sets the value formatter that {@link com.ngandroid.lib.ngattributes.NgText} and
@@ -219,6 +224,38 @@ public class NgAndroid {
         }
 
         /**
+         * sets the blur that {@link com.ngandroid.lib.ngattributes.NgBlur} will use to blur views
+         * @param blur
+         * @return
+         */
+        public Builder setBlur(Blur blur) {
+            this.blur = blur;
+            return this;
+        }
+
+        /**
+         * sets the scale ratio that will be used by {@link DefaultBlur}, only works if #setBlur is
+         * not used
+         * @param scaleRatio
+         * @return
+         */
+        public Builder setDefaultBlurScaleRatio(float scaleRatio){
+            this.scaleRatio = scaleRatio;
+            return this;
+        }
+
+        /**
+         * sets the blur radius that will be used by {@link DefaultBlur}, only works if #setBlur is
+         * not used
+         * @param blurRadius
+         * @return
+         */
+        public Builder setDefaultBlurRadius(float blurRadius){
+            this.blurRadius = blurRadius;
+            return this;
+        }
+
+        /**
          * builds the NgAndroid instance
          * @return NgAndroid
          */
@@ -227,7 +264,10 @@ public class NgAndroid {
             if(valueFormatter == null)
                 valueFormatter = new DefaultValueFormatter();
 
-            return new NgAndroid(Attrs.getAttributes(valueFormatter));
+            if(blur == null)
+                blur = new DefaultBlur(scaleRatio, blurRadius);
+
+            return new NgAndroid(AttrsResolver.getAttrsImpl().getAttributes(valueFormatter, blur));
         }
     }
 }

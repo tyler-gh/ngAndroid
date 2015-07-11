@@ -4,7 +4,7 @@ import com.github.davityle.ngprocessor.attrcompiler.node.AVisitor;
 import com.github.davityle.ngprocessor.attrcompiler.node.Identifier;
 import com.github.davityle.ngprocessor.attrcompiler.node.Node;
 import com.github.davityle.ngprocessor.attrcompiler.node.ObjectField;
-import com.github.davityle.ngprocessor.util.source.SourceField;
+import com.github.davityle.ngprocessor.source.SourceField;
 
 public class SetExpressionVisitor extends AVisitor {
 

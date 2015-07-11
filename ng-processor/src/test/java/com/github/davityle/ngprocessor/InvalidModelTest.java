@@ -1,5 +1,6 @@
 package com.github.davityle.ngprocessor;
 
+import com.github.davityle.ngprocessor.util.Option;
 import com.google.testing.compile.JavaFileObjects;
 
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class InvalidModelTest {
 
         ASSERT.about(javaSource())
                 .that(file)
-                .processedWith(Collections.singletonList(new NgProcessor("ng-processor/src/test/resources/emptylayout")))
+                .processedWith(Collections.singletonList(new NgProcessor(Option.of("ng-processor/src/test/resources/emptylayout"))))
                 .failsToCompile()
                 .withErrorContaining("is missing a corresponding getter");
     }

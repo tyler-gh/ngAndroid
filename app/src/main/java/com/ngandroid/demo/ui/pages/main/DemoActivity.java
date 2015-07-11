@@ -14,6 +14,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.ngandroid.demo.R;
+import com.ngandroid.demo.model.DemoItem;
+import com.ngandroid.demo.scope.DemoScope;
 import com.ngandroid.demo.ui.pages.ngclick.NgClickFragment;
 import com.ngandroid.demo.ui.pages.ngmodel.NgModelFragment;
 

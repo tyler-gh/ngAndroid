@@ -20,20 +20,13 @@ package com.github.davityle.ngprocessor.attrcompiler;
 import com.github.davityle.ngprocessor.attrcompiler.node.Node;
 import com.github.davityle.ngprocessor.attrcompiler.parse.Parser;
 
-/**
- * Created by tyler on 2/2/15.
- */
+import javax.inject.Inject;
+
 public class AttributeCompiler {
 
-    private final Node expression;
 
-    public AttributeCompiler(String expression){
-        this(Parser.tryParse(expression));
-    }
-
-    public AttributeCompiler(Node expression) {
-        this.expression = expression;
-    }
+    @Inject
+    public AttributeCompiler(){}
 
     public static String translateToJavaGetter(String source) {
         Node expression = Parser.tryParse(source);

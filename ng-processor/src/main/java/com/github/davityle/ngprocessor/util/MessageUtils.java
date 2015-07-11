@@ -17,44 +17,45 @@
 package com.github.davityle.ngprocessor.util;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.inject.Inject;
 import javax.lang.model.element.Element;
 
-import static javax.tools.Diagnostic.Kind;
+import javax.tools.Diagnostic.Kind;
 
 /**
  * Created by tyler on 3/30/15.
  */
 public class MessageUtils {
 
-    private static ProcessingEnvironment processingEnv;
-    private static boolean hasErrors = false;
-
-    public static void setProcessingEnv(ProcessingEnvironment processingEnv){
-        MessageUtils.processingEnv = processingEnv;
-        hasErrors = false;
+    private final ProcessingEnvironment processingEnv;
+    private boolean hasErrors = false;
+    
+    @Inject
+    public MessageUtils(ProcessingEnvironment processingEnv){
+        this.processingEnv = processingEnv;
     }
 
-    public static void error(Element element, String message, Object... args) {
+    public void error(Element element, String message, Object... args) {
         printMessage(Kind.ERROR, element, message, args);
         hasErrors = true;
     }
 
-    public static void note(Element element, String message, Object... args){
+    public void note(Element element, String message, Object... args){
         printMessage(Kind.NOTE, element, message, args);
     }
 
-    public static void warning(Element element, String message, Object... args) {
+    public void warning(Element element, String message, Object... args) {
         printMessage(Kind.WARNING, element, message, args);
     }
 
-    private static void printMessage(Kind kind, Element element, String message, Object... args){
+    private void printMessage(Kind kind, Element element, String message, Object... args){
         if (args.length > 0) {
             message = String.format(message, args);
         }
         processingEnv.getMessager().printMessage(kind, message, element);
     }
 
-    public static boolean hasErrors() {
+    public boolean hasErrors() {
         return hasErrors;
     }
 }

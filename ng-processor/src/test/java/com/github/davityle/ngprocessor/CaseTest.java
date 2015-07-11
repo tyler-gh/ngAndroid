@@ -1,5 +1,6 @@
 package com.github.davityle.ngprocessor;
 
+import com.github.davityle.ngprocessor.util.Option;
 import com.google.testing.compile.JavaFileObjects;
 
 import org.junit.Test;
@@ -33,11 +34,11 @@ public class CaseTest {
                 "}";
         ASSERT.about(javaSource())
                 .that(JavaFileObjects.forSourceString("com.yella.CaseTest", content))
-                .processedWith(Collections.singletonList(new NgProcessor("ng-processor/src/test/resources/case_layouts")))
+                .processedWith(Collections.singletonList(new NgProcessor(Option.of("ng-processor/src/test/resources/case_layouts"))))
                 .compilesWithoutError()
                 .and()
                 .generatesFileNamed(SOURCE_OUTPUT, "com.yella", "CaseTest$$NgScope.java")
                 .and()
-                .generatesFileNamed(SOURCE_OUTPUT, "com.yella" ,"CaseMatters$$NgModel.java");
+                .generatesFileNamed(SOURCE_OUTPUT, "com.yella", "CaseMatters$$NgModel.java");
     }
 }

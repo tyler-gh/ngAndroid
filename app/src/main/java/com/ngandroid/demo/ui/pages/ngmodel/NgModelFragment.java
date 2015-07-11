@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ngandroid.demo.R;
-import com.ngandroid.demo.models.NgMod;
+import com.ngandroid.demo.model.NgMod;
 import com.ngandroid.lib.NgAndroid;
 import com.ngandroid.lib.annotations.NgModel;
 import com.ngandroid.lib.annotations.NgScope;

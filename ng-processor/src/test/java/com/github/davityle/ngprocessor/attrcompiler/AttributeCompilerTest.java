@@ -16,8 +16,6 @@
 
 package com.github.davityle.ngprocessor.attrcompiler;
 
-//import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
-//import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 
 import org.junit.Test;
 
