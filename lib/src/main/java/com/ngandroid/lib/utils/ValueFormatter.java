@@ -40,7 +40,7 @@ public abstract class ValueFormatter {
     /**
      * used to 'filter' representations of objects that you wouldn't want displayed to the user. The
      * default function removes the display of '0' or '0.0' if the user has erased the text. This is
-     * to prevent a persistent number being shown when the user tries to erase it.
+     * to prevent a number being shown when the user tries to erase it.
      * @param value the value that is being filtered
      * @param previousValue the previous value
      * @return the filtered String

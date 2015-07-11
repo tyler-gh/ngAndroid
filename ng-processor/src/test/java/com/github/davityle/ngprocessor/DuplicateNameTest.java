@@ -1,5 +1,6 @@
 package com.github.davityle.ngprocessor;
 
+import com.github.davityle.ngprocessor.util.Option;
 import com.google.testing.compile.JavaFileObjects;
 
 import org.junit.Test;
@@ -53,7 +54,7 @@ public class DuplicateNameTest {
 
         ASSERT.about(javaSource())
                 .that(fileObject)
-                .processedWith((Iterable)Collections.singletonList(new NgProcessor("ng-processor/src/test/resources/emptylayout")))
+                .processedWith((Iterable) Collections.singletonList(new NgProcessor(Option.of("ng-processor/src/test/resources/emptylayout"))))
                 .failsToCompile()
                 .withErrorContaining("Field 'XML' in model 'com.github.davityle.ngprocessor.DuplicateScope.DuplicateModel' is a duplicate.")
                 .in(fileObject)

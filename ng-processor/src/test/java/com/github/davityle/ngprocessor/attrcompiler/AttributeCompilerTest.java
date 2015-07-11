@@ -18,9 +18,6 @@ package com.github.davityle.ngprocessor.attrcompiler;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 
 public class AttributeCompilerTest {

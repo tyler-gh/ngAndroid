@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.ngandroid.demo.R;
+import com.ngandroid.demo.model.DemoItem;
+import com.ngandroid.demo.scope.DemoScope;
 import com.ngandroid.lib.NgAndroid;
 
 import java.util.List;

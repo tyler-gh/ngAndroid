@@ -22,6 +22,7 @@ import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
@@ -33,22 +34,26 @@ import javax.lang.model.util.Types;
  * Created by tyler on 3/30/15.
  */
 public class TypeUtils {
-    private static Types typeUtils;
+    private final Types typeUtils;
+    private final MessageUtils messageUtils;
 
-    public static void setTypeUtils(Types types){
-        typeUtils = types;
+    @Inject
+    public TypeUtils(Types types, MessageUtils messageUtils){
+        this.typeUtils = types;
+        this.messageUtils = messageUtils;
     }
 
-    public static TypeElement asTypeElement(TypeMirror typeMirror){
+    public TypeElement asTypeElement(TypeMirror typeMirror){
         return (TypeElement) typeUtils.asElement(typeMirror);
     }
-    public static TypeMirror getOperatorKind(Source leftSide, Source rightSide){
+    public TypeMirror getOperatorKind(Source leftSide, Source rightSide){
         return getOperatorKind(leftSide, rightSide, null);
     }
+
     public static TypeMirror getOperatorKind(Source leftSide, Source rightSide, TokenType.BinaryOperator operator){
         return null;
     }
-    public static TypeMirror getOperatorKind(TypeMirror leftMirror, TypeMirror rightMirror){
+    public TypeMirror getOperatorKind(TypeMirror leftMirror, TypeMirror rightMirror){
         return getOperatorKind(leftMirror, rightMirror, null);
     }
     /**
@@ -70,7 +75,7 @@ public class TypeUtils {
      * @param operator
      * @return
      */
-    public static TypeMirror getOperatorKind(TypeMirror leftMirror, TypeMirror rightMirror , TokenType.BinaryOperator operator){
+    public TypeMirror getOperatorKind(TypeMirror leftMirror, TypeMirror rightMirror , TokenType.BinaryOperator operator){
 
         if(leftMirror == null || rightMirror == null)
             return null;
@@ -85,11 +90,11 @@ public class TypeUtils {
 
         if(either(leftKind, rightKind, TypeKind.BOOLEAN) ) {
             if(operator != null) {
-                MessageUtils.error(null, "Cannot perform perform the operation '%s' with a boolean type. (%s %s %s)", operator.toString(), leftMirror, operator.toString(), rightMirror);
+                messageUtils.error(null, "Cannot perform perform the operation '%s' with a boolean type. (%s %s %s)", operator.toString(), leftMirror, operator.toString(), rightMirror);
             }
             return null;
         }
-        //TODO check if they are boxed type
+
         if(leftKind.isPrimitive() && rightKind.isPrimitive()) {
             if (typeUtils.isSameType(leftMirror, rightMirror))
                 return typeUtils.getPrimitiveType(leftKind);
@@ -104,14 +109,13 @@ public class TypeUtils {
                 return typeUtils.getPrimitiveType(TypeKind.LONG);
 
             if (
-                    either(leftKind, rightKind, TypeKind.INT) ||
-                            either(leftKind, rightKind, TypeKind.CHAR) ||
-                            either(leftKind, rightKind, TypeKind.SHORT) ||
-                            either(leftKind, rightKind, TypeKind.BYTE)
-                    ) {
+                either(leftKind, rightKind, TypeKind.INT) ||
+                either(leftKind, rightKind, TypeKind.CHAR) ||
+                either(leftKind, rightKind, TypeKind.SHORT) ||
+                either(leftKind, rightKind, TypeKind.BYTE)
+            ) {
                 return typeUtils.getPrimitiveType(TypeKind.INT);
             }
-            // one of the above should always return
         }
         TypeMirror intMirror = typeUtils.getPrimitiveType(TypeKind.INT);
         if(both(assignable(intMirror, leftMirror), assignable(intMirror, rightMirror)))
@@ -132,16 +136,16 @@ public class TypeUtils {
         return null;
     }
 
-    private static boolean both(boolean a, boolean b){
+    private boolean both(boolean a, boolean b){
         return a && b;
     }
 
-    public static boolean assignable(TypeMirror current, TypeMirror typeMirror){
+    public boolean assignable(TypeMirror current, TypeMirror typeMirror){
         return typeUtils.isSubtype(typeMirror, current)  ||
                 typeUtils.isAssignable(typeMirror, current);
     }
 
-    public static boolean matchFirstPrecedence(TypeMirror current, TypeMirror typeMirror) {
+    public boolean matchFirstPrecedence(TypeMirror current, TypeMirror typeMirror) {
         if(isString(current) && isString(typeMirror))
             return true;
 
@@ -150,14 +154,14 @@ public class TypeUtils {
                 typeUtils.isAssignable(typeMirror, current);
     }
 
-    public static boolean isSameType(TypeMirror current, TypeMirror typeMirror){
+    public boolean isSameType(TypeMirror current, TypeMirror typeMirror){
         if(isString(current) && isString(typeMirror))
             return true;
 
         return typeUtils.isSameType(current, typeMirror);
     }
 
-    public static boolean match(TypeMirror current, TypeMirror typeMirror) {
+    public boolean match(TypeMirror current, TypeMirror typeMirror) {
         if(isString(current) && isString(typeMirror))
             return true;
 
@@ -168,43 +172,43 @@ public class TypeUtils {
                 typeUtils.isAssignable(typeMirror, current);
     }
 
-    private static boolean either(TypeKind left, TypeKind right, TypeKind compare){
+    private boolean either(TypeKind left, TypeKind right, TypeKind compare){
         return left.equals(compare) || right.equals(compare);
     }
 
 
-    public static boolean isString(TypeMirror typeMirror){
+    public boolean isString(TypeMirror typeMirror){
         return String.class.getName().equals(typeMirror.toString());
     }
 
-    public static TypeMirror getLongType() {
+    public TypeMirror getLongType() {
         return typeUtils.getPrimitiveType(TypeKind.LONG);
     }
 
-    public static TypeMirror getDoubleType() {
+    public TypeMirror getDoubleType() {
         return typeUtils.getPrimitiveType(TypeKind.DOUBLE);
     }
 
-    public static TypeMirror getFloatType() {
+    public TypeMirror getFloatType() {
         return typeUtils.getPrimitiveType(TypeKind.FLOAT);
     }
 
-    public static TypeMirror getStringType() {
+    public TypeMirror getStringType() {
         return STRING;
     }
 
-    public static TypeMirror getIntegerType() {
+    public TypeMirror getIntegerType() {
         return typeUtils.getPrimitiveType(TypeKind.INT);
     }
 
-    public static TypeMirror getBooleanType() {
+    public TypeMirror getBooleanType() {
         return typeUtils.getPrimitiveType(TypeKind.BOOLEAN);
     }
 
     /**
      * Stub TypeMirror for a String
      */
-    private static final TypeMirror STRING = new TypeMirror() {
+    private final TypeMirror STRING = new TypeMirror() {
         public TypeKind getKind() {return null;}
         public <R, P> R accept(TypeVisitor<R, P> v, P p) {return null;}
         public List<? extends AnnotationMirror> getAnnotationMirrors() {return null;}
@@ -217,7 +221,7 @@ public class TypeUtils {
         }
     };
 
-    public static boolean equalsOrHasPrecedence(TypeMirror precedence, TypeMirror mirror) {
+    public boolean equalsOrHasPrecedence(TypeMirror precedence, TypeMirror mirror) {
         return typeUtils.isSameType(precedence, mirror) || typeUtils.isAssignable(mirror, precedence);
     }
 }

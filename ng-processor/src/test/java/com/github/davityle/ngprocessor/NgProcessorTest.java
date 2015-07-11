@@ -16,6 +16,7 @@
 
 package com.github.davityle.ngprocessor;
 
+import com.github.davityle.ngprocessor.util.Option;
 import com.google.common.io.Files;
 import com.google.testing.compile.JavaFileObjects;
 import com.ngandroid.lib.annotations.NgModel;
@@ -43,7 +44,7 @@ public class NgProcessorTest {
 
         ASSERT.about(javaSource())
                 .that(JavaFileObjects.forSourceString("com.github.davityle.ngprocessor.NgProcessorTest", content))
-                .processedWith(Collections.singletonList(new NgProcessor("ng-processor/src/test/resources/layouts")))
+                .processedWith(Collections.singletonList(new NgProcessor(Option.of("ng-processor/src/test/resources/layouts"))))
                 .compilesWithoutError()
                 .and()
                 .generatesFileNamed(SOURCE_OUTPUT, "com.github.davityle.ngprocessor", "NgProcessorTest$$NgScope.java")
@@ -102,6 +103,8 @@ class TestPoint {
     private Character cx;
 
     private String str;
+
+    private boolean bool;
 
     public Double getX() {
         return x;
@@ -205,5 +208,13 @@ class TestPoint {
 
     public void setStr(String str) {
         this.str = str;
+    }
+
+    public boolean getBool() {
+        return bool;
+    }
+
+    public void setBool(boolean bool) {
+        this.bool = bool;
     }
 }

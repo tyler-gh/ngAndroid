@@ -54,6 +54,10 @@
             android:id="@+id/xkd"
             ng:ngClick="floatPlusChar(point1.cx + point2.fx)"/>
 
+        <View
+            android:id="@+id/pBool"
+            ng:ngBlur="point1.bool"/>
+
 
     </LinearLayout>
 </ScrollView>
