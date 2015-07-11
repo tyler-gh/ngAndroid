@@ -1,6 +1,7 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.parse;
 
+import com.github.davityle.ngprocessor.attrcompiler.GetExpressionVisitor;
 import com.github.davityle.ngprocessor.attrcompiler.node.*;
 
 import org.apache.velocity.runtime.directive.Parse;
@@ -145,6 +146,8 @@ public class Parser {
             return new NumberConstant(advance());
         } else if (next.getTokenType() == TokenType.IDENTIFIER) {
             return new Identifier(advance());
+        } else if (next.getTokenType() == TokenType.STRING) {
+            return new StringLiteral(advance());
         }
 
         throw new ParseException(next);

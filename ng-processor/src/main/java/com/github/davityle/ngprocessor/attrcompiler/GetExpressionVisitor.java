@@ -22,17 +22,22 @@ public class GetExpressionVisitor extends AVisitor {
     }
 
     @Override
+    public void visit(StringLiteral node) {
+        result.append(node.toJavaString());
+    }
+
+    @Override
     public void visit(BinaryOperator node) {
         result.append('(');
-        visit(node.getLHS());
+        node.getLHS().accept(this);
         result.append(node.getToken().getScript());
-        visit(node.getRHS());
+        node.getRHS().accept(this);
         result.append((')'));
     }
 
     @Override
     public void visit(ObjectField node) {
-        visit(node.getLHS());
+        node.getLHS().accept(this);
         result.append('.');
         result.append("get");
         result.append(SourceField.capitalize(node.getToken().getScript()));
@@ -41,7 +46,7 @@ public class GetExpressionVisitor extends AVisitor {
 
     @Override
     public void visit(FunctionCall node) {
-        visit(node.getLHS());
+        node.getLHS().accept(this);
         result.append('(');
 
         boolean isFirst = true;
@@ -53,7 +58,7 @@ public class GetExpressionVisitor extends AVisitor {
                 result.append(',');
             }
 
-            visit(parameter);
+            parameter.accept(this);
         }
 
         result.append(')');
@@ -68,21 +73,21 @@ public class GetExpressionVisitor extends AVisitor {
     @Override
     public void visit(TernaryOperator node) {
         result.append('(');
-        visit(node.getCondition());
+        node.getCondition().accept(this);
         result.append(')');
         result.append('?');
         result.append('(');
-        visit(node.getIfTrue());
+        node.getIfTrue().accept(this);
         result.append(')');
         result.append(':');
         result.append('(');
-        visit(node.getIfFalse());
+        node.getIfFalse().accept(this);
         result.append(')');
     }
 
     @Override
     public void visit(UnaryOperator node) {
         result.append(node.getToken().getScript());
-        visit(node.getRHS());
+        node.getRHS().accept(this);
     }
 }

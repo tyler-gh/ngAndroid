@@ -59,10 +59,10 @@ public enum TokenType {
         SUBTRACTION("-", 4),
         KNOT_EQUALS("!=", 3),
         EQUALS_EQUALS("==", 3),
-        LESS_THAN("<", 1),
-        GREATER_THAN(">", 1),
-        LESS_EQUAL_THAN("<=", 1),
-        GREATER_EQUAL_THAN(">=", 1);
+        LESS_THAN("<", 2),
+        GREATER_THAN(">", 2),
+        LESS_EQUAL_THAN("<=", 2),
+        GREATER_EQUAL_THAN(">=", 2);
 
         final String source;
         final int precedence;

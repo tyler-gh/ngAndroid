@@ -16,9 +16,6 @@
 
 package com.github.davityle.ngprocessor.attrcompiler;
 
-import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
-
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -63,15 +60,17 @@ public class AttributeCompilerTest {
 
     @Test
     public void testStringCompilation(){
+        assertEquals("\"Martin Luther King Jr.\"", AttributeCompiler.translateToJavaGetter("'Martin Luther King Jr.'"));
+
         String getter = AttributeCompiler.translateToJavaGetter("xyz('Martin Luther King Jr.')");
         assertEquals("scope.xyz(\"Martin Luther King Jr.\")", getter);
 
         getter = AttributeCompiler.translateToJavaGetter("xyz('Martin Luther King\\'s Jr.')");
-        assertEquals("scope.xyz(\"Martin Luther King's Jr.\")", getter);
+        assertEquals("scope.xyz(\"Martin Luther King\\'s Jr.\")", getter);
 
 
         getter = AttributeCompiler.translateToJavaGetter("xyz('Martin \"Luther\" King\\'s Jr.')");
-        assertEquals("scope.xyz(\"Martin \\\"Luther\\\" King's Jr.\")", getter);
+        assertEquals("scope.xyz(\"Martin \\\"Luther\\\" King\\'s Jr.\")", getter);
     }
 
     @Test
@@ -80,7 +79,7 @@ public class AttributeCompilerTest {
         assertEquals("((scope.getStringValue()+\"orange \")+scope.getIntValue())", getter);
 
         getter = AttributeCompiler.translateToJavaGetter("isTrue() ? 'abcdefg ' + getIntValue() : getStringValue()");
-        assertEquals("scope.isTrue()?(\"abcdefg \"+scope.getIntValue()):scope.getStringValue()", getter);
+        assertEquals("(scope.isTrue())?((\"abcdefg \"+scope.getIntValue())):(scope.getStringValue())", getter);
     }
 
 }

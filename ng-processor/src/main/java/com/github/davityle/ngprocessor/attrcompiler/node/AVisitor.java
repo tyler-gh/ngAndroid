@@ -23,6 +23,7 @@ public abstract class AVisitor implements IVisitor {
     public void visit(NumberConstant node)  {
         visit((Expression)node);
     }
+    public void visit(StringLiteral node) { visit((Expression)node); }
     public void visit(ObjectField node)  {
         visit((Expression)node);
     }

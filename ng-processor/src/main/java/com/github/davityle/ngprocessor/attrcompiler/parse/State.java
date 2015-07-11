@@ -159,11 +159,27 @@ public enum State
 		}
 	},
 
+	QuestionMark
+	{
+		StepResult step(char currentChar)
+		{
+			return new StepResult(DefaultState(currentChar), TokenType.TERNARY_QUESTION_MARK);
+		}
+	},
+
+	Colon
+	{
+		StepResult step(char currentChar)
+		{
+			return new StepResult(DefaultState(currentChar), TokenType.TERNARY_COLON);
+		}
+	},
+
 	StringState
 	{
 		StepResult step(char currentChar)
 		{
-			if (currentChar == '\"')
+			if (currentChar == '\'')
 			{
 				return new StepResult(State.StringEndState);
 			}
@@ -274,7 +290,7 @@ public enum State
 		{
 			return State.OpClosePState;
 		}
-		else if (currentChar == '"')
+		else if (currentChar == '\'')
 		{
 			return State.StringState;
 		}
@@ -308,6 +324,14 @@ public enum State
 		else if (currentChar == ',')
 		{
 			return State.OpCommaState;
+		}
+		else if (currentChar == '?')
+		{
+			return State.QuestionMark;
+		}
+		else if (currentChar == ':')
+		{
+			return State.Colon;
 		}
 		else if (currentChar == '\0')
 		{
