@@ -153,13 +153,8 @@ public class NgProcessor extends AbstractProcessor {
         dependencyComponent.inject(sourceCreator);
         sourceCreator.createSourceFiles();
 
-        if(!messageUtils.hasErrors()) {
-            messageUtils.note(null, ":NgAndroid:successful");
-            return true;
-        } else {
-            messageUtils.note(null, ":NgAndroid:failed");
-            return false;
-        }
+        messageUtils.note(null, ":NgAndroid:finished");
+        return true;
     }
 
     @Override

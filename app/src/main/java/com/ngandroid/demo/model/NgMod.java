@@ -1,4 +1,4 @@
-package com.ngandroid.demo.models;
+package com.ngandroid.demo.model;
 
 /**
  * Created by tyler on 4/28/15.

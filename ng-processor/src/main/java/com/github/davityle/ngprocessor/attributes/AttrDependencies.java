@@ -19,6 +19,7 @@ public class AttrDependencies extends AttrDependencyMap {
         put(new AttrDependency("FireCheckObserver"));
         put(new AttrDependency("SetTextModelObserver"));
         put(new AttrDependency("TextInteracter"));
+        put(new AttrDependency("NgIf"));
     }
 
     public String getAttributesPackage(){

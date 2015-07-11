@@ -104,6 +104,8 @@ class TestPoint {
 
     private String str;
 
+    private boolean bool;
+
     public Double getX() {
         return x;
     }
@@ -206,5 +208,13 @@ class TestPoint {
 
     public void setStr(String str) {
         this.str = str;
+    }
+
+    public boolean getBool() {
+        return bool;
+    }
+
+    public void setBool(boolean bool) {
+        this.bool = bool;
     }
 }

@@ -14,16 +14,22 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.demo.models.test;
+package com.ngandroid.demo.model.test;
+
+import com.ngandroid.lib.annotations.NgModel;
+import com.ngandroid.lib.annotations.NgScope;
 
 /**
 * Created by tyler on 3/23/15.
 */
-public interface TestModel {
-    public String getJoe();
-    public void setJoe(String joe);
-    public boolean getIsInvisible();
-    public void setIsInvisible(boolean isVisible);
-    public int getNum();
-    public void setNum(int num);
+@NgScope
+public class ModelTestScope {
+//  TODO throw an error in this situation @NgModel
+    public TestSetterRequired testSetterRequired;
+    @NgModel
+    public TestJsonModel testJsonModel;
+    @NgModel
+    public TestSubModel testSubModel;
+    @NgModel
+    public TestClass TestClass;
 }

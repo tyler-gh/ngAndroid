@@ -21,6 +21,7 @@ public class R {
         public static final int fPD = 7;
         public static final int xkd = 8;
         public static final int caseId = 9;
+        public static final int pBool = 10;
     }
 
     public static final class styleable {

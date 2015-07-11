@@ -14,22 +14,19 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.demo.models.test;
+package com.ngandroid.demo.model.test;
+
+import com.ngandroid.lib.annotations.NgModel;
+import com.ngandroid.lib.annotations.NgScope;
 
 /**
 * Created by tyler on 3/23/15.
 */
-public interface TestJsonModel {
-    public int getInt();
-    public void setInt(int i);
-    public float getFloat();
-    public void setFloat(float f);
-    public double getDouble();
-    public void setDouble(double d);
-    public String getString();
-    public void setString(String s);
-    public boolean getBoolean();
-    public void setBoolean(boolean b);
-    public void setJsonModel(TestJsonModel tsm);
-    public TestJsonModel getJsonModel();
+@NgScope
+public class TestBugScope {
+    @NgModel
+    public Input input;
+    public void multiply(int x, int y){
+
+    }
 }

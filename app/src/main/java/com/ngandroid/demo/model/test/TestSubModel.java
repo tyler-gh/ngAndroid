@@ -14,33 +14,12 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.demo.models.test;
-
-import com.ngandroid.lib.annotations.NgModel;
-import com.ngandroid.lib.annotations.NgScope;
+package com.ngandroid.demo.model.test;
 
 /**
 * Created by tyler on 3/23/15.
 */
-@NgScope
-public class TestScope {
-    @NgModel
-    public TestModel modelName;
-    private void method(){
-    }
-    private void method(String value){
-        System.out.println(value);
-    }
-    private void method(int value){
-        System.out.println(value);
-    }
-    private String getStringValue(){
-        return "This is a string value ";
-    }
-    private int getIntValue(){
-        return 42;
-    }
-    private boolean isTrue(){
-        return true;
-    }
+public interface TestSubModel {
+    public void setJsonModel(TestJsonModel tsm);
+    public TestJsonModel getJsonModel();
 }

@@ -1,7 +1,8 @@
-package com.ngandroid.demo.ui.pages.main;
+package com.ngandroid.demo.scope;
 
 import android.app.Fragment;
 
+import com.ngandroid.demo.model.DemoItem;
 import com.ngandroid.lib.annotations.NgModel;
 import com.ngandroid.lib.annotations.NgScope;
 
@@ -9,22 +10,22 @@ import com.ngandroid.lib.annotations.NgScope;
  * Created by tyler on 4/23/15.
  */
 @NgScope
-class DemoScope {
+public class DemoScope {
     @NgModel
     DemoItem item;
 
     private final FragmentSelectedListener fragmentSelectedListener;
 
-    DemoScope(FragmentSelectedListener fragmentSelectedListener){
+    public DemoScope(FragmentSelectedListener fragmentSelectedListener){
         this.fragmentSelectedListener = fragmentSelectedListener;
     }
 
-    void setItem(DemoItem item) {
+    public void setItem(DemoItem item) {
         this.item.setText(item.getText());
         this.item.setFragment(item.getFragment());
     }
 
-    void showFragment(Class<? extends Fragment> fragment){
+    public void showFragment(Class<? extends Fragment> fragment){
         fragmentSelectedListener.onFragmentSelected(fragment);
     }
 

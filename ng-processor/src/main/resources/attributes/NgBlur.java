@@ -24,17 +24,19 @@ import android.widget.ImageView;
 import com.ngandroid.lib.R;
 import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelObserver;
-import com.ngandroid.lib.utils.BlurUtils;
+import com.ngandroid.lib.utils.Blur;
 
 
-class NgBlur extends NgIf{
-    private static NgBlur ourInstance = new NgBlur();
+class NgBlur extends NgIf {
 
-    static NgBlur getInstance() {
-        return ourInstance;
+    static NgBlur getInstance(Blur blur) {
+        return new NgBlur(blur);
     }
 
-    private NgBlur() {
+    private final Blur blur;
+
+    private NgBlur(Blur blur) {
+        this.blur = blur;
     }
 
     @Override
@@ -61,7 +63,7 @@ class NgBlur extends NgIf{
                     if(model.getValue(field)){
                         view.setVisibility(View.GONE);
                         view.setDrawingCacheEnabled(true);
-                        imageView.setImageBitmap(BlurUtils.blurBitmap(view.getDrawingCache(), view.getContext()));
+                        imageView.setImageBitmap(blur.blurBitmap(view.getDrawingCache(), view.getContext()));
                         imageView.setVisibility(View.VISIBLE);
                     }else{
                         view.setVisibility(View.VISIBLE);

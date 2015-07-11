@@ -14,16 +14,19 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.demo.models.test;
-
-import com.ngandroid.lib.annotations.NgModel;
-import com.ngandroid.lib.annotations.NgScope;
+package com.ngandroid.demo.model.test;
 
 /**
-* Created by tyler on 3/23/15.
-*/
-@NgScope
-public class ViewScope {
-    @NgModel
-    public Note note;
+ * Created by tyler on 4/1/15.
+ */
+public class TestClass {
+    private int x;
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getX(){
+        return x;
+    }
 }

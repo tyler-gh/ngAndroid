@@ -14,9 +14,8 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.demo.models.test;
+package com.ngandroid.demo.model.test;
 
-import com.ngandroid.demo.models.Input;
 import com.ngandroid.lib.annotations.NgModel;
 import com.ngandroid.lib.annotations.NgScope;
 
@@ -24,10 +23,24 @@ import com.ngandroid.lib.annotations.NgScope;
 * Created by tyler on 3/23/15.
 */
 @NgScope
-public class TestBugScope {
+public class TestScope {
     @NgModel
-    public Input input;
-    public void multiply(int x, int y){
-
+    public TestModel modelName;
+    private void method(){
+    }
+    private void method(String value){
+        System.out.println(value);
+    }
+    private void method(int value){
+        System.out.println(value);
+    }
+    private String getStringValue(){
+        return "This is a string value ";
+    }
+    private int getIntValue(){
+        return 42;
+    }
+    private boolean isTrue(){
+        return true;
     }
 }

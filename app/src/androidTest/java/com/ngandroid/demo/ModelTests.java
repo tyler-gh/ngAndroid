@@ -18,7 +18,7 @@ package com.ngandroid.demo;
 
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.ngandroid.demo.models.test.ModelTestScope;
+import com.ngandroid.demo.model.test.ModelTestScope;
 import com.ngandroid.demo.ui.pages.main.DemoActivity;
 import com.ngandroid.lib.NgAndroid;
 

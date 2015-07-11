@@ -14,20 +14,22 @@
  *    limitations under the License.
  */
 
-package com.ngandroid.demo.models.test;
+package com.ngandroid.demo.model.test;
 
 /**
 * Created by tyler on 3/23/15.
 */
-public interface Note {
-    public long getTime();
-    public void setTime(long time);
-    public int getId();
-    public void setId(int id);
-    public String getTimeString();
-    public void setTimeString(String timeString);
-    public String getTitle();
-    public void setTitle(String title);
-    public String getText();
-    public void setText(String text);
+public interface TestJsonModel {
+    public int getInt();
+    public void setInt(int i);
+    public float getFloat();
+    public void setFloat(float f);
+    public double getDouble();
+    public void setDouble(double d);
+    public String getString();
+    public void setString(String s);
+    public boolean getBoolean();
+    public void setBoolean(boolean b);
+    public void setJsonModel(TestJsonModel tsm);
+    public TestJsonModel getJsonModel();
 }
