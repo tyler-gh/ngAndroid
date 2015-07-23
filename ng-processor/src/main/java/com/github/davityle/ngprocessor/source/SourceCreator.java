@@ -73,14 +73,16 @@ public class SourceCreator {
         Template vtAttrs = ve.getTemplate("templates/attrs.vm");
 
         for(AttrDependency attrDependency : attrDependencies) {
-            try {
-                JavaFileObject jfo = filer.createSourceFile(attrPackageResolver.getPackage() + "." + attrDependency.getClassName());
-                Writer writer = jfo.openWriter();
-                writer.write(attrDependency.getSourceCode());
-                writer.flush();
-                writer.close();
-            }catch (IOException e){
-                messageUtils.error(null, e.getMessage());
+            if(attrDependency.getSourceCode().isPresent()) {
+                try {
+                    JavaFileObject jfo = filer.createSourceFile(attrPackageResolver.getPackage() + "." + attrDependency.getClassName());
+                    Writer writer = jfo.openWriter();
+                    writer.write(attrDependency.getSourceCode().get());
+                    writer.flush();
+                    writer.close();
+                } catch (IOException e) {
+                    messageUtils.error(null, e.getMessage());
+                }
             }
         }
 

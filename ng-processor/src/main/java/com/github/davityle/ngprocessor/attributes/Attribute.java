@@ -1,5 +1,7 @@
 package com.github.davityle.ngprocessor.attributes;
 
+import com.github.davityle.ngprocessor.util.Option;
+
 /**
  * Created by tyler on 7/3/15.
  */
@@ -10,6 +12,11 @@ public class Attribute extends AttrDependency {
 
     public Attribute(String className){
         this(className, toAttrName(className));
+    }
+
+    public Attribute(String className, Option<String> source) {
+        super(className, source);
+        this.attrName = toAttrName(className);
     }
 
     public Attribute(String className, String attrName) {

@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.lang.model.element.Element;
@@ -99,15 +98,15 @@ public class ScopeSourceLinker {
         if(xmlNodes != null) {
             // This could be done by just mapping elements to the layout instead of linking to the
             // node in LayoutScopeMapper
-            for (XmlNode xmlNode : xmlNodes) {
-                String layoutName = xmlNode.getLayoutName();
-                Set<XmlNode> ids = layouts.get(layoutName);
-                if (ids == null) {
-                    ids = new TreeSet<>(TUPLE_COMPARATOR);
-                    layouts.put(layoutName, ids);
-                }
-                ids.add(xmlNode);
-            }
+//            for (XmlNode xmlNode : xmlNodes) {
+//                String layoutName = xmlNode.getLayoutName();
+//                Set<XmlNode> ids = layouts.get(layoutName);
+//                if (ids == null) {
+//                    ids = new TreeSet<>(TUPLE_COMPARATOR);
+//                    layouts.put(layoutName, ids);
+//                }
+//                ids.add(xmlNode);
+//            }
         }
         return new NgScopeSourceLink(className, packageName, fullName, fields, els, layouts, manifestPackageName);
     }

@@ -58,10 +58,10 @@ public class ${simpleClassName}$$NgScope <T extends ${fullName}> implements com.
                                     else if(attr == ${manifestPackageName}.R.styleable.ngAndroid_${attr.name}){
                                     #end
                                         #if($attr.source.void)
-                                            ${attr.source};
+                                            ${attr.source.getterSource};
                                             return null;
                                         #else
-                                            return ${attr.source};
+                                            return ${attr.source.setterSource};
                                         #end
                                     }
                                 #end

@@ -46,15 +46,15 @@ public class Tokenizer
 
                 if (tokenType != TokenType.NONE)
                 {
-                    if (tokenType != TokenType.WHITESPACE)
-                    {
-                        String tokenValue = source.substring(currentTokenStart, currentPosition);
-                        result.add(new Token(tokenType, tokenValue, currentTokenStart));
-                    }
-                    else if (tokenType == TokenType.RUBBISH)
+                    if (tokenType == TokenType.RUBBISH)
                     {
                         String tokenValue = source.substring(currentTokenStart, currentPosition);
                         throw new ParseException(new Token(tokenType, tokenValue, currentTokenStart), "Unexpected character '" + currentChar + "' at col " + currentTokenStart);
+                    }
+                    else if (tokenType != TokenType.WHITESPACE)
+                    {
+                        String tokenValue = source.substring(currentTokenStart, currentPosition);
+                        result.add(new Token(tokenType, tokenValue, currentTokenStart));
                     }
 
                     currentTokenStart = currentPosition;

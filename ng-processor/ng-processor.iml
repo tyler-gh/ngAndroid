@@ -51,5 +51,7 @@
     <orderEntry type="library" exported="" scope="TEST" name="httpcore-4.0.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="commons-codec-1.3" level="project" />
     <orderEntry type="library" exported="" name="ng-processor.ng-processor-1.0.9-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="ng-processor.ng-processor-1.0.9-SNAPSHOT-javadoc" level="project" />
+    <orderEntry type="library" exported="" name="ng-processor.ng-processor-1.0.9-SNAPSHOT-sources" level="project" />
   </component>
 </module>

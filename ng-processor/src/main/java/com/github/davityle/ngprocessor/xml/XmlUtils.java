@@ -16,172 +16,214 @@
 
 package com.github.davityle.ngprocessor.xml;
 
-import com.github.davityle.ngprocessor.attrcompiler.AttributeCompiler;
 import com.github.davityle.ngprocessor.attrcompiler.parse.ParseException;
-import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import com.github.davityle.ngprocessor.attributes.Attributes;
+import com.github.davityle.ngprocessor.attributes.ScopeAttrNameResolver;
 import com.github.davityle.ngprocessor.finders.LayoutsFinder;
+import com.github.davityle.ngprocessor.finders.NamespaceFinder;
+import com.github.davityle.ngprocessor.util.CollectionUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.Option;
+import com.github.davityle.ngprocessor.util.Tuple;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-/**
- * Created by tyler on 3/30/15.
- */
 public class XmlUtils {
 
-    private static final Pattern NAME_SPACE_PATTERN = Pattern.compile("xmlns:(.+)=\"http://schemas.android.com/apk/res-auto\"");
     private static final Pattern ID_ATTR_PATTERN = Pattern.compile("android:id=\"@\\+id/(.+)\"");
     private static final String NAMESPACE_ATTRIBUTE_REG = "%s:(.+)=\"(.+)\"";
 
     private final MessageUtils messageUtils;
+    private final CollectionUtils collectionUtils;
+    private final ScopeAttrNameResolver scopeAttrNameResolver;
     private final LayoutsFinder layoutsFinder;
-    private final AttributeCompiler attributeCompiler;
+    private final NamespaceFinder namespaceFinder;
     private final Attributes attributes;
+    private Pattern attrPattern;
 
     @Inject
-    public XmlUtils(MessageUtils messageUtils, LayoutsFinder layoutsFinder, AttributeCompiler attributeCompiler, Attributes attributes){
+    public XmlUtils(MessageUtils messageUtils, CollectionUtils collectionUtils, ScopeAttrNameResolver scopeAttrNameResolver, LayoutsFinder layoutsFinder, NamespaceFinder namespaceFinder, Attributes attributes){
         this.messageUtils = messageUtils;
+        this.collectionUtils = collectionUtils;
+        this.scopeAttrNameResolver = scopeAttrNameResolver;
         this.layoutsFinder = layoutsFinder;
-        this.attributeCompiler = attributeCompiler;
+        this.namespaceFinder = namespaceFinder;
         this.attributes = attributes;
+    }
+
+    /**
+     * maps all of the layouts to their scopes, could be optimized
+     * @return
+     */
+    public Map<String, Collection<XmlScope>> getFileNodeMap() {
+        List<File> layoutDirs = layoutsFinder.findLayoutDirs();
+
+        Collection<File> layoutFiles = collectionUtils.flatMap(layoutDirs, new CollectionUtils.Function<File, Collection<File>>() {
+            @Override
+            public Collection<File> apply(File file) {
+                return collectionUtils.filter(Arrays.asList(file.listFiles()), new CollectionUtils.Function<File, Boolean>() {
+                    @Override
+                    public Boolean apply(File file) {
+                        return file.getName().endsWith(".xml");
+                    }
+                });
+            }
+        });
+
+        Collection<Document> docs = collectionUtils.flatMapOpt(layoutFiles, new CollectionUtils.Function<File, Option<Document>>() {
+            @Override
+            public Option<Document> apply(File file) {
+                return getDocumentFromFile(file);
+            }
+        });
+
+        return collectionUtils.toMap(collectionUtils.flatMapOpt(docs, new CollectionUtils.Function<Document, Option<Tuple<String, Collection<XmlScope>>>>() {
+            @Override
+            public Option<Tuple<String, Collection<XmlScope>>> apply(Document doc) {
+                Option<String> optNameSpace = namespaceFinder.getNameSpace(doc);
+                if (optNameSpace.isPresent()) {
+                    attrPattern = Pattern.compile(String.format(NAMESPACE_ATTRIBUTE_REG, optNameSpace.get()));
+                    Collection<XmlScope> scopes = getScopes(doc);
+                    return Option.of(Tuple.of(doc.getDocumentURI(), scopes));
+                } else {
+                    return Option.absent();
+                }
+            }
+        }));
+    }
+
+    private Collection<XmlScope> getScopes(Node scopeNode) {
+
+        NodeListCollection nodeList = new NodeListCollection(scopeNode.getChildNodes());
+
+        Collection<XmlScope> scopes = collectionUtils.flatMapOpt(nodeList, new CollectionUtils.Function<Node, Option<XmlScope>>() {
+            @Override
+            public Option<XmlScope> apply(final Node node) {
+                return getScopeAttr(node).map(new Option.Map<XmlScope, XmlScope>() {
+                    @Override
+                    public XmlScope map(XmlScope xmlScope) {
+                        return xmlScope.addAttributes(getAttributes(node));
+                    }
+                });
+            }
+        });
+
+        scopes.addAll(collectionUtils.flatMap(nodeList, new CollectionUtils.Function<Node, Collection<XmlScope>>() {
+            @Override
+            public Collection<XmlScope> apply(Node node) {
+                return getScopes(node);
+            }
+        }));
+
+        if(!scopes.isEmpty()){
+            throw new RuntimeException(scopes.toString());
+        }
+
+//        System.out.println(scopes);
+
+        return scopes;
+    }
+
+    private Option<XmlScope> getScopeAttr(Node node) {
+        return Option.of(node.getAttributes()).fold(new Option.OptionCB<NamedNodeMap, Option<XmlScope>>() {
+            @Override
+            public Option<XmlScope> absent() {
+                return Option.absent();
+            }
+            @Override
+            public Option<XmlScope> present(NamedNodeMap namedNodeMap) {
+                for (Node attr : new NamedNodeMapCollection(namedNodeMap)) {
+                    Matcher matcher = attrPattern.matcher(attr.toString());
+                    if(matcher.matches()) System.out.println(matcher.group(1));
+                    if(matcher.matches() && scopeAttrNameResolver.getScopeAttrName().equals(matcher.group(1))) {
+                        return Option.of(new XmlScope(matcher.group(2)));
+                    }
+                }
+                return Option.absent();
+            }
+        });
+    }
+
+    private Collection<XmlAttribute> getAttributes(Node node) {
+        if(getScopeAttr(node).isPresent())
+            return Collections.emptyList();
+
+        Collection<XmlAttribute> nodeAttrs = Option.of(node.getAttributes()).fold(new Option.OptionCB<NamedNodeMap, Collection<XmlAttribute>>() {
+            @Override
+            public Collection<XmlAttribute> absent() {
+                return Collections.emptyList();
+            }
+
+            @Override
+            public Collection<XmlAttribute> present(NamedNodeMap namedNodeMap) {
+
+                Option<String> nodeId = getNodeId(namedNodeMap);
+                List<XmlAttribute> attributeList = new ArrayList<>();
+
+                for (Node node : new NamedNodeMapCollection(namedNodeMap)) {
+                    Matcher matcher = attrPattern.matcher(node.toString());
+                    String attr = matcher.group(1);
+                    if (attributes.containsKey(attr)) {
+                        String value = matcher.group(2);
+                        try {
+                            XmlAttribute xmlAttribute = new XmlAttribute(attr, value, nodeId);
+                            attributeList.add(xmlAttribute);
+                        } catch (ParseException | RuntimeException e) {
+                            Object[] params = new Object[]{node.getBaseURI(), attr, nodeId.getOrElse("no id available"), value, e.getMessage()};
+                            messageUtils.error(null, "Layout file '%s' has an invalid attribute '%s' in view '%s' with value '%s' because '%s'", params);
+                        }
+                    }
+                }
+
+                return attributeList;
+            }
+        });
+
+        nodeAttrs.addAll(collectionUtils.flatMap(new NodeListCollection(node.getChildNodes()), new CollectionUtils.Function<Node, Collection<XmlAttribute>>() {
+            @Override
+            public Collection<XmlAttribute> apply(Node node) {
+                return getAttributes(node);
+            }
+        }));
+
+        return nodeAttrs;
+    }
+
+    private Option<String> getNodeId(NamedNodeMap nodeMap) {
+        for(int j = 0; j < nodeMap.getLength(); j++) {
+            Node node = nodeMap.item(j);
+            Matcher idMatcher = ID_ATTR_PATTERN.matcher(node.toString());
+
+            if (idMatcher.matches()) {
+                return Option.of(idMatcher.group(1));
+            }
+        }
+        return Option.absent();
     }
 
     public Option<Document> getDocumentFromFile(File file){
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            return Option.of(db.parse(file));
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
+            document.setDocumentURI(file.getAbsolutePath());
+            return Option.of(document);
         } catch (Exception e) {
             messageUtils.error(null, e.getMessage());
             return Option.absent();
         }
-    }
-
-    public Map<File, List<com.github.davityle.ngprocessor.xml.XmlNode>> getFileNodeMap(){
-        List<File> layoutDirs = layoutsFinder.findLayouts();
-        Map<File, List<com.github.davityle.ngprocessor.xml.XmlNode>> xmlAttrMap = new HashMap<>();
-
-        for(File f : layoutDirs){
-            for(File kid : f.listFiles()){
-                if(kid.getName().endsWith(".xml")){
-                    Option<Document> doc = getDocumentFromFile(kid);
-                    if(doc.isAbsent()){
-                        continue;
-                    }
-
-                    NodeList children = doc.get().getChildNodes();
-                    String nameSpace = getNameSpace(children);
-                    if(nameSpace != null){
-                        String pattern = String.format(NAMESPACE_ATTRIBUTE_REG, nameSpace);
-                        Pattern nameSpaceAttributePattern = Pattern.compile(pattern);
-                        List<com.github.davityle.ngprocessor.xml.XmlNode> nodeList = new ArrayList<>();
-                        getNgAttrNodes(doc.get(), nameSpaceAttributePattern, nodeList, kid.getName());
-                        for(com.github.davityle.ngprocessor.xml.XmlNode xmlNode : nodeList){
-                            for(XmlAttribute xmlAttribute : xmlNode.getAttributes()){
-                                try {
-                                    Source source = new Source(xmlAttribute.getValue());
-                                    xmlAttribute.setSource(source);
-                                }
-                                catch (ParseException | RuntimeException e) {
-                                    messageUtils.error(null,
-                                            "Layout file '%s' has an invalid attribute '%s' in view '%s' with value '%s' because '%s'",
-                                            kid,
-                                            xmlAttribute.getName(),
-                                            xmlNode.getId(),
-                                            xmlAttribute.getValue(),
-                                            e.getMessage()
-                                    );
-                                }
-                            }
-                        }
-                        xmlAttrMap.put(kid, nodeList);
-                    }
-                }
-            }
-        }
-        return xmlAttrMap;
-    }
-
-    private void getNgAttrNodes(Node n, Pattern attributePattern, List<com.github.davityle.ngprocessor.xml.XmlNode> ngAttrNodes, String fileName){
-        if(n == null || !n.hasChildNodes())
-            return;
-
-        NodeList nodes = n.getChildNodes();
-        for(int index = 0; index < nodes.getLength(); index++) {
-            Node childNode = nodes.item(index);
-            NamedNodeMap nodeMap = childNode.getAttributes();
-            if(nodeMap != null){
-                List<XmlAttribute> attributeList = null;
-                String id = null;
-                for(int j = 0; j < nodeMap.getLength(); j++){
-                    Node node = nodeMap.item(j);
-                    Matcher idMatcher = ID_ATTR_PATTERN.matcher(node.toString());
-
-                    if(idMatcher.matches()){
-                        id = idMatcher.group(1);
-                        continue;
-                    }
-
-                    Matcher matcher = attributePattern.matcher(node.toString());
-                    if(matcher.matches()){
-                        if(attributeList == null)
-                            attributeList = new ArrayList<>();
-                        String attr = matcher.group(1);
-                        if(attributes.containsKey(attr)) {
-                            attributeList.add(new XmlAttribute(attr, matcher.group(2)));
-                        }
-                    }
-
-                }
-                if(attributeList != null && !attributeList.isEmpty()){
-                    if(id == null){
-                        messageUtils.error(null, "xml attributes '%s' in node '%s' in layout file '%s' need an id", attributeList.toString(), childNode.toString(), fileName);
-                    }else {
-                        ngAttrNodes.add(new com.github.davityle.ngprocessor.xml.XmlNode(id, attributeList, fileName, childNode.getNodeName()));
-                    }
-                }
-            }
-            getNgAttrNodes(childNode, attributePattern, ngAttrNodes, fileName);
-        }
-    }
-
-    private String getNameSpace(NodeList nodes){
-        for(int index = 0; index < nodes.getLength(); index++) {
-            NamedNodeMap nodeMap = nodes.item(index).getAttributes();
-            if(nodeMap != null){
-                for(int j = 0; j < nodeMap.getLength(); j++){
-                    Matcher matcher = NAME_SPACE_PATTERN.matcher(nodeMap.item(j).toString());
-                    if(matcher.matches()){
-                        return matcher.group(1);
-                    }
-                }
-            }
-        }
-        for(int index = 0; index < nodes.getLength(); index++) {
-            NodeList nodeList = nodes.item(index).getChildNodes();
-            if(nodeList != null){
-                String namespace = getNameSpace(nodeList);
-                if(namespace != null)
-                    return namespace;
-            }
-        }
-        return null;
     }
 }

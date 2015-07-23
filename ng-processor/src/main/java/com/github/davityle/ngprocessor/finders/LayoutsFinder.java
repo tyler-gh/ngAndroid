@@ -42,7 +42,7 @@ public class LayoutsFinder {
         this.defaultLayoutDirProvider = defaultLayoutDirProvider;
     }
 
-    public List<File> findLayouts(){
+    public List<File> findLayoutDirs(){
         return defaultLayoutDirProvider.getDefaultLayoutDir().fold(new Option.OptionCB<String, List<File>>() {
             @Override
             public List<File> absent() {
@@ -65,7 +65,7 @@ public class LayoutsFinder {
 
                 File root = new File(".");
                 List<File> files = new ArrayList<>();
-                findLayouts(root, files);
+                findLayoutDirs(root, files);
                 return files;
             }
 
@@ -85,7 +85,7 @@ public class LayoutsFinder {
         return Collections.singletonList(file);
     }
 
-    private void findLayouts(File f, List<File> files){
+    private void findLayoutDirs(File f, List<File> files){
         File[] kids = f.listFiles();
         if(kids != null) {
             for (File file : kids) {
@@ -94,7 +94,7 @@ public class LayoutsFinder {
                     if (file.getName().equals("layout")) {
                         files.add(file);
                     } else {
-                        findLayouts(file, files);
+                        findLayoutDirs(file, files);
                     }
                 }
             }

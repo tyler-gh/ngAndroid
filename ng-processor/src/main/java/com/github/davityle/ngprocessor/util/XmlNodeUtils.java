@@ -1,9 +1,10 @@
 package com.github.davityle.ngprocessor.util;
 
-import com.github.davityle.ngprocessor.xml.XmlNode;
+import com.github.davityle.ngprocessor.xml.XmlAttribute;
+import com.github.davityle.ngprocessor.xml.XmlScope;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,17 +14,25 @@ import javax.inject.Inject;
  * Created by tyler on 7/6/15.
  */
 public class XmlNodeUtils {
-    @Inject
-    public XmlNodeUtils() {
 
+    private final CollectionUtils collectionUtils;
+
+    @Inject
+    public XmlNodeUtils(CollectionUtils collectionUtils) {
+        this.collectionUtils = collectionUtils;
     }
 
-    public Set<String> getAttributes(Map<? extends Object, List<XmlNode>> nodeMap) {
+    public Set<String> getAttributes(Map<?, Collection<XmlScope>> nodeMap) {
         Set<String> attrs = new HashSet<>();
 
-        for(List<XmlNode> nodes : nodeMap.values()) {
-            for(XmlNode node : nodes) {
-                attrs.addAll(node.getAttrs());
+        for(Collection<XmlScope> nodes : nodeMap.values()) {
+            for(XmlScope node : nodes) {
+                attrs.addAll(collectionUtils.map(node.getAttributes(), new CollectionUtils.Function<XmlAttribute, String>() {
+                    @Override
+                    public String apply(XmlAttribute xmlAttribute) {
+                        return xmlAttribute.getName();
+                    }
+                }));
             }
         }
 

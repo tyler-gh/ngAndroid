@@ -19,10 +19,12 @@ package com.github.davityle.ngprocessor.map;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.TypeUtils;
+import com.github.davityle.ngprocessor.xml.XmlAttribute;
 import com.github.davityle.ngprocessor.xml.XmlNode;
+import com.github.davityle.ngprocessor.xml.XmlScope;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +35,7 @@ import javax.lang.model.element.Element;
 
 public class LayoutScopeMapper {
 
-    private final Set<Map.Entry<File, List<XmlNode>>> xmlLayouts;
+    private final Set<Map.Entry<String, Collection<XmlScope>>> xmlLayouts;
     private final Map<Element, List<XmlNode>> elementNodeMap = new HashMap<>();
     private final List<Element> scopes;
     private boolean isMapped;
@@ -45,7 +47,7 @@ public class LayoutScopeMapper {
     @Inject
     TypeUtils typeUtils;
 
-    public LayoutScopeMapper(List<Element> scopes, Map<File, List<XmlNode>> fileNodeMap){
+    public LayoutScopeMapper(List<Element> scopes, Map<String, Collection<XmlScope>> fileNodeMap){
         this.scopes = scopes;
         this.xmlLayouts = fileNodeMap.entrySet();
     }
@@ -59,7 +61,26 @@ public class LayoutScopeMapper {
     }
 
     private void linkLayouts(){
+        final Map<XmlNode, Boolean> viewScopeMap = new HashMap<XmlNode, Boolean>();
+
+        for (Map.Entry<String, Collection<XmlScope>> layout : xmlLayouts) {
+            Collection<XmlScope> views = layout.getValue();
+            for (Element scope : scopes) {
+                if(scopeMatchesAll(scope, views)){
+
+                }
+            }
+        }
         isMapped = true;
+    }
+
+    private boolean scopeMatchesAll(Element scope, Collection<XmlScope> views) {
+        for(XmlScope node : views){
+            for(XmlAttribute attribute : node.getAttributes()){
+                
+            }
+        }
+        return false;
     }
 
     private void put(XmlNode view, Element element){

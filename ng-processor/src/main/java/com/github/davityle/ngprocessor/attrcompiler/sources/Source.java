@@ -21,13 +21,6 @@ import com.github.davityle.ngprocessor.attrcompiler.SetExpressionVisitor;
 import com.github.davityle.ngprocessor.attrcompiler.node.Node;
 import com.github.davityle.ngprocessor.attrcompiler.parse.ParseException;
 import com.github.davityle.ngprocessor.attrcompiler.parse.Parser;
-import com.github.davityle.ngprocessor.util.TypeUtils;
-
-import org.apache.velocity.runtime.directive.Parse;
-
-import java.util.List;
-
-import javax.lang.model.type.TypeMirror;
 
 /**
  * Created by davityle on 1/24/15.
@@ -45,5 +38,9 @@ public class Source {
 
     public String getSetterSource(String value) {
         return SetExpressionVisitor.generateSetExpression(node, value);
+    }
+
+    public boolean isVoid() {
+        return false;
     }
 }

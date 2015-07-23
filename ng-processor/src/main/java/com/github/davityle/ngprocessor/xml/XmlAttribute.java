@@ -16,21 +16,23 @@
 
 package com.github.davityle.ngprocessor.xml;
 
+import com.github.davityle.ngprocessor.attrcompiler.parse.ParseException;
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.github.davityle.ngprocessor.util.Option;
 
 /**
 * Created by tyler on 3/25/15.
 */
 public class XmlAttribute {
     private final String name, value;
+    private final Option<String> viewId;
     private Source source;
 
-    XmlAttribute(String name, String value) {
+    XmlAttribute(String name, String value, Option<String> viewId) throws ParseException {
         this.name = name;
         this.value = value;
+        this.viewId = viewId;
+        this.source = new Source(value);
     }
 
     public String getName() {

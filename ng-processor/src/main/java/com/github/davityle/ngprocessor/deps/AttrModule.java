@@ -1,6 +1,7 @@
 package com.github.davityle.ngprocessor.deps;
 
 import com.github.davityle.ngprocessor.attributes.AttrPackageResolver;
+import com.github.davityle.ngprocessor.attributes.ScopeAttrNameResolver;
 
 import dagger.Module;
 import dagger.Provides;
@@ -18,6 +19,21 @@ public class AttrModule {
             @Override
             public String getAttrClassName() {
                 return "AttrsImpl";
+            }
+        };
+    }
+
+    @Provides
+    public ScopeAttrNameResolver scopeAttrNameResolver() {
+        return new ScopeAttrNameResolver() {
+            @Override
+            public String getScopeAttrName() {
+                return "ngScope";
+            }
+
+            @Override
+            public String getScopeAttrNameUppercase() {
+                return "NgScope";
             }
         };
     }

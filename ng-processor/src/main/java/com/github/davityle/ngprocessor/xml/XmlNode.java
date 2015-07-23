@@ -26,18 +26,12 @@ import java.util.Set;
 public class XmlNode {
     private final String id;
     private final List<? extends XmlAttribute> attributes;
-    private final String layoutParent;
     private final String elementType;
 
-    public XmlNode(String id, List<? extends XmlAttribute> attributes, String layoutParent, String elementType) {
+    public XmlNode(String id, List<? extends XmlAttribute> attributes, String elementType) {
         this.id = id;
         this.attributes = attributes;
         this.elementType = elementType;
-        this.layoutParent = layoutParent.replace(".xml","");
-    }
-
-    public String getLayoutName(){
-        return layoutParent;
     }
 
     public String getElementType(){
@@ -69,7 +63,7 @@ public class XmlNode {
 
     @Override
     public int hashCode() {
-        return layoutParent.hashCode() * 17 + id.hashCode() * 7 + attributes.hashCode() * 31;
+        return id.hashCode() * 7 + attributes.hashCode() * 31 + elementType.hashCode() * 17;
     }
 }
 

@@ -35,9 +35,11 @@ import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 import com.github.davityle.ngprocessor.util.Option;
 import com.github.davityle.ngprocessor.util.XmlNodeUtils;
-import com.github.davityle.ngprocessor.xml.XmlNode;
+import com.github.davityle.ngprocessor.xml.XmlScope;
 
-import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +54,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.tools.Diagnostic;
 
 import dagger.Module;
 import dagger.Provides;
@@ -90,72 +93,81 @@ public class NgProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        try {
+            if (annotations.size() == 0)
+                return false;
 
-        if(annotations.size() == 0)
-            return false;
+            final DependencyComponent dependencyComponent = DaggerDependencyComponent
+                    .builder()
+                    .layoutModule(layoutModule)
+                    .environmentModule(new EnvironmentModule(roundEnv))
+                    .attrModule(new AttrModule())
+                    .build();
 
-        final DependencyComponent dependencyComponent = DaggerDependencyComponent
-                .builder()
-                .layoutModule(layoutModule)
-                .environmentModule(new EnvironmentModule(roundEnv))
-                .attrModule(new AttrModule())
-                .build();
+            MessageUtils messageUtils = dependencyComponent.createMessageUtils();
+            messageUtils.note(null, ":NgAndroid:processing");
 
-        MessageUtils messageUtils = dependencyComponent.createMessageUtils();
+            Option<String> manifestPackageName = getPackageNameFromAndroidManifest(dependencyComponent);
 
-        ManifestPackageUtils manifestPackageUtils = dependencyComponent.createManifestPackageUtils();
+            if (manifestPackageName.isAbsent()) {
+                messageUtils.error(null, ":NgAndroid:Unable to find android manifest.");
+                return false;
+            }
 
-        messageUtils.note(null, ":NgAndroid:processing");
+            // get the elements annotated with NgScope
+            List<Element> scopes = dependencyComponent.createNgScopeAnnotationUtils().getScopes(annotations);
 
-        Option<String> manifestPackageName = manifestPackageUtils.getPackageName();
+            // get the xml layouts/nodes with attributes
+            Map<String, Collection<XmlScope>> fileNodeMap = dependencyComponent.createXmlUtils().getFileNodeMap();
 
-        if(manifestPackageName.isAbsent()) {
-            messageUtils.error(null, ":NgAndroid:Unable to find android manifest.");
+            if (messageUtils.hasErrors())
+                return false;
+
+            LayoutScopeMapper layoutScopeMapper = new LayoutScopeMapper(scopes, fileNodeMap);
+            ModelScopeMapper modelScopeMapper = new ModelScopeMapper(annotations, scopes);
+
+            dependencyComponent.inject(layoutScopeMapper);
+            dependencyComponent.inject(modelScopeMapper);
+
+            // get the mapped models
+            Map<String, Element> modelMap = modelScopeMapper.getModels();
+            // get the mapped scopes
+            Map<String, List<Element>> scopeMap = modelScopeMapper.getScopeMap();
+
+            ModelSourceLinker sourceLinker = new ModelSourceLinker(modelMap);
+            dependencyComponent.inject(sourceLinker);
+            // get the model to source links
+            List<NgModelSourceLink> modelSourceLinks = sourceLinker.getSourceLinks();
+            // get the scope to source links
+            ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopes, scopeMap, layoutScopeMapper.getElementNodeMap(), manifestPackageName.get());
+            dependencyComponent.inject(scopeSourceLinker);
+            List<NgScopeSourceLink> scopeSourceLinks = scopeSourceLinker.getSourceLinks();
+
+            AttrDependencyUtils attrDependencyUtils = dependencyComponent.createAttrDependencyUtils();
+            XmlNodeUtils xmlNodeUtils = dependencyComponent.createXmlNodeUtils();
+
+            Set<AttrDependency> dependencySet = attrDependencyUtils.getDependencies(xmlNodeUtils.getAttributes(fileNodeMap));
+
+            // create the source files
+            SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, scopeSourceLinks, dependencySet);
+            dependencyComponent.inject(sourceCreator);
+            sourceCreator.createSourceFiles();
+
+            messageUtils.note(null, ":NgAndroid:finished");
+            return true;
+        } catch (Throwable t) {
+            StringWriter sw = new StringWriter();
+            t.printStackTrace(new PrintWriter(sw));
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "There was an error compiling your ngAttributes: " + sw.toString().replace('\n', ' '), null);
             return false;
         }
-
-        // get the elements annotated with NgScope
-        List<Element> scopes = dependencyComponent.createNgScopeAnnotationUtils().getScopes(annotations);
-
-        // get the xml layouts/nodes with attributes
-        Map<File, List<XmlNode>> fileNodeMap = dependencyComponent.createXmlUtils().getFileNodeMap();
-
-        if(messageUtils.hasErrors())
-            return false;
-
-        LayoutScopeMapper layoutScopeMapper = new LayoutScopeMapper(scopes, fileNodeMap);
-        ModelScopeMapper modelScopeMapper = new ModelScopeMapper(annotations, scopes);
-
-        dependencyComponent.inject(layoutScopeMapper);
-        dependencyComponent.inject(modelScopeMapper);
-
-        // get the mapped models
-        Map<String, Element> modelMap = modelScopeMapper.getModels();
-        // get the mapped scopes
-        Map<String, List<Element>> scopeMap = modelScopeMapper.getScopeMap();
-
-        ModelSourceLinker sourceLinker = new ModelSourceLinker(modelMap);
-        dependencyComponent.inject(sourceLinker);
-        // get the model to source links
-        List<NgModelSourceLink> modelSourceLinks = sourceLinker.getSourceLinks();
-        // get the scope to source links
-        ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopes, scopeMap, layoutScopeMapper.getElementNodeMap(), manifestPackageName.get());
-        dependencyComponent.inject(scopeSourceLinker);
-        List<NgScopeSourceLink> scopeSourceLinks = scopeSourceLinker.getSourceLinks();
-
-        AttrDependencyUtils attrDependencyUtils = dependencyComponent.createAttrDependencyUtils();
-        XmlNodeUtils xmlNodeUtils = dependencyComponent.createXmlNodeUtils();
-
-        Set<AttrDependency> dependencySet = attrDependencyUtils.getDependencies(xmlNodeUtils.getAttributes(fileNodeMap));
-
-        // create the source files
-        SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, scopeSourceLinks, dependencySet);
-        dependencyComponent.inject(sourceCreator);
-        sourceCreator.createSourceFiles();
-
-        messageUtils.note(null, ":NgAndroid:finished");
-        return true;
     }
+
+    private Option<String> getPackageNameFromAndroidManifest(DependencyComponent dependencyComponent) {
+        ManifestPackageUtils manifestPackageUtils = dependencyComponent.createManifestPackageUtils();
+        return manifestPackageUtils.getPackageName();
+    }
+
 
     @Override
     public SourceVersion getSupportedSourceVersion() {

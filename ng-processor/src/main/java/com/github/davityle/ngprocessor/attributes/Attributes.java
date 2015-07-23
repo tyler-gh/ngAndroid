@@ -1,10 +1,13 @@
 package com.github.davityle.ngprocessor.attributes;
 
+import com.github.davityle.ngprocessor.util.Option;
+
 import javax.inject.Inject;
 
 public class Attributes extends AttributeMap {
     @Inject
-    public Attributes() {
+    public Attributes(ScopeAttrNameResolver scopeAttrNameResolver) {
+        put(new Attribute(scopeAttrNameResolver.getScopeAttrNameUppercase(), Option.<String>absent()));
         put(new Attribute("NgBlur").setAttrParameters("blur").setDependencies("NgIf"));
         put(new Attribute("NgChange").setDependencies("Executor"));
         put(new Attribute("NgClick").setDependencies("Executor"));

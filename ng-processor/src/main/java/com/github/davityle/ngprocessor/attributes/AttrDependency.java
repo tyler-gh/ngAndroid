@@ -1,5 +1,7 @@
 package com.github.davityle.ngprocessor.attributes;
 
+import com.github.davityle.ngprocessor.util.Option;
+
 import java.util.Scanner;
 
 /**
@@ -8,14 +10,14 @@ import java.util.Scanner;
 public class AttrDependency {
 
     private final String className;
-    private final String sourceCode;
+    private final Option<String> sourceCode;
     private String[] dependencies;
 
     public AttrDependency(String className) {
-        this(className, getResource("attributes/" + className + ".java"));
+        this(className, Option.of(getResource("attributes/" + className + ".java")));
     }
 
-    public AttrDependency(String className, String sourceCode) {
+    public AttrDependency(String className, Option<String> sourceCode) {
         this.className = className;
         this.sourceCode = sourceCode;
     }
@@ -24,7 +26,7 @@ public class AttrDependency {
         return className;
     }
 
-    public String getSourceCode() {
+    public Option<String> getSourceCode() {
         return sourceCode;
     }
 
