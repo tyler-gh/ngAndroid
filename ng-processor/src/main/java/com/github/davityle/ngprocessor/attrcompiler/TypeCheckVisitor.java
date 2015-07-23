@@ -28,19 +28,16 @@ public class TypeCheckVisitor extends AVisitor {
     }
 
     public void visit(FunctionCall node)  {
-        System.out.println(node.getToken().getScript());
-
         for(Expression expression : node.getParameters()){
             expression.accept(this);
         }
     }
 
     public void visit(Identifier node)  {
-        System.out.println(node.getToken().getScript());
+//        System.out.println(node.getToken().getScript());
     }
 
     public void visit(ObjectField node)  {
-        System.out.println(node.getToken().getScript());
         node.getLHS().accept(this);
     }
 

@@ -135,7 +135,7 @@ public class NodeCollection implements Collection<Node> {
 
         @Override
         public boolean hasNext() {
-            return nodeList.getLength() < place - 1;
+            return place + 1 < nodeList.getLength();
         }
 
         @Override

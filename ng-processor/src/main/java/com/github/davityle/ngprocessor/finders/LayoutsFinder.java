@@ -20,8 +20,6 @@ import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.Option;
 
 import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,21 +50,7 @@ public class LayoutsFinder {
                     return getFileFromPath(path);
                 }
 
-                URL url = Thread.currentThread().getContextClassLoader().getResource("/src/main/res/layout/");
-                if(url != null) {
-                    try {
-                        File layoutDir = new File(url.toURI());
-                        if(layoutDir.exists() && layoutDir.isDirectory())
-                            return Collections.singletonList(layoutDir);
-                    } catch (URISyntaxException e) {
-                        messageUtils.note(null, e.getMessage());
-                    }
-                }
-
-                File root = new File(".");
-                List<File> files = new ArrayList<>();
-                findLayoutDirs(root, files);
-                return files;
+                return findLayoutDirs(new File("."));
             }
 
             @Override
@@ -85,12 +69,29 @@ public class LayoutsFinder {
         return Collections.singletonList(file);
     }
 
-    private void findLayoutDirs(File f, List<File> files){
+    private List<File> findLayoutDirs(File f){
         File[] kids = f.listFiles();
         if(kids != null) {
             for (File file : kids) {
                 String name = file.getName();
-                if (file.isDirectory() && !name.equals("compile") && !name.equals("bin")) {
+                if (file.isDirectory() && !name.equals("compile") && !name.equals("bin") && !name.equals("build")) {
+                    File resourceFile = new File(file, "src/main/res/");
+                    if (resourceFile.exists() && resourceFile.isDirectory()) {
+                        List<File> dirs = new ArrayList<>();
+                        findLayoutDirs(file, dirs);
+                        return dirs;
+                    }
+                }
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    private void findLayoutDirs(File f, List<File> files){
+        File[] kids = f.listFiles();
+        if(kids != null) {
+            for (File file : kids) {
+                if (file.isDirectory()) {
                     if (file.getName().equals("layout")) {
                         files.add(file);
                     } else {

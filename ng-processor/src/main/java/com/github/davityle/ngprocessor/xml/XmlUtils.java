@@ -117,7 +117,12 @@ public class XmlUtils {
                 return getScopeAttr(node).map(new Option.Map<XmlScope, XmlScope>() {
                     @Override
                     public XmlScope map(XmlScope xmlScope) {
-                        return xmlScope.addAttributes(getAttributes(node));
+                        return xmlScope.addAttributes(collectionUtils.flatMap(new NodeListCollection(node.getChildNodes()), new CollectionUtils.Function<Node, Collection<XmlAttribute>>() {
+                            @Override
+                            public Collection<XmlAttribute> apply(Node node) {
+                                return getAttributes(node);
+                            }
+                        }));
                     }
                 });
             }
@@ -129,12 +134,6 @@ public class XmlUtils {
                 return getScopes(node);
             }
         }));
-
-        if(!scopes.isEmpty()){
-            throw new RuntimeException(scopes.toString());
-        }
-
-//        System.out.println(scopes);
 
         return scopes;
     }
@@ -149,7 +148,6 @@ public class XmlUtils {
             public Option<XmlScope> present(NamedNodeMap namedNodeMap) {
                 for (Node attr : new NamedNodeMapCollection(namedNodeMap)) {
                     Matcher matcher = attrPattern.matcher(attr.toString());
-                    if(matcher.matches()) System.out.println(matcher.group(1));
                     if(matcher.matches() && scopeAttrNameResolver.getScopeAttrName().equals(matcher.group(1))) {
                         return Option.of(new XmlScope(matcher.group(2)));
                     }
@@ -177,8 +175,8 @@ public class XmlUtils {
 
                 for (Node node : new NamedNodeMapCollection(namedNodeMap)) {
                     Matcher matcher = attrPattern.matcher(node.toString());
-                    String attr = matcher.group(1);
-                    if (attributes.containsKey(attr)) {
+                    if(matcher.matches() && attributes.containsKey(matcher.group(1))) {
+                        String attr = matcher.group(1);
                         String value = matcher.group(2);
                         try {
                             XmlAttribute xmlAttribute = new XmlAttribute(attr, value, nodeId);

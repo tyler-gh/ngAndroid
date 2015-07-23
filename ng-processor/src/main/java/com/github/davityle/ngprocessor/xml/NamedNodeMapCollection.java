@@ -13,7 +13,6 @@ public class NamedNodeMapCollection extends NodeCollection {
         super(new Nodes() {
             @Override
             public Node item(int i) {
-                System.out.println(i + "/" + getLength());
                 return nodeMap.item(i);
             }
 
