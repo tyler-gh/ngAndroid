@@ -1,0 +1,120 @@
+package ngandroid.layouts;
+
+import android.view.View;
+import android.widget.*;
+
+public class ${className} implements com.ngandroid.lib.ng.Layout {
+
+	private T scope;
+	#foreach($scope in $scopes)
+	    private ${scope.typeName} $scope.name;
+	#end
+	private com.ngandroid.lib.NgAndroid ngandroid_;
+
+	public ${className}(com.ngandroid.lib.NgAndroid ngandroid#foreach($scope in $scopes) ${scope.typeName}, $scope.name #end){
+		this.ngandroid_ = ngandroid;
+		#foreach($scope in $scopes)
+            this.$scope.name = $scope.name;
+            #foreach($model in $ngModels)
+                if(this.${scope.name}.${model.name} == null || !(this.${scope.name}.${model.name} instanceof com.ngandroid.lib.ng.Model)){
+                    this.${scope.name}.${model.name} = new ${model.typeName}$$NgModel();
+                }
+            #end
+        #end
+	}
+
+	public void attach(int layoutId, android.view.View __view__){
+	    switch(layoutId){
+            #foreach ($mapEntry in $layouts.entrySet())
+                case ${manifestPackageName}.R.layout.${mapEntry.key}:{
+                    #foreach($v in $mapEntry.value)
+                        ${v.elementType} ${v.id} = (${v.elementType}) __view__.findViewById(${manifestPackageName}.R.id.${v.id});
+                        #foreach($attr in $v.attributes)
+                            #set( $models = $attr.modelSource )
+                            ngandroid_.attach(
+                                ${manifestPackageName}.R.styleable.ngAndroid_${attr.name},
+                                this,
+                                ${v.id},
+                                ${manifestPackageName}.R.layout.${mapEntry.key},
+                                ${manifestPackageName}.R.id.${v.id}
+                                #foreach($model in $models)
+                                    ,com.ngandroid.lib.utils.Tuple.of("${model.modelName}","${model.fieldName}")
+                                #end
+                            );
+                        #end
+                    #end
+                    break;
+                }
+            #end
+        }
+	}
+
+	public Object execute(int layoutId, int viewId, int attr){
+	    switch(layoutId){
+            #foreach ($mapEntry in $layouts.entrySet())
+                case ${manifestPackageName}.R.layout.${mapEntry.key}:{
+                    switch(viewId){
+                        #foreach($v in $mapEntry.value)
+                            case ${manifestPackageName}.R.id.${v.id}:
+                                #foreach($attr in $v.attributes)
+                                    #if( $foreach.count == 1)
+                                    if(attr == ${manifestPackageName}.R.styleable.ngAndroid_${attr.name}){
+                                    #else
+                                    else if(attr == ${manifestPackageName}.R.styleable.ngAndroid_${attr.name}){
+                                    #end
+                                        #if($attr.source.void)
+                                            ${attr.source.getterSource};
+                                            return null;
+                                        #else
+                                            return ${attr.source.setterSource};
+                                        #end
+                                    }
+                                #end
+                                    else{
+                                        android.util.Log.w("${simpleClassName}", "view ${v.id} in layout ${mapEntry.key} does not have attribute " + attr);
+                                        return null;
+                                    }
+                        #end
+                        default:
+                           android.util.Log.w("${simpleClassName}", "View " + Integer.toHexString(layoutId) + " in layout " + Integer.toHexString(layoutId) + " does not have any ngAttributes");
+                           return null;
+                    }
+                }
+            #end
+            default:{
+                android.util.Log.w("${simpleClassName}", "${simpleClassName} does not match layout " + Integer.toHexString(layoutId));
+                return null;
+            }
+        }
+	}
+
+	public <T> void setModelValue(String model, String field, T value){
+        switch(model){
+            #foreach($field in $fields)
+                case "${field.name}":
+                    ((com.ngandroid.lib.ng.Model) scope.${field.name}).setValue(field, value);
+            #end
+        }
+        throw new com.ngandroid.lib.exceptions.NgException("Field '" + model + "' was not found in ${simpleClassName}");
+	}
+
+	public <T> T getModelValue(String model, String field){
+	    switch(model){
+            #foreach($field in $fields)
+                case "${field.name}":
+                    return (T) ((com.ngandroid.lib.ng.Model) scope.${field.name}).getValue(field);
+            #end
+        }
+        throw new com.ngandroid.lib.exceptions.NgException("Field '" + model + "' was not found in ${simpleClassName}");
+	}
+
+	public com.ngandroid.lib.ng.Model getModel(String model){
+		switch(model){
+		    #foreach($field in $fields)
+		        case "${field.name}":
+		            return (com.ngandroid.lib.ng.Model) scope.${field.name};
+            #end
+		}
+		throw new com.ngandroid.lib.exceptions.NgException("Field '" + model + "' was not found in ${simpleClassName}");
+	}
+}

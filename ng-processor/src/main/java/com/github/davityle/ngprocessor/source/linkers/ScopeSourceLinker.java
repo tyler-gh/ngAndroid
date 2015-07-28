@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -36,7 +35,7 @@ public class ScopeSourceLinker {
 
 //    private static final TupleComparator TUPLE_COMPARATOR = new TupleComparator();
 
-    private final Set<Scope> scopes;
+//    private final Set<Scope> scopes;
     private final Map<String, Collection<Scope>> scopeMap;
 //    private final Map<Element, List<XmlNode>> elementNodeMap;
     private final String manifestPackageName;
@@ -44,8 +43,8 @@ public class ScopeSourceLinker {
     @Inject ElementUtils elementUtils;
     @Inject TypeUtils typeUtils;
 
-    public ScopeSourceLinker(Set<Scope> scopes, Map<String, Collection<Scope>> scopeMap, /*Map<Element, List<XmlNode>> elementNodeMap,*/ String manifestPackageName) {
-        this.scopes = scopes;
+    public ScopeSourceLinker(Map<String, Collection<Scope>> scopeMap, String manifestPackageName) {
+//        this.scopes = scopes;
         this.scopeMap = scopeMap;
 //        this.elementNodeMap = elementNodeMap;
         this.manifestPackageName = manifestPackageName;
@@ -55,9 +54,11 @@ public class ScopeSourceLinker {
 
         List<NgScopeSourceLink> scopeSourceLinks = new ArrayList<>();
 
-        for(Scope scope : scopes){
+
+
+//        for(Scope scope : scopes){
 //            scopeSourceLinks.add(getSourceLink(scope.getJavaElement()));
-        }
+//        }
 
         return scopeSourceLinks;
     }

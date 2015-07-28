@@ -21,7 +21,6 @@ import com.github.davityle.ngprocessor.util.CollectionUtils;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.Option;
-import com.github.davityle.ngprocessor.util.ScopeUtils;
 import com.github.davityle.ngprocessor.util.Tuple;
 import com.github.davityle.ngprocessor.util.TypeUtils;
 import com.github.davityle.ngprocessor.xml.XmlScope;
@@ -31,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 
 public class LayoutScopeMapper {
@@ -53,12 +51,7 @@ public class LayoutScopeMapper {
         this.fileNodeMap = fileNodeMap;
     }
 
-
-    public Map<String, Collection<Scope>> getElementNodeMap(){
-        return linkLayouts();
-    }
-
-    private Map<String, Collection<Scope>> linkLayouts(){
+    public Map<String, Collection<Scope>> mapLayoutsToScopes(){
         return collectionUtils.map(fileNodeMap, new CollectionUtils.Function<Tuple<String, Collection<XmlScope>>, Tuple<String, Collection<Scope>>>() {
             @Override
             public Tuple<String, Collection<Scope>> apply(final Tuple<String, Collection<XmlScope>> layout) {
@@ -69,35 +62,25 @@ public class LayoutScopeMapper {
                         if (modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)) {
                             messageUtils.error(Option.of(scope.getJavaElement()), "Unable to access Scope '%s'. Must have default or public access", scope.toString());
                         }
-                        return scopeInLayout(scope.getJavaElement(), layout.getSecond());
+                        Option<XmlScope> xmlScopeOpt = findScopeInLayout(scope, layout.getSecond());
+                        if(xmlScopeOpt.isPresent()) {
+                            scope.addXmlScope(layout.getFirst(), xmlScopeOpt.get());
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
                 }));
             }
         });
     }
 
-    private boolean scopeInLayout(Element scope, Collection<XmlScope> views) {
+    private Option<XmlScope> findScopeInLayout(Scope scope, Collection<XmlScope> views) {
         for(XmlScope node : views){
-            if(getScopeName(scope).equals(node.getScopeName())) {
-                return true;
+            if(scope.getScopeName().equals(node.getScopeName())) {
+                return Option.of(node);
             }
         }
-        return false;
-    }
-
-    private String getScopeName(final Element scope) {
-        return elementUtils.getAnnotationValue(scope, ScopeUtils.NG_SCOPE_ANNOTATION, "name", String.class).fold(new Option.OptionCB<String, String>() {
-            @Override
-            public String absent() {
-                messageUtils.error(Option.of(scope), "Scope must have a name.");
-                return "";
-            }
-
-            @Override
-            public String present(String s) {
-                System.out.println(s);
-                return s;
-            }
-        });
+        return Option.absent();
     }
 }

@@ -84,7 +84,7 @@ public class ScopeUtils {
                             public Boolean apply(Element element) {
                                 return element.getEnclosingElement().equals(scope);
                             }
-                        }));
+                        }), getScopeName(scope));
                     }
                 });
             }
@@ -103,6 +103,22 @@ public class ScopeUtils {
             @Override
             public Collection<Element> apply(TypeElement annotation) {
                 return new ArrayList<>(roundEnv.getElementsAnnotatedWith(annotation));
+            }
+        });
+    }
+
+    private String getScopeName(final Element scope) {
+        return elementUtils.getAnnotationValue(scope, ScopeUtils.NG_SCOPE_ANNOTATION, "name", String.class).fold(new Option.OptionCB<String, String>() {
+            @Override
+            public String absent() {
+                messageUtils.error(Option.of(scope), "Scope must have a name.");
+                return "";
+            }
+
+            @Override
+            public String present(String s) {
+                System.out.println(s);
+                return s;
             }
         });
     }

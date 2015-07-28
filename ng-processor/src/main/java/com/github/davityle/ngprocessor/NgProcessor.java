@@ -121,12 +121,8 @@ public class NgProcessor extends AbstractProcessor {
                 return false;
 
             Map<String, Collection<Scope>> layoutsWScopes = mapLayoutsToScopes(scopes, xmlScopes);
-//            ModelScopeMapper modelScopeMapper = getModelScopeMapper(/*scopes,*/ annotations);
-
-//            Map<String, Element> modelMap = modelScopeMapper.getModels();
-//            Map<String, List<Element>> scopeMap = modelScopeMapper.getScopeMap();
             List<NgModelSourceLink> modelSourceLinks = getModelSourceLinks(getModels(annotations));
-            List<NgScopeSourceLink> scopeSourceLinks = getScopeSourceLinks(scopes, /*scopeMap,*/ layoutsWScopes, manifestPackageName.get());
+            List<NgScopeSourceLink> scopeSourceLinks = getScopeSourceLinks(layoutsWScopes, manifestPackageName.get());
             Set<AttrDependency> dependencySet = getDependencySet(xmlScopes);
 
             createSourceFiles(modelSourceLinks, scopeSourceLinks, dependencySet);
@@ -144,18 +140,12 @@ public class NgProcessor extends AbstractProcessor {
     private Map<String, Collection<Scope>> mapLayoutsToScopes(Set<Scope> scopes, Map<String, Collection<XmlScope>> xmlScopes){
         LayoutScopeMapper layoutScopeMapper = new LayoutScopeMapper(scopes, xmlScopes);
         dependencyComponent.inject(layoutScopeMapper);
-        return layoutScopeMapper.getElementNodeMap();
+        return layoutScopeMapper.mapLayoutsToScopes();
     }
 
     private Collection<Element> getModels(Set<? extends TypeElement> annotations) {
         return dependencyComponent.createScopeUtils().getModels(annotations);
     }
-
-//    private ModelScopeMapper getModelScopeMapper(/*Set<Element> scopes,*/ Set<? extends TypeElement> annotations){
-//        ModelScopeMapper modelScopeMapper = new ModelScopeMapper(annotations);
-//        dependencyComponent.inject(modelScopeMapper);
-//        return modelScopeMapper;
-//    }
 
     private List<NgModelSourceLink>  getModelSourceLinks(Collection<Element> modelMap) {
         ModelSourceLinker sourceLinker = new ModelSourceLinker(modelMap);
@@ -163,8 +153,8 @@ public class NgProcessor extends AbstractProcessor {
         return sourceLinker.getSourceLinks();
     }
 
-    private List<NgScopeSourceLink> getScopeSourceLinks(Set<Scope> scopes, Map<String, Collection<Scope>> scopeMap, /*Map<Element, List<XmlNode>> elementNodeMap,*/ String packageName){
-        ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopes, scopeMap, /*elementNodeMap,*/ packageName);
+    private List<NgScopeSourceLink> getScopeSourceLinks(Map<String, Collection<Scope>> scopeMap, String packageName){
+        ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopeMap, packageName);
         dependencyComponent.inject(scopeSourceLinker);
         return scopeSourceLinker.getSourceLinks();
     }

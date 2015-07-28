@@ -33,7 +33,7 @@ import static com.google.common.truth.Truth.ASSERT;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 
-@NgScope
+@NgScope(name = "TypeScope")
 public class NgProcessorTest {
 
     @Test
