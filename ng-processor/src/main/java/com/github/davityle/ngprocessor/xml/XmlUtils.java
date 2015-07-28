@@ -41,6 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+import javax.lang.model.element.Element;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 public class XmlUtils {
@@ -70,7 +71,7 @@ public class XmlUtils {
      * maps all of the layouts to their scopes, could be optimized
      * @return
      */
-    public Map<String, Collection<XmlScope>> getFileNodeMap() {
+    public Map<String, Collection<XmlScope>> getXmlScopes() {
         List<File> layoutDirs = layoutsFinder.findLayoutDirs();
 
         Collection<File> layoutFiles = collectionUtils.flatMap(layoutDirs, new CollectionUtils.Function<File, Collection<File>>() {
@@ -183,7 +184,7 @@ public class XmlUtils {
                             attributeList.add(xmlAttribute);
                         } catch (ParseException | RuntimeException e) {
                             Object[] params = new Object[]{node.getBaseURI(), attr, nodeId.getOrElse("no id available"), value, e.getMessage()};
-                            messageUtils.error(null, "Layout file '%s' has an invalid attribute '%s' in view '%s' with value '%s' because '%s'", params);
+                            messageUtils.error(Option.<Element>absent(), "Layout file '%s' has an invalid attribute '%s' in view '%s' with value '%s' because '%s'", params);
                         }
                     }
                 }
@@ -220,7 +221,7 @@ public class XmlUtils {
             document.setDocumentURI(file.getAbsolutePath());
             return Option.of(document);
         } catch (Exception e) {
-            messageUtils.error(null, e.getMessage());
+            messageUtils.error(Option.<Element>absent(), e.getMessage());
             return Option.absent();
         }
     }

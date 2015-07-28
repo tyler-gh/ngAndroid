@@ -17,7 +17,7 @@
 package com.github.davityle.ngprocessor.source.links;
 
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
-import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
+import com.github.davityle.ngprocessor.util.ScopeUtils;
 import com.github.davityle.ngprocessor.source.SourceField;
 import com.github.davityle.ngprocessor.xml.XmlNode;
 
@@ -75,7 +75,7 @@ public class NgScopeSourceLink implements SourceLink{
 
     @Override
     public String getSourceFileName() {
-        return packageName + "." + className + NgScopeAnnotationUtils.SCOPE_APPENDAGE;
+        return packageName + "." + className + ScopeUtils.SCOPE_APPENDAGE;
     }
 
     public List<Source> getSources() {

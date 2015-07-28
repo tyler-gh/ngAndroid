@@ -29,10 +29,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+import javax.lang.model.element.Element;
 
-/**
- * Created by tyler on 4/7/15.
- */
 public class ManifestPackageUtils {
 
     private static final Pattern PACKAGE_PATTERN = Pattern.compile(".*package=\"(.*)\"");
@@ -68,7 +66,7 @@ public class ManifestPackageUtils {
         return manifestFinder.findManifest().fold(new Option.OptionCB<File, Option<String>>() {
             @Override
             public Option<String> absent() {
-                messageUtils.error(null, "Unable to find android manifest.");
+                messageUtils.error(Option.<Element>absent(), "Unable to find android manifest.");
                 return Option.absent();
             }
 

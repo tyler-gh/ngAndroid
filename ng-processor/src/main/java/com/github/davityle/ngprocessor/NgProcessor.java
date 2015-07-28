@@ -17,13 +17,11 @@
 package com.github.davityle.ngprocessor;
 
 import com.github.davityle.ngprocessor.attributes.AttrDependency;
-import com.github.davityle.ngprocessor.deps.AttrModule;
 import com.github.davityle.ngprocessor.deps.DaggerDependencyComponent;
 import com.github.davityle.ngprocessor.deps.DependencyComponent;
 import com.github.davityle.ngprocessor.deps.LayoutModule;
 import com.github.davityle.ngprocessor.finders.DefaultLayoutDirProvider;
 import com.github.davityle.ngprocessor.map.LayoutScopeMapper;
-import com.github.davityle.ngprocessor.map.ModelScopeMapper;
 import com.github.davityle.ngprocessor.source.SourceCreator;
 import com.github.davityle.ngprocessor.source.linkers.ModelSourceLinker;
 import com.github.davityle.ngprocessor.source.linkers.ScopeSourceLinker;
@@ -32,8 +30,8 @@ import com.github.davityle.ngprocessor.source.links.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.AttrDependencyUtils;
 import com.github.davityle.ngprocessor.util.ManifestPackageUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
-import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 import com.github.davityle.ngprocessor.util.Option;
+import com.github.davityle.ngprocessor.util.ScopeUtils;
 import com.github.davityle.ngprocessor.util.XmlNodeUtils;
 import com.github.davityle.ngprocessor.xml.XmlScope;
 
@@ -60,29 +58,33 @@ import dagger.Module;
 import dagger.Provides;
 
 @SupportedAnnotationTypes({
-    ModelScopeMapper.NG_MODEL_ANNOTATION,
-    NgScopeAnnotationUtils.NG_SCOPE_ANNOTATION
+    ScopeUtils.NG_MODEL_ANNOTATION,
+    ScopeUtils.NG_SCOPE_ANNOTATION
 })
 public class NgProcessor extends AbstractProcessor {
 
-    private final LayoutModule layoutModule;
+    private final DaggerDependencyComponent.Builder dependencyComponentBuilder;
+    private final Option<EnvironmentResolver> envModule;
+    private DependencyComponent dependencyComponent;
     private ProcessingEnvironment env;
+    private RoundEnvironment roundEnv;
 
     public NgProcessor(){
         this(Option.<String>absent());
     }
 
     public NgProcessor(final Option<String> option){
-        this(new LayoutModule(new DefaultLayoutDirProvider() {
+        this(DaggerDependencyComponent.builder().layoutModule(new LayoutModule(new DefaultLayoutDirProvider() {
             @Override
             public Option<String> getDefaultLayoutDir() {
                 return option;
             }
-        }));
+        })), Option.<EnvironmentResolver>absent());
     }
 
-    public NgProcessor(LayoutModule layoutModule){
-        this.layoutModule = layoutModule;
+    public NgProcessor(DaggerDependencyComponent.Builder dependencyComponentBuilder, Option<EnvironmentResolver> envModule){
+        this.dependencyComponentBuilder = dependencyComponentBuilder;
+        this.envModule = envModule;
     }
 
     @Override
@@ -93,67 +95,43 @@ public class NgProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        this.roundEnv = roundEnv;
+        if (annotations.size() == 0)
+            return false;
+
         try {
-            if (annotations.size() == 0)
-                return false;
-
-            final DependencyComponent dependencyComponent = DaggerDependencyComponent
-                    .builder()
-                    .layoutModule(layoutModule)
-                    .environmentModule(new EnvironmentModule(roundEnv))
-                    .attrModule(new AttrModule())
+            this.dependencyComponent = dependencyComponentBuilder
+                    .environmentModule(new EnvironmentModule(envModule.getOrElse(new ResolverImpl())))
                     .build();
+            final MessageUtils messageUtils = dependencyComponent.createMessageUtils();
 
-            MessageUtils messageUtils = dependencyComponent.createMessageUtils();
-            messageUtils.note(null, ":NgAndroid:processing");
+            messageUtils.note(Option.<Element>absent(), ":NgAndroid:processing");
 
-            Option<String> manifestPackageName = getPackageNameFromAndroidManifest(dependencyComponent);
+            Option<String> manifestPackageName = getPackageNameFromAndroidManifest();
 
             if (manifestPackageName.isAbsent()) {
-                messageUtils.error(null, ":NgAndroid:Unable to find android manifest.");
+                messageUtils.error(Option.<Element>absent(), ":NgAndroid:Unable to find android manifest.");
                 return false;
             }
 
-            // get the elements annotated with NgScope
-            List<Element> scopes = dependencyComponent.createNgScopeAnnotationUtils().getScopes(annotations);
-
-            // get the xml layouts/nodes with attributes
-            Map<String, Collection<XmlScope>> fileNodeMap = dependencyComponent.createXmlUtils().getFileNodeMap();
+            Set<Scope> scopes = getScopeSet(annotations);
+            Map<String, Collection<XmlScope>> xmlScopes = getXmlScopes();
 
             if (messageUtils.hasErrors())
                 return false;
 
-            LayoutScopeMapper layoutScopeMapper = new LayoutScopeMapper(scopes, fileNodeMap);
-            ModelScopeMapper modelScopeMapper = new ModelScopeMapper(annotations, scopes);
+            Map<String, Collection<Scope>> layoutsWScopes = mapLayoutsToScopes(scopes, xmlScopes);
+//            ModelScopeMapper modelScopeMapper = getModelScopeMapper(/*scopes,*/ annotations);
 
-            dependencyComponent.inject(layoutScopeMapper);
-            dependencyComponent.inject(modelScopeMapper);
+//            Map<String, Element> modelMap = modelScopeMapper.getModels();
+//            Map<String, List<Element>> scopeMap = modelScopeMapper.getScopeMap();
+            List<NgModelSourceLink> modelSourceLinks = getModelSourceLinks(getModels(annotations));
+            List<NgScopeSourceLink> scopeSourceLinks = getScopeSourceLinks(scopes, /*scopeMap,*/ layoutsWScopes, manifestPackageName.get());
+            Set<AttrDependency> dependencySet = getDependencySet(xmlScopes);
 
-            // get the mapped models
-            Map<String, Element> modelMap = modelScopeMapper.getModels();
-            // get the mapped scopes
-            Map<String, List<Element>> scopeMap = modelScopeMapper.getScopeMap();
+            createSourceFiles(modelSourceLinks, scopeSourceLinks, dependencySet);
 
-            ModelSourceLinker sourceLinker = new ModelSourceLinker(modelMap);
-            dependencyComponent.inject(sourceLinker);
-            // get the model to source links
-            List<NgModelSourceLink> modelSourceLinks = sourceLinker.getSourceLinks();
-            // get the scope to source links
-            ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopes, scopeMap, layoutScopeMapper.getElementNodeMap(), manifestPackageName.get());
-            dependencyComponent.inject(scopeSourceLinker);
-            List<NgScopeSourceLink> scopeSourceLinks = scopeSourceLinker.getSourceLinks();
-
-            AttrDependencyUtils attrDependencyUtils = dependencyComponent.createAttrDependencyUtils();
-            XmlNodeUtils xmlNodeUtils = dependencyComponent.createXmlNodeUtils();
-
-            Set<AttrDependency> dependencySet = attrDependencyUtils.getDependencies(xmlNodeUtils.getAttributes(fileNodeMap));
-
-            // create the source files
-            SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, scopeSourceLinks, dependencySet);
-            dependencyComponent.inject(sourceCreator);
-            sourceCreator.createSourceFiles();
-
-            messageUtils.note(null, ":NgAndroid:finished");
+            messageUtils.note(Option.<Element>absent(), ":NgAndroid:finished");
             return true;
         } catch (Throwable t) {
             StringWriter sw = new StringWriter();
@@ -163,9 +141,58 @@ public class NgProcessor extends AbstractProcessor {
         }
     }
 
-    private Option<String> getPackageNameFromAndroidManifest(DependencyComponent dependencyComponent) {
+    private Map<String, Collection<Scope>> mapLayoutsToScopes(Set<Scope> scopes, Map<String, Collection<XmlScope>> xmlScopes){
+        LayoutScopeMapper layoutScopeMapper = new LayoutScopeMapper(scopes, xmlScopes);
+        dependencyComponent.inject(layoutScopeMapper);
+        return layoutScopeMapper.getElementNodeMap();
+    }
+
+    private Collection<Element> getModels(Set<? extends TypeElement> annotations) {
+        return dependencyComponent.createScopeUtils().getModels(annotations);
+    }
+
+//    private ModelScopeMapper getModelScopeMapper(/*Set<Element> scopes,*/ Set<? extends TypeElement> annotations){
+//        ModelScopeMapper modelScopeMapper = new ModelScopeMapper(annotations);
+//        dependencyComponent.inject(modelScopeMapper);
+//        return modelScopeMapper;
+//    }
+
+    private List<NgModelSourceLink>  getModelSourceLinks(Collection<Element> modelMap) {
+        ModelSourceLinker sourceLinker = new ModelSourceLinker(modelMap);
+        dependencyComponent.inject(sourceLinker);
+        return sourceLinker.getSourceLinks();
+    }
+
+    private List<NgScopeSourceLink> getScopeSourceLinks(Set<Scope> scopes, Map<String, Collection<Scope>> scopeMap, /*Map<Element, List<XmlNode>> elementNodeMap,*/ String packageName){
+        ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopes, scopeMap, /*elementNodeMap,*/ packageName);
+        dependencyComponent.inject(scopeSourceLinker);
+        return scopeSourceLinker.getSourceLinks();
+    }
+
+    private void createSourceFiles(List<NgModelSourceLink> modelSourceLinks, List<NgScopeSourceLink> scopeSourceLinks, Set<AttrDependency> dependencySet) {
+        SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, scopeSourceLinks, dependencySet);
+        dependencyComponent.inject(sourceCreator);
+        sourceCreator.createSourceFiles();
+    }
+
+    private Set<AttrDependency> getDependencySet(Map<String, Collection<XmlScope>> xmlScopes) {
+        AttrDependencyUtils attrDependencyUtils = dependencyComponent.createAttrDependencyUtils();
+        XmlNodeUtils xmlNodeUtils = dependencyComponent.createXmlNodeUtils();
+        return attrDependencyUtils.getDependencies(xmlNodeUtils.getAttributes(xmlScopes));
+    }
+
+
+    private Option<String> getPackageNameFromAndroidManifest() {
         ManifestPackageUtils manifestPackageUtils = dependencyComponent.createManifestPackageUtils();
         return manifestPackageUtils.getPackageName();
+    }
+
+    private Set<Scope> getScopeSet(Set<? extends TypeElement> annotations) {
+        return dependencyComponent.createScopeUtils().getScopes(annotations);
+    }
+
+    private Map<String, Collection<XmlScope>> getXmlScopes() {
+       return dependencyComponent.createXmlUtils().getXmlScopes();
     }
 
 
@@ -175,36 +202,67 @@ public class NgProcessor extends AbstractProcessor {
     }
 
     @Module
-    public class EnvironmentModule {
-        private final RoundEnvironment roundEnv;
+    public static class EnvironmentModule {
 
-        public EnvironmentModule(RoundEnvironment roundEnv){
-            this.roundEnv = roundEnv;
+        private final EnvironmentResolver resolver;
+
+        public EnvironmentModule(EnvironmentResolver resolver) {
+            this.resolver = resolver;
         }
 
         @Provides
         public ProcessingEnvironment getProcessingEnvironment() {
-            return processingEnv;
+            return resolver.getProcessingEnvironment();
         }
 
         @Provides
         public Filer getFiler(){
-            return env.getFiler();
+            return resolver.getFiler();
         }
 
         @Provides
         public Types getTypeUtils(){
-            return env.getTypeUtils();
+            return resolver.getTypeUtils();
         }
 
         @Provides
         public Elements getElementUtils(){
-            return env.getElementUtils();
+            return resolver.getElementUtils();
         }
 
         @Provides
         public RoundEnvironment getRoundEnv(){
+            return resolver.getRoundEnv();
+        }
+    }
+
+    public class ResolverImpl implements EnvironmentResolver{
+        public ProcessingEnvironment getProcessingEnvironment() {
+            return processingEnv;
+        }
+
+        public Filer getFiler(){
+            return env.getFiler();
+        }
+
+        public Types getTypeUtils(){
+            return env.getTypeUtils();
+        }
+
+        public Elements getElementUtils(){
+            return env.getElementUtils();
+        }
+
+        public RoundEnvironment getRoundEnv(){
             return roundEnv;
         }
+    }
+
+    public interface EnvironmentResolver {
+        ProcessingEnvironment getProcessingEnvironment();
+        Filer getFiler();
+        Types getTypeUtils();
+        Elements getElementUtils();
+        RoundEnvironment getRoundEnv();
     }
 }

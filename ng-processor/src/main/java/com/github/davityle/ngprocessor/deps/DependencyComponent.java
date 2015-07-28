@@ -9,7 +9,7 @@ import com.github.davityle.ngprocessor.source.linkers.ScopeSourceLinker;
 import com.github.davityle.ngprocessor.util.AttrDependencyUtils;
 import com.github.davityle.ngprocessor.util.ManifestPackageUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
-import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
+import com.github.davityle.ngprocessor.util.ScopeUtils;
 import com.github.davityle.ngprocessor.util.XmlNodeUtils;
 import com.github.davityle.ngprocessor.xml.XmlUtils;
 
@@ -26,7 +26,7 @@ import dagger.Component;
 })
 public interface DependencyComponent {
     ManifestPackageUtils createManifestPackageUtils();
-    NgScopeAnnotationUtils createNgScopeAnnotationUtils();
+    ScopeUtils createScopeUtils();
     MessageUtils createMessageUtils();
     XmlUtils createXmlUtils();
     AttrDependencyUtils createAttrDependencyUtils();

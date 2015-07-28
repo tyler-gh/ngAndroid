@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -13,6 +14,15 @@ public class CollectionUtils {
 
     @Inject
     public CollectionUtils() {
+    }
+
+    public <T> Option<T> find(final Iterable<T> it, final Function<T, Boolean> f) {
+        for(T t : it) {
+            if(f.apply(t)) {
+                return Option.of(t);
+            }
+        }
+        return Option.absent();
     }
 
     public <T> Collection<T> filter(final Iterable<T> it, final Function<T, Boolean> f) {
@@ -73,6 +83,18 @@ public class CollectionUtils {
             }
         });
         return arrayList;
+    }
+
+    public <T, R, P, Q> Map<P, Q> map(final Map<T, R> it, final Function<Tuple<T, R>, Tuple<P, Q>> f) {
+        final Map<P, Q> map = new HashMap<>();
+        it.forEach(new BiConsumer<T, R>() {
+            @Override
+            public void accept(T t, R r) {
+                Tuple<P, Q> val = f.apply(Tuple.of(t, r));
+                map.put(val.getFirst(), val.getSecond());
+            }
+        });
+        return map;
     }
 
     public interface Function<T, R> {

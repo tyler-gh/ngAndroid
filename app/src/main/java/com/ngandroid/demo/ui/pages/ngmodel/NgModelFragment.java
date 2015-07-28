@@ -12,7 +12,7 @@ import com.ngandroid.demo.model.NgMod;
 import com.ngandroid.lib.NgAndroid;
 import com.ngandroid.lib.annotations.NgModel;
 import com.ngandroid.lib.annotations.NgScope;
-@NgScope
+@NgScope(name="ModelFragment")
 public class NgModelFragment extends Fragment {
     private final NgAndroid ng = NgAndroid.getInstance();
 

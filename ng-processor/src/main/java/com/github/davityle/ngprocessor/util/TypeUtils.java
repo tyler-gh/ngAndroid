@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -90,7 +91,7 @@ public class TypeUtils {
 
         if(either(leftKind, rightKind, TypeKind.BOOLEAN) ) {
             if(operator != null) {
-                messageUtils.error(null, "Cannot perform perform the operation '%s' with a boolean type. (%s %s %s)", operator.toString(), leftMirror, operator.toString(), rightMirror);
+                messageUtils.error(Option.<Element>absent(), "Cannot perform perform the operation '%s' with a boolean type. (%s %s %s)", operator.toString(), leftMirror, operator.toString(), rightMirror);
             }
             return null;
         }

@@ -22,7 +22,7 @@ import com.ngandroid.lib.annotations.NgScope;
 /**
 * Created by tyler on 3/23/15.
 */
-@NgScope
+@NgScope(name="BugScope")
 public class TestBugScope {
     @NgModel
     public Input input;

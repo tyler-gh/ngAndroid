@@ -22,7 +22,7 @@ import com.ngandroid.lib.annotations.NgScope;
 /**
 * Created by tyler on 3/23/15.
 */
-@NgScope
+@NgScope(name="ModelTestScope")
 public class ModelTestScope {
 //  TODO throw an error in this situation @NgModel
     public TestSetterRequired testSetterRequired;

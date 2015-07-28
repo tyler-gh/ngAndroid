@@ -15,7 +15,7 @@ import com.ngandroid.lib.annotations.NgScope;
 /**
  * A simple {@link Fragment} subclass.
  */
-@NgScope
+@NgScope(name="ClickFragment")
 public class NgClickFragment extends Fragment {
 
     NgAndroid ng = NgAndroid.getInstance();

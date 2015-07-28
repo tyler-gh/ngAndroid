@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.lang.model.element.Element;
 
 /**
  * Created by tyler on 3/30/15.
@@ -63,7 +64,7 @@ public class LayoutsFinder {
     private List<File> getFileFromPath(String path){
         File file = new File(path);
         if(!file.exists()){
-            messageUtils.error(null, "The layout file path '%s' does not exist", path);
+            messageUtils.error(Option.<Element>absent(), "The layout file path '%s' does not exist", path);
             return new ArrayList<>();
         }
         return Collections.singletonList(file);

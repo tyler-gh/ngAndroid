@@ -22,6 +22,7 @@ import com.github.davityle.ngprocessor.attributes.Attribute;
 import com.github.davityle.ngprocessor.source.links.NgModelSourceLink;
 import com.github.davityle.ngprocessor.source.links.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.MessageUtils;
+import com.github.davityle.ngprocessor.util.Option;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -81,7 +82,7 @@ public class SourceCreator {
                     writer.flush();
                     writer.close();
                 } catch (IOException e) {
-                    messageUtils.error(null, e.getMessage());
+                    messageUtils.error(Option.<Element>absent(), e.getMessage());
                 }
             }
         }
@@ -94,7 +95,7 @@ public class SourceCreator {
                 writer.flush();
                 writer.close();
             }catch (IOException e){
-                messageUtils.error(ms.getElements()[0], e.getMessage());
+                messageUtils.error(Option.of(ms.getElements()[0]), e.getMessage());
             }
         }
 
@@ -107,7 +108,7 @@ public class SourceCreator {
                 writer.close();
             }catch (IOException e){
                 Element[] elements = ns.getElements();
-                messageUtils.error(elements[elements.length - 1], e.getMessage());
+                messageUtils.error(Option.of(elements[elements.length - 1]), e.getMessage());
             }
         }
 
@@ -134,7 +135,7 @@ public class SourceCreator {
             writer.flush();
             writer.close();
         }catch (IOException e){
-            messageUtils.error(null, e.getMessage());
+            messageUtils.error(Option.<Element>absent(), e.getMessage());
         }
 
 

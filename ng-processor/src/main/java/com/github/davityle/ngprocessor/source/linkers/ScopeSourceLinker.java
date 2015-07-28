@@ -16,44 +16,38 @@
 
 package com.github.davityle.ngprocessor.source.linkers;
 
+import com.github.davityle.ngprocessor.Scope;
 import com.github.davityle.ngprocessor.source.links.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
-import com.github.davityle.ngprocessor.util.NgScopeAnnotationUtils;
 import com.github.davityle.ngprocessor.util.TypeUtils;
-import com.github.davityle.ngprocessor.xml.XmlNode;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
 
 /**
  * Created by tyler on 3/30/15.
  */
 public class ScopeSourceLinker {
 
-    private static final TupleComparator TUPLE_COMPARATOR = new TupleComparator();
+//    private static final TupleComparator TUPLE_COMPARATOR = new TupleComparator();
 
-    private final List<Element> scopes;
-    private final Map<String, List<Element>> scopeMap;
-    private final Map<Element, List<XmlNode>> elementNodeMap;
+    private final Set<Scope> scopes;
+    private final Map<String, Collection<Scope>> scopeMap;
+//    private final Map<Element, List<XmlNode>> elementNodeMap;
     private final String manifestPackageName;
 
     @Inject ElementUtils elementUtils;
     @Inject TypeUtils typeUtils;
 
-    public ScopeSourceLinker(List<Element> scopes, Map<String, List<Element>> scopeMap, Map<Element, List<XmlNode>> elementNodeMap, String manifestPackageName) {
+    public ScopeSourceLinker(Set<Scope> scopes, Map<String, Collection<Scope>> scopeMap, /*Map<Element, List<XmlNode>> elementNodeMap,*/ String manifestPackageName) {
         this.scopes = scopes;
         this.scopeMap = scopeMap;
-        this.elementNodeMap = elementNodeMap;
+//        this.elementNodeMap = elementNodeMap;
         this.manifestPackageName = manifestPackageName;
     }
 
@@ -61,41 +55,42 @@ public class ScopeSourceLinker {
 
         List<NgScopeSourceLink> scopeSourceLinks = new ArrayList<>();
 
-        for(Element scope : scopes){
-            scopeSourceLinks.add(getSourceLink(scope));
+        for(Scope scope : scopes){
+//            scopeSourceLinks.add(getSourceLink(scope.getJavaElement()));
         }
 
         return scopeSourceLinks;
     }
 
-    private NgScopeSourceLink getSourceLink(Element scopeClass){
+//    private NgScopeSourceLink getSourceLink(Element scopeClass){
+//
+//        TypeElement scopeType = (TypeElement) scopeClass;
+//        String packageName = elementUtils.getPackageName(scopeType);
+//        String className = elementUtils.getClassName(scopeType, packageName);
+//        String fullName = elementUtils.getFullName(scopeType);
+//        String scopeName = className + ScopeUtils.SCOPE_APPENDAGE;
+//        String key = packageName + "." + scopeName;
+//
+//        // TODO KEY is now layout file
+//        Collection<Scope> elements = scopeMap.get(key);
+//
+//        List<SourceField> fields = new ArrayList<>();
+//        for(Element element : elements){
+//            Name fieldName = element.getSimpleName();
+//            TypeMirror fieldType = element.asType();
+//            TypeElement typeElement = typeUtils.asTypeElement(fieldType);
+//            String pack = elementUtils.getPackageName(typeElement);
+//            String modelName = elementUtils.stripClassName(fieldType);
+//            fields.add(new SourceField(fieldName.toString(), pack + '.' + modelName));
+//        }
+//
+//        Element[] els = elements.toArray(new Element[elements.size() + 1]);
+//        els[elements.size()] = scopeClass;
 
-        TypeElement scopeType = (TypeElement) scopeClass;
-        String packageName = elementUtils.getPackageName(scopeType);
-        String className = elementUtils.getClassName(scopeType, packageName);
-        String fullName = elementUtils.getFullName(scopeType);
-        String scopeName = className + NgScopeAnnotationUtils.SCOPE_APPENDAGE;
-        String key = packageName + "." + scopeName;
-
-        List<Element> elements = scopeMap.get(key);
-
-        List<com.github.davityle.ngprocessor.source.SourceField> fields = new ArrayList<>();
-        for(Element element : elements){
-            Name fieldName = element.getSimpleName();
-            TypeMirror fieldType = element.asType();
-            TypeElement typeElement = typeUtils.asTypeElement(fieldType);
-            String pack = elementUtils.getPackageName(typeElement);
-            String modelName = elementUtils.stripClassName(fieldType);
-            fields.add(new com.github.davityle.ngprocessor.source.SourceField(fieldName.toString(), pack + '.' + modelName));
-        }
-
-        Element[] els = elements.toArray(new Element[elements.size() + 1]);
-        els[elements.size()] = scopeClass;
-
-        List<XmlNode> xmlNodes = elementNodeMap.get(scopeClass);
-        Map<String, Set<XmlNode>> layouts = new HashMap<>();
-
-        if(xmlNodes != null) {
+//        List<XmlNode> xmlNodes = elementNodeMap.get(scopeClass);
+//        Map<String, Set<XmlNode>> layouts = new HashMap<>();
+//
+//        if(xmlNodes != null) {
             // This could be done by just mapping elements to the layout instead of linking to the
             // node in LayoutScopeMapper
 //            for (XmlNode xmlNode : xmlNodes) {
@@ -107,15 +102,15 @@ public class ScopeSourceLinker {
 //                }
 //                ids.add(xmlNode);
 //            }
-        }
-        return new NgScopeSourceLink(className, packageName, fullName, fields, els, layouts, manifestPackageName);
-    }
+//        }
+//        return new NgScopeSourceLink(className, packageName, fullName, fields, els, /*layouts*/ null, manifestPackageName);
+//    }
 
 }
 
-class TupleComparator implements Comparator<XmlNode> {
-    @Override
-    public int compare(XmlNode o1, XmlNode o2) {
-        return o1.getId().compareTo(o2.getId());
-    }
-}
+//class TupleComparator implements Comparator<XmlNode> {
+//    @Override
+//    public int compare(XmlNode o1, XmlNode o2) {
+//        return o1.getId().compareTo(o2.getId());
+//    }
+//}

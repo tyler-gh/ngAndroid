@@ -16,29 +16,28 @@
 
 package com.github.davityle.ngprocessor.map;
 
+import com.github.davityle.ngprocessor.Scope;
+import com.github.davityle.ngprocessor.util.CollectionUtils;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
+import com.github.davityle.ngprocessor.util.Option;
+import com.github.davityle.ngprocessor.util.ScopeUtils;
+import com.github.davityle.ngprocessor.util.Tuple;
 import com.github.davityle.ngprocessor.util.TypeUtils;
-import com.github.davityle.ngprocessor.xml.XmlAttribute;
-import com.github.davityle.ngprocessor.xml.XmlNode;
 import com.github.davityle.ngprocessor.xml.XmlScope;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 
 public class LayoutScopeMapper {
 
-    private final Set<Map.Entry<String, Collection<XmlScope>>> xmlLayouts;
-    private final Map<Element, List<XmlNode>> elementNodeMap = new HashMap<>();
-    private final List<Element> scopes;
-    private boolean isMapped;
+    private final Map<String, Collection<XmlScope>> fileNodeMap;
+    private final Set<Scope> scopes;
 
     @Inject
     ElementUtils elementUtils;
@@ -46,49 +45,59 @@ public class LayoutScopeMapper {
     MessageUtils messageUtils;
     @Inject
     TypeUtils typeUtils;
+    @Inject
+    CollectionUtils collectionUtils;
 
-    public LayoutScopeMapper(List<Element> scopes, Map<String, Collection<XmlScope>> fileNodeMap){
+    public LayoutScopeMapper(Set<Scope> scopes, Map<String, Collection<XmlScope>> fileNodeMap){
         this.scopes = scopes;
-        this.xmlLayouts = fileNodeMap.entrySet();
+        this.fileNodeMap = fileNodeMap;
     }
 
 
-    public Map<Element, List<XmlNode>> getElementNodeMap(){
-        if(!isMapped){
-            linkLayouts();
-        }
-        return elementNodeMap;
+    public Map<String, Collection<Scope>> getElementNodeMap(){
+        return linkLayouts();
     }
 
-    private void linkLayouts(){
-        final Map<XmlNode, Boolean> viewScopeMap = new HashMap<XmlNode, Boolean>();
-
-        for (Map.Entry<String, Collection<XmlScope>> layout : xmlLayouts) {
-            Collection<XmlScope> views = layout.getValue();
-            for (Element scope : scopes) {
-                if(scopeMatchesAll(scope, views)){
-
-                }
+    private Map<String, Collection<Scope>> linkLayouts(){
+        return collectionUtils.map(fileNodeMap, new CollectionUtils.Function<Tuple<String, Collection<XmlScope>>, Tuple<String, Collection<Scope>>>() {
+            @Override
+            public Tuple<String, Collection<Scope>> apply(final Tuple<String, Collection<XmlScope>> layout) {
+                return Tuple.of(layout.getFirst(), collectionUtils.filter(scopes, new CollectionUtils.Function<Scope, Boolean>() {
+                    @Override
+                    public Boolean apply(Scope scope) {
+                        Set<Modifier> modifiers = scope.getJavaElement().getModifiers();
+                        if (modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)) {
+                            messageUtils.error(Option.of(scope.getJavaElement()), "Unable to access Scope '%s'. Must have default or public access", scope.toString());
+                        }
+                        return scopeInLayout(scope.getJavaElement(), layout.getSecond());
+                    }
+                }));
             }
-        }
-        isMapped = true;
+        });
     }
 
-    private boolean scopeMatchesAll(Element scope, Collection<XmlScope> views) {
+    private boolean scopeInLayout(Element scope, Collection<XmlScope> views) {
         for(XmlScope node : views){
-            for(XmlAttribute attribute : node.getAttributes()){
-                
+            if(getScopeName(scope).equals(node.getScopeName())) {
+                return true;
             }
         }
         return false;
     }
 
-    private void put(XmlNode view, Element element){
-            List<XmlNode> nodes =  elementNodeMap.get(element);
-            if(nodes == null){
-                nodes = new ArrayList<>();
-                elementNodeMap.put(element, nodes);
+    private String getScopeName(final Element scope) {
+        return elementUtils.getAnnotationValue(scope, ScopeUtils.NG_SCOPE_ANNOTATION, "name", String.class).fold(new Option.OptionCB<String, String>() {
+            @Override
+            public String absent() {
+                messageUtils.error(Option.of(scope), "Scope must have a name.");
+                return "";
             }
-            nodes.add(view);
+
+            @Override
+            public String present(String s) {
+                System.out.println(s);
+                return s;
+            }
+        });
     }
 }

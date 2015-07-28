@@ -6,10 +6,7 @@ import com.ngandroid.demo.model.DemoItem;
 import com.ngandroid.lib.annotations.NgModel;
 import com.ngandroid.lib.annotations.NgScope;
 
-/**
- * Created by tyler on 4/23/15.
- */
-@NgScope
+@NgScope(name="DemoScope")
 public class DemoScope {
     @NgModel
     DemoItem item;

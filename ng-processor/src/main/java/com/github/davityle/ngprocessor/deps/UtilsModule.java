@@ -10,9 +10,17 @@ import dagger.Provides;
 
 @Module
 public class UtilsModule {
+
+    private MessageUtils messageUtils;
+    private ProcessingEnvironment processingEnvironment;
+
     @Provides
     @Singleton
     public MessageUtils messageUtils(ProcessingEnvironment processingEnvironment){
-        return new MessageUtils(processingEnvironment);
+        if(this.messageUtils == null || this.processingEnvironment != processingEnvironment) {
+            this.messageUtils = new MessageUtils(processingEnvironment);
+            this.processingEnvironment = processingEnvironment;
+        }
+        return messageUtils;
     }
 }
