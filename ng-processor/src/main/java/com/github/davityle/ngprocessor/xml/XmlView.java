@@ -23,12 +23,12 @@ import java.util.Set;
 /**
  * Created by tyler on 3/25/15.
  */
-public class XmlNode {
+public class XmlView {
     private final String id;
     private final List<? extends XmlAttribute> attributes;
     private final String elementType;
 
-    public XmlNode(String id, List<? extends XmlAttribute> attributes, String elementType) {
+    public XmlView(String id, List<? extends XmlAttribute> attributes, String elementType) {
         this.id = id;
         this.attributes = attributes;
         this.elementType = elementType;
