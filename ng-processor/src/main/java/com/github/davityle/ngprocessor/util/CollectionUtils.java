@@ -97,6 +97,17 @@ public class CollectionUtils {
         return map;
     }
 
+    public <T, R, P> Collection<P> mapToCollection(final Map<T, R> it, final Function<Tuple<T, R>, P> f) {
+        final Collection<P> ps = new ArrayList<>();
+        it.forEach(new BiConsumer<T, R>() {
+            @Override
+            public void accept(T t, R r) {
+                ps.add(f.apply(Tuple.of(t, r)));
+            }
+        });
+        return ps;
+    }
+
     public interface Function<T, R> {
         R apply(T t);
     }

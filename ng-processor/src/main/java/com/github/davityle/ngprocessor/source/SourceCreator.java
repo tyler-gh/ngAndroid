@@ -19,8 +19,8 @@ package com.github.davityle.ngprocessor.source;
 import com.github.davityle.ngprocessor.attributes.AttrDependency;
 import com.github.davityle.ngprocessor.attributes.AttrPackageResolver;
 import com.github.davityle.ngprocessor.attributes.Attribute;
+import com.github.davityle.ngprocessor.source.links.LayoutSourceLink;
 import com.github.davityle.ngprocessor.source.links.NgModelSourceLink;
-import com.github.davityle.ngprocessor.source.links.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.Option;
 
@@ -30,6 +30,7 @@ import org.apache.velocity.app.VelocityEngine;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -46,16 +47,16 @@ import javax.tools.JavaFileObject;
 public class SourceCreator {
 
     private final List<NgModelSourceLink> modelSourceLinks;
-    private final List<NgScopeSourceLink> scopeSourceLinks;
+    private final Collection<LayoutSourceLink> layoutSourceLinks;
     private final Set<AttrDependency> attrDependencies;
 
     @Inject MessageUtils messageUtils;
     @Inject Filer filer;
     @Inject AttrPackageResolver attrPackageResolver;
 
-    public SourceCreator(List<NgModelSourceLink> modelSourceLinks, List<NgScopeSourceLink> scopeSourceLinks, Set<AttrDependency> attrDependencies) {
+    public SourceCreator(List<NgModelSourceLink> modelSourceLinks, Collection<LayoutSourceLink> layoutSourceLinks, Set<AttrDependency> attrDependencies) {
         this.modelSourceLinks = modelSourceLinks;
-        this.scopeSourceLinks = scopeSourceLinks;
+        this.layoutSourceLinks = layoutSourceLinks;
         this.attrDependencies = attrDependencies;
     }
 
@@ -70,7 +71,7 @@ public class SourceCreator {
         ve.init();
 
         Template vtModel = ve.getTemplate("templates/ngmodel.vm");
-        Template vtScope = ve.getTemplate("templates/ngscope.vm");
+        Template vtLayout = ve.getTemplate("templates/layout.vm");
         Template vtAttrs = ve.getTemplate("templates/attrs.vm");
 
         for(AttrDependency attrDependency : attrDependencies) {
@@ -99,16 +100,15 @@ public class SourceCreator {
             }
         }
 
-        for(NgScopeSourceLink ns : scopeSourceLinks){
+        for(LayoutSourceLink lsl : layoutSourceLinks){
             try {
-                JavaFileObject jfo = filer.createSourceFile(ns.getSourceFileName(), ns.getElements());
+                JavaFileObject jfo = filer.createSourceFile(lsl.getSourceFileName(), lsl.getElements());
                 Writer writer = jfo.openWriter();
-                vtScope.merge(ns.getVelocityContext(), writer);
+                vtLayout.merge(lsl.getVelocityContext(), writer);
                 writer.flush();
                 writer.close();
             }catch (IOException e){
-                Element[] elements = ns.getElements();
-                messageUtils.error(Option.of(elements[elements.length - 1]), e.getMessage());
+                messageUtils.error(Option.<Element>absent(), e.getMessage());
             }
         }
 

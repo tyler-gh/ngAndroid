@@ -16,6 +16,7 @@
 
 package com.github.davityle.ngprocessor.util;
 
+import com.github.davityle.ngprocessor.Model;
 import com.github.davityle.ngprocessor.Scope;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ import javax.lang.model.element.TypeElement;
 public class ScopeUtils {
 
     public static final String NG_SCOPE_ANNOTATION = "com.ngandroid.lib.annotations.NgScope";
-    public static final String NG_MODEL_ANNOTATION = "com.ngandroid.lib.annotations.NgScope";
+    public static final String NG_MODEL_ANNOTATION = "com.ngandroid.lib.annotations.NgModel";
     public static final String SCOPE_APPENDAGE = "$$NgScope";
 
     private final ElementUtils elementUtils;
@@ -79,12 +80,7 @@ public class ScopeUtils {
                         if (modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)) {
                             messageUtils.error(Option.of(scope), "Unable to access Scope '%s'. Must have default or public access", scope.toString());
                         }
-                        return new Scope(scope, collectionUtils.filter(ngModels, new CollectionUtils.Function<Element, Boolean>() {
-                            @Override
-                            public Boolean apply(Element element) {
-                                return element.getEnclosingElement().equals(scope);
-                            }
-                        }), getScopeName(scope));
+                        return new Scope(scope, getModelsForScope(ngModels, scope), getScopeName(scope), elementUtils.getTypeName(scope));
                     }
                 });
             }
@@ -107,17 +103,31 @@ public class ScopeUtils {
         });
     }
 
+    private Collection<Model> getModelsForScope(final Collection<Element> ngModels, final Element scope) {
+        return collectionUtils.map(collectionUtils.filter(ngModels, new CollectionUtils.Function<Element, Boolean>() {
+            @Override
+            public Boolean apply(Element element) {
+                return element.getEnclosingElement().equals(scope);
+            }
+        }), new CollectionUtils.Function<Element, Model>() {
+            @Override
+            public Model apply(Element element) {
+                return new Model(element.getSimpleName().toString(), elementUtils.getTypeName(element));
+            }
+        });
+    }
+
+
     private String getScopeName(final Element scope) {
         return elementUtils.getAnnotationValue(scope, ScopeUtils.NG_SCOPE_ANNOTATION, "name", String.class).fold(new Option.OptionCB<String, String>() {
             @Override
             public String absent() {
-                messageUtils.error(Option.of(scope), "Scope must have a name.");
+                messageUticd ls.error(Option.of(scope), "Scope must have a name.");
                 return "";
             }
 
             @Override
             public String present(String s) {
-                System.out.println(s);
                 return s;
             }
         });

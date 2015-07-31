@@ -77,7 +77,7 @@ public class LayoutScopeMapper {
 
     private Option<XmlScope> findScopeInLayout(Scope scope, Collection<XmlScope> views) {
         for(XmlScope node : views){
-            if(scope.getScopeName().equals(node.getScopeName())) {
+            if(scope.getName().equals(node.getScopeName())) {
                 return Option.of(node);
             }
         }

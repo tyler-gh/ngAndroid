@@ -16,19 +16,16 @@
 
 package com.github.davityle.ngprocessor.xml;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-/**
- * Created by tyler on 3/25/15.
- */
 public class XmlView {
     private final String id;
-    private final List<? extends XmlAttribute> attributes;
+    private final Collection<XmlAttribute> attributes;
     private final String elementType;
 
-    public XmlView(String id, List<? extends XmlAttribute> attributes, String elementType) {
+    public XmlView(String id, Collection<XmlAttribute> attributes, String elementType) {
         this.id = id;
         this.attributes = attributes;
         this.elementType = elementType;
@@ -38,7 +35,7 @@ public class XmlView {
         return elementType;
     }
 
-    public List<? extends XmlAttribute> getAttributes() {
+    public Collection<XmlAttribute> getAttributes() {
         return attributes;
     }
 

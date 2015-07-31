@@ -2,6 +2,7 @@ package com.github.davityle.ngprocessor.util;
 
 import com.github.davityle.ngprocessor.xml.XmlAttribute;
 import com.github.davityle.ngprocessor.xml.XmlScope;
+import com.github.davityle.ngprocessor.xml.XmlView;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,10 +28,15 @@ public class XmlNodeUtils {
 
         for(Collection<XmlScope> nodes : nodeMap.values()) {
             for(XmlScope node : nodes) {
-                attrs.addAll(collectionUtils.map(node.getAttributes(), new CollectionUtils.Function<XmlAttribute, String>() {
+                attrs.addAll(collectionUtils.flatMap(node.getViews(), new CollectionUtils.Function<XmlView, Collection<String>>() {
                     @Override
-                    public String apply(XmlAttribute xmlAttribute) {
-                        return xmlAttribute.getName();
+                    public Collection<String> apply(XmlView view) {
+                        return collectionUtils.map(view.getAttributes(), new CollectionUtils.Function<XmlAttribute, String>() {
+                            @Override
+                            public String apply(XmlAttribute xmlAttribute) {
+                                return xmlAttribute.getName();
+                            }
+                        });
                     }
                 }));
             }

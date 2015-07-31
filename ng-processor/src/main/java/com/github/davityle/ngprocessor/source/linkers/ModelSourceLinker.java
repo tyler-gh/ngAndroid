@@ -36,9 +36,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
-/**
- * Created by tyler on 3/30/15.
- */
 public class ModelSourceLinker {
 
     private final Collection<Element> ngModels;
@@ -109,7 +106,7 @@ public class ModelSourceLinker {
                         break;
                     }
                 }
-                if(!getterFound){
+                if(!getterFound) {
                     messageUtils.error(Option.of(setter), "Field '%s' is missing a corresponding getter", fName);
                 }
                 fields.add(sourceField);

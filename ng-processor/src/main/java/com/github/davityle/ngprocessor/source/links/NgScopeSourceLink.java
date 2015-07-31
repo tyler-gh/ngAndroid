@@ -19,7 +19,7 @@ package com.github.davityle.ngprocessor.source.links;
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import com.github.davityle.ngprocessor.util.ScopeUtils;
 import com.github.davityle.ngprocessor.source.SourceField;
-import com.github.davityle.ngprocessor.xml.XmlNode;
+import com.github.davityle.ngprocessor.xml.XmlView;
 
 import org.apache.velocity.VelocityContext;
 
@@ -39,11 +39,11 @@ public class NgScopeSourceLink implements SourceLink{
     private final String fullName;
     private final List<SourceField> fields;
     private final Element[] elements;
-    private final Map<String, Set<XmlNode>> layouts;
+    private final Map<String, Set<XmlView>> layouts;
     private final String manifestPackageName;
     private List<Source> sources;
 
-    public NgScopeSourceLink(String className, String packageName, String fullName, List<SourceField> fields, Element[] elements, Map<String, Set<XmlNode>> layouts, String manifestPackageName) {
+    public NgScopeSourceLink(String className, String packageName, String fullName, List<SourceField> fields, Element[] elements, Map<String, Set<XmlView>> layouts, String manifestPackageName) {
         this.className = className;
         this.packageName = packageName;
         this.fullName = fullName;

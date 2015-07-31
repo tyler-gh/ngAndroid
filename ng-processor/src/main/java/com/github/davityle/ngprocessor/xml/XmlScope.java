@@ -6,7 +6,7 @@ import java.util.List;
 
 public class XmlScope {
     private final String scopeName;
-    private final List<XmlAttribute> attributes = new ArrayList<>();
+    private final List<XmlView> views = new ArrayList<>();
 
     public XmlScope(String scopeName) {
         this.scopeName = scopeName;
@@ -16,17 +16,17 @@ public class XmlScope {
         return scopeName;
     }
 
-    public List<XmlAttribute> getAttributes() {
-        return attributes;
+    public List<XmlView> getViews() {
+        return views;
     }
 
-    public XmlScope addAttributes(Collection<XmlAttribute> attributes) {
-        this.attributes.addAll(attributes);
+    public XmlScope addViews(Collection<XmlView> views) {
+        this.views.addAll(views);
         return this;
     }
 
     @Override
     public String toString() {
-        return scopeName + ":" + attributes;
+        return scopeName + ":" + views;
     }
 }

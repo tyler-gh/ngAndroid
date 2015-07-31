@@ -35,6 +35,10 @@ public class XmlAttribute {
         this.source = new Source(value);
     }
 
+    public String getId() {
+        return viewId.get();
+    }
+
     public String getName() {
         return name;
     }

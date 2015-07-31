@@ -118,9 +118,9 @@ public class XmlUtils {
                 return getScopeAttr(node).map(new Option.Map<XmlScope, XmlScope>() {
                     @Override
                     public XmlScope map(XmlScope xmlScope) {
-                        return xmlScope.addAttributes(collectionUtils.flatMap(new NodeListCollection(node.getChildNodes()), new CollectionUtils.Function<Node, Collection<XmlAttribute>>() {
+                        return xmlScope.addViews(collectionUtils.flatMap(new NodeListCollection(node.getChildNodes()), new CollectionUtils.Function<Node, Collection<XmlView>>() {
                             @Override
-                            public Collection<XmlAttribute> apply(Node node) {
+                            public Collection<XmlView> apply(Node node) {
                                 return getAttributes(node);
                             }
                         }));
@@ -158,11 +158,19 @@ public class XmlUtils {
         });
     }
 
-    private Collection<XmlAttribute> getAttributes(Node node) {
+    private Collection<XmlView> getAttributes(final Node node) {
+        // TODO add sub scopes
         if(getScopeAttr(node).isPresent())
             return Collections.emptyList();
 
-        Collection<XmlAttribute> nodeAttrs = Option.of(node.getAttributes()).fold(new Option.OptionCB<NamedNodeMap, Collection<XmlAttribute>>() {
+        final Option<String> nodeId = Option.of(node.getAttributes()).map(new Option.Map<NamedNodeMap, String>() {
+            @Override
+            public String map(NamedNodeMap namedNodeMap) {
+                return getNodeId(namedNodeMap).getOrElse(null);
+            }
+        });
+
+        final Collection<XmlAttribute> nodeAttrs = Option.of(node.getAttributes()).fold(new Option.OptionCB<NamedNodeMap, Collection<XmlAttribute>>() {
             @Override
             public Collection<XmlAttribute> absent() {
                 return Collections.emptyList();
@@ -170,10 +178,7 @@ public class XmlUtils {
 
             @Override
             public Collection<XmlAttribute> present(NamedNodeMap namedNodeMap) {
-
-                Option<String> nodeId = getNodeId(namedNodeMap);
                 List<XmlAttribute> attributeList = new ArrayList<>();
-
                 for (Node node : new NamedNodeMapCollection(namedNodeMap)) {
                     Matcher matcher = attrPattern.matcher(node.toString());
                     if(matcher.matches() && attributes.containsKey(matcher.group(1))) {
@@ -192,15 +197,32 @@ public class XmlUtils {
                 return attributeList;
             }
         });
+        Collection<XmlView> views = new ArrayList<>();
+        if(!nodeAttrs.isEmpty()) {
+            Option<XmlView> view = nodeId.fold(new Option.OptionCB<String, Option<XmlView>>() {
+                @Override
+                public Option<XmlView> absent() {
+                    messageUtils.error(Option.<Element>absent(), "View '%s' must have an id in order for ngAndroid to use its attributes.", node);
+                    return Option.absent();
+                }
 
-        nodeAttrs.addAll(collectionUtils.flatMap(new NodeListCollection(node.getChildNodes()), new CollectionUtils.Function<Node, Collection<XmlAttribute>>() {
+                @Override
+                public Option<XmlView> present(String s) {
+                    return Option.of(new XmlView(s, nodeAttrs, node.getNodeName()));
+                }
+            });
+            if(view.isPresent()) {
+                views.add(view.get());
+            }
+        }
+        views.addAll(collectionUtils.flatMap(new NodeListCollection(node.getChildNodes()), new CollectionUtils.Function<Node, Collection<XmlView>>() {
             @Override
-            public Collection<XmlAttribute> apply(Node node) {
+            public Collection<XmlView> apply(Node node) {
                 return getAttributes(node);
             }
         }));
 
-        return nodeAttrs;
+        return views;
     }
 
     private Option<String> getNodeId(NamedNodeMap nodeMap) {

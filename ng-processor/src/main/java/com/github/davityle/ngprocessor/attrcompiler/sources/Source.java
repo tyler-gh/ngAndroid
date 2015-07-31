@@ -32,7 +32,7 @@ public class Source {
         this.node = Parser.parse(source);
     }
 
-    public String getSetterSource() {
+    public String getGetterSource() {
         return GetExpressionVisitor.generateGetExpression(node);
     }
 

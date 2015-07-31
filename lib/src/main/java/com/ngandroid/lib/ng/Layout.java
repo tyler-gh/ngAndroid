@@ -1,7 +1,9 @@
 package com.ngandroid.lib.ng;
 
-/**
- * Created by tyler on 7/29/15.
- */
+import android.view.View;
+
 public interface Layout {
+    int getId();
+    Object execute(int viewId, int attr);
+    void attach(View __view__);
 }

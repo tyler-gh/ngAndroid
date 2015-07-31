@@ -66,7 +66,7 @@ public class GetExpressionVisitor extends AVisitor {
 
     @Override
     public void visit(Identifier node) {
-        result.append("scope.");
+//        result.append("scope.");
         result.append(node.getToken().getScript());
     }
 

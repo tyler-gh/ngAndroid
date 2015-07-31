@@ -222,4 +222,12 @@ public class ElementUtils {
            }
         });
     }
+
+    public String getTypeName(Element element) {
+        TypeMirror fieldType = element.asType();
+        TypeElement typeElement = typeUtils.asTypeElement(fieldType);
+        String pack = getPackageName(typeElement);
+        String modelName = stripClassName(fieldType);
+        return (pack + '.' + modelName).replaceAll("<.*>", "");
+    }
 }

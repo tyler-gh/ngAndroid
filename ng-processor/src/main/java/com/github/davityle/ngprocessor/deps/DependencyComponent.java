@@ -7,6 +7,7 @@ import com.github.davityle.ngprocessor.source.SourceCreator;
 import com.github.davityle.ngprocessor.source.linkers.ModelSourceLinker;
 import com.github.davityle.ngprocessor.source.linkers.ScopeSourceLinker;
 import com.github.davityle.ngprocessor.util.AttrDependencyUtils;
+import com.github.davityle.ngprocessor.util.CollectionUtils;
 import com.github.davityle.ngprocessor.util.ManifestPackageUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.ScopeUtils;
@@ -31,6 +32,7 @@ public interface DependencyComponent {
     XmlUtils createXmlUtils();
     AttrDependencyUtils createAttrDependencyUtils();
     XmlNodeUtils createXmlNodeUtils();
+    CollectionUtils createCollectionUtils();
 
     void inject(ModelScopeMapper modelScopeMapper);
     void inject(LayoutScopeMapper layoutScopeMapper);

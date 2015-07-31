@@ -24,14 +24,15 @@ import com.github.davityle.ngprocessor.finders.DefaultLayoutDirProvider;
 import com.github.davityle.ngprocessor.map.LayoutScopeMapper;
 import com.github.davityle.ngprocessor.source.SourceCreator;
 import com.github.davityle.ngprocessor.source.linkers.ModelSourceLinker;
-import com.github.davityle.ngprocessor.source.linkers.ScopeSourceLinker;
+import com.github.davityle.ngprocessor.source.links.LayoutSourceLink;
 import com.github.davityle.ngprocessor.source.links.NgModelSourceLink;
-import com.github.davityle.ngprocessor.source.links.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.AttrDependencyUtils;
+import com.github.davityle.ngprocessor.util.CollectionUtils;
 import com.github.davityle.ngprocessor.util.ManifestPackageUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.Option;
 import com.github.davityle.ngprocessor.util.ScopeUtils;
+import com.github.davityle.ngprocessor.util.Tuple;
 import com.github.davityle.ngprocessor.util.XmlNodeUtils;
 import com.github.davityle.ngprocessor.xml.XmlScope;
 
@@ -121,10 +122,10 @@ public class NgProcessor extends AbstractProcessor {
                 return false;
 
             Map<String, Collection<Scope>> layoutsWScopes = mapLayoutsToScopes(scopes, xmlScopes);
-            List<NgModelSourceLink> modelSourceLinks = getModelSourceLinks(getModels(annotations));
-            List<NgScopeSourceLink> scopeSourceLinks = getScopeSourceLinks(layoutsWScopes, manifestPackageName.get());
-            Set<AttrDependency> dependencySet = getDependencySet(xmlScopes);
+            Collection<LayoutSourceLink> scopeSourceLinks = getLayoutSourceLinks(layoutsWScopes, manifestPackageName.get());
 
+            Set<AttrDependency> dependencySet = getDependencySet(xmlScopes);
+            List<NgModelSourceLink> modelSourceLinks = getModelSourceLinks(getModels(annotations));
             createSourceFiles(modelSourceLinks, scopeSourceLinks, dependencySet);
 
             messageUtils.note(Option.<Element>absent(), ":NgAndroid:finished");
@@ -153,13 +154,16 @@ public class NgProcessor extends AbstractProcessor {
         return sourceLinker.getSourceLinks();
     }
 
-    private List<NgScopeSourceLink> getScopeSourceLinks(Map<String, Collection<Scope>> scopeMap, String packageName){
-        ScopeSourceLinker scopeSourceLinker = new ScopeSourceLinker(scopeMap, packageName);
-        dependencyComponent.inject(scopeSourceLinker);
-        return scopeSourceLinker.getSourceLinks();
+    private Collection<LayoutSourceLink> getLayoutSourceLinks(final Map<String, Collection<Scope>> scopeMap, final String packageName){
+        return dependencyComponent.createCollectionUtils().mapToCollection(scopeMap, new CollectionUtils.Function<Tuple<String, Collection<Scope>>, LayoutSourceLink>() {
+            @Override
+            public LayoutSourceLink apply(Tuple<String, Collection<Scope>> layout) {
+                return new LayoutSourceLink(layout.getSecond(), layout.getFirst(), packageName);
+            }
+        });
     }
 
-    private void createSourceFiles(List<NgModelSourceLink> modelSourceLinks, List<NgScopeSourceLink> scopeSourceLinks, Set<AttrDependency> dependencySet) {
+    private void createSourceFiles(List<NgModelSourceLink> modelSourceLinks, Collection<LayoutSourceLink> scopeSourceLinks, Set<AttrDependency> dependencySet) {
         SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, scopeSourceLinks, dependencySet);
         dependencyComponent.inject(sourceCreator);
         sourceCreator.createSourceFiles();

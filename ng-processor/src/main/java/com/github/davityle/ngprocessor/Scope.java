@@ -1,6 +1,7 @@
 package com.github.davityle.ngprocessor;
 
 import com.github.davityle.ngprocessor.xml.XmlScope;
+import com.github.davityle.ngprocessor.xml.XmlView;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,17 +11,16 @@ import javax.lang.model.element.Element;
 
 public class Scope {
 
-    // TODO, Model classes, scopeType
-
     private final Element javaElement;
-    private final Collection<Element> ngModelJavaElements;
-    private final String scopeName;
+    private final Collection<Model> ngModels;
+    private final String scopeName, scopeType;
     private final Map<String, XmlScope> xmlScopes;
 
-    public Scope(Element javaElement, Collection<Element> ngModelJavaElements, String scopeName) {
+    public Scope(Element javaElement, Collection<Model> ngModels, String scopeName, String scopeType) {
         this.javaElement = javaElement;
-        this.ngModelJavaElements = ngModelJavaElements;
+        this.ngModels = ngModels;
         this.scopeName = scopeName;
+        this.scopeType = scopeType;
         this.xmlScopes = new HashMap<>();
     }
 
@@ -32,16 +32,28 @@ public class Scope {
         return xmlScopes;
     }
 
+    public boolean inLayout(String layout) {
+        return xmlScopes.containsKey(layout);
+    }
+
+    public Collection<XmlView> getViews(String layout) {
+        return xmlScopes.get(layout).getViews();
+    }
+
     public Element getJavaElement() {
         return javaElement;
     }
 
-    public Collection<Element> getNgModels() {
-        return ngModelJavaElements;
+    public Collection<Model> getNgModels() {
+        return ngModels;
     }
 
-    public String getScopeName() {
+    public String getName() {
         return scopeName;
+    }
+
+    public String getTypeName() {
+        return scopeType;
     }
 
     @Override

@@ -74,8 +74,7 @@ public class LayoutsFinder {
         File[] kids = f.listFiles();
         if(kids != null) {
             for (File file : kids) {
-                String name = file.getName();
-                if (file.isDirectory() && !name.equals("compile") && !name.equals("bin") && !name.equals("build")) {
+                if (isNonBuildDirectory(file)) {
                     File resourceFile = new File(file, "src/main/res/");
                     if (resourceFile.exists() && resourceFile.isDirectory()) {
                         List<File> dirs = new ArrayList<>();
@@ -92,7 +91,7 @@ public class LayoutsFinder {
         File[] kids = f.listFiles();
         if(kids != null) {
             for (File file : kids) {
-                if (file.isDirectory()) {
+                if (isNonBuildDirectory(file)) {
                     if (file.getName().equals("layout")) {
                         files.add(file);
                     } else {
@@ -101,5 +100,10 @@ public class LayoutsFinder {
                 }
             }
         }
+    }
+
+    private boolean isNonBuildDirectory(File file) {
+        String name = file.getName();
+        return file.isDirectory() && !name.equals("compile") && !name.equals("bin") && !name.equals("build");
     }
 }
