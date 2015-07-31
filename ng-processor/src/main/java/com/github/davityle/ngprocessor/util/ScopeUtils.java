@@ -122,7 +122,7 @@ public class ScopeUtils {
         return elementUtils.getAnnotationValue(scope, ScopeUtils.NG_SCOPE_ANNOTATION, "name", String.class).fold(new Option.OptionCB<String, String>() {
             @Override
             public String absent() {
-                messageUticd ls.error(Option.of(scope), "Scope must have a name.");
+                messageUtils.error(Option.of(scope), "Scope must have a name.");
                 return "";
             }
 
