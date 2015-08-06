@@ -4,9 +4,9 @@ import com.github.davityle.ngprocessor.attrcompiler.node.*;
 import com.github.davityle.ngprocessor.source.SourceField;
 
 public class GetExpressionVisitor extends AVisitor {
-    private StringBuilder result;
+    protected StringBuilder result;
 
-    private GetExpressionVisitor() {
+    GetExpressionVisitor() {
         result = new StringBuilder();
     }
 
@@ -66,8 +66,9 @@ public class GetExpressionVisitor extends AVisitor {
 
     @Override
     public void visit(Identifier node) {
-//        result.append("scope.");
+        result.append("get");
         result.append(node.getToken().getScript());
+        result.append("()");
     }
 
     @Override

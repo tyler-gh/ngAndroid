@@ -16,13 +16,12 @@
 
 package com.github.davityle.ngprocessor.map;
 
-import com.github.davityle.ngprocessor.Scope;
+import com.github.davityle.ngprocessor.model.Layout;
+import com.github.davityle.ngprocessor.model.Scope;
 import com.github.davityle.ngprocessor.util.CollectionUtils;
-import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.Option;
 import com.github.davityle.ngprocessor.util.Tuple;
-import com.github.davityle.ngprocessor.util.TypeUtils;
 import com.github.davityle.ngprocessor.xml.XmlScope;
 
 import java.util.Collection;
@@ -34,27 +33,23 @@ import javax.lang.model.element.Modifier;
 
 public class LayoutScopeMapper {
 
-    private final Map<String, Collection<XmlScope>> fileNodeMap;
+    private final Map<Layout, Collection<XmlScope>> fileNodeMap;
     private final Set<Scope> scopes;
 
     @Inject
-    ElementUtils elementUtils;
-    @Inject
     MessageUtils messageUtils;
-    @Inject
-    TypeUtils typeUtils;
     @Inject
     CollectionUtils collectionUtils;
 
-    public LayoutScopeMapper(Set<Scope> scopes, Map<String, Collection<XmlScope>> fileNodeMap){
+    public LayoutScopeMapper(Set<Scope> scopes, Map<Layout, Collection<XmlScope>> fileNodeMap){
         this.scopes = scopes;
         this.fileNodeMap = fileNodeMap;
     }
 
-    public Map<String, Collection<Scope>> mapLayoutsToScopes(){
-        return collectionUtils.map(fileNodeMap, new CollectionUtils.Function<Tuple<String, Collection<XmlScope>>, Tuple<String, Collection<Scope>>>() {
+    public Map<Layout, Collection<Scope>> mapLayoutsToScopes(){
+        return collectionUtils.map(fileNodeMap, new CollectionUtils.Function<Tuple<Layout, Collection<XmlScope>>, Tuple<Layout, Collection<Scope>>>() {
             @Override
-            public Tuple<String, Collection<Scope>> apply(final Tuple<String, Collection<XmlScope>> layout) {
+            public Tuple<Layout, Collection<Scope>> apply(final Tuple<Layout, Collection<XmlScope>> layout) {
                 return Tuple.of(layout.getFirst(), collectionUtils.filter(scopes, new CollectionUtils.Function<Scope, Boolean>() {
                     @Override
                     public Boolean apply(Scope scope) {

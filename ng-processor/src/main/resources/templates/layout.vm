@@ -5,20 +5,15 @@ import android.widget.*;
 
 public class ${className} implements com.ngandroid.lib.ng.Layout {
 
+    private com.ngandroid.lib.NgAndroid ngandroid_;
 	#foreach($scope in $scopes)
-	    private $scope.typeName $scope.name;
+	    private ${scope.typeName}$$NgScope $scope.name;
 	#end
-	private com.ngandroid.lib.NgAndroid ngandroid_;
 
 	public ${className}(com.ngandroid.lib.NgAndroid ngandroid#foreach($scope in $scopes), $scope.typeName $scope.name #end){
 		this.ngandroid_ = ngandroid;
 		#foreach($scope in $scopes)
-            this.$scope.name = $scope.name;
-            #foreach($model in $scope.ngModels)
-                if(this.${scope.name}.${model.name} == null || !(this.${scope.name}.${model.name} instanceof com.ngandroid.lib.ng.Model)){
-                    this.${scope.name}.${model.name} = new ${model.typeName}$$NgModel();
-                }
-            #end
+            this.$scope.name = new ${scope.typeName}$$NgScope($scope.name);
         #end
 	}
 
@@ -29,19 +24,12 @@ public class ${className} implements com.ngandroid.lib.ng.Layout {
 	public void attach(android.view.View __view__){
         #foreach($scope in $scopes)
             #foreach($view in $scope.getViews($layoutPath))
-                $view.elementType $view.id = ($view.elementType) __view__.findViewById(${packageName}.R.id.${view.id});
+                /*$view.elementType*/ android.view.View $view.id = /*($view.elementType)*/ __view__.findViewById(${packageName}.R.id.${view.id});
                 #foreach($attr in $view.attributes)
-                    ##set( $models = $attr.modelSource )
-                    ##ngandroid_.attach(
-                    ##    ${manifestPackageName}.R.styleable.ngAndroid_${attr.name},
-                    ##    this,
-                    ##    ${v.id},
-                    ##    ${manifestPackageName}.R.layout.${mapEntry.key},
-                    ##    ${manifestPackageName}.R.id.${v.id}
-                    ##    #foreach($model in $models)
-                    ##        ,com.ngandroid.lib.utils.Tuple.of("${model.modelName}","${model.fieldName}")
-                    ##    #end
-                    ##);
+                    #set ($attrSource = $attr.source)
+                    #set ($attrClassName = $attr.className)
+                    #set ($viewName = $view.id)
+                    #evaluate ( ${attr.attachSource} )
                 #end
             #end
         #end
@@ -67,14 +55,27 @@ public class ${className} implements com.ngandroid.lib.ng.Layout {
                             }
                         #end
                             else{
-                                android.util.Log.w("${simpleClassName}", "view ${v.id} in layout ${mapEntry.key} does not have attribute " + attr);
+                                android.util.Log.w("${className}", "view ${view.id} does not have attribute " + attr);
                                 return null;
                             }
                 #end
             #end
             default:
-               android.util.Log.w("${className}", "View " + Integer.toHexString(viewId) + " in layout " + Integer.toHexString(getId()) + " does not have any ngAttributes");
+               android.util.Log.w("${className}", "View " + Integer.toHexString(viewId) + " in layout '${layoutName}' does not have any ngAttributes");
                return null;
         }
 	}
+
+	#foreach($scope in $scopes)
+        #foreach($view in $scope.getViews($layoutPath))
+            #foreach($attr in $view.attributes)
+                #set ($attrSource = $attr.source)
+                #set ($attrClassName = $attr.className)
+                #set ($viewType = $view.elementType)
+                #set ($type = ${attr.source.getType($scope)})
+                #set ($boolType = false)
+                #evaluate ( ${attr.classSource} )
+            #end
+        #end
+    #end
 }

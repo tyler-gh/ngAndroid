@@ -20,8 +20,5 @@ package com.ngandroid.lib.ng;
  * Defines a Model. Used in generated code.
  */
 public interface Model {
-    void addObserver(String field, ModelObserver modelObserver);
-    <T> T getValue(String field);
-    <T> void setValue(String field, T value);
-    Class<?> getType(String field);
+
 }

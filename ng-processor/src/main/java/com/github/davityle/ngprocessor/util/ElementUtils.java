@@ -183,8 +183,16 @@ public class ElementUtils {
         return type.getQualifiedName().toString();
     }
 
-    public String getPackageName(Element type) {
-        return elementUtils.getPackageOf(type).getQualifiedName().toString();
+    public String getFullName(Element element) {
+        return getFullName(typeUtils.asTypeElement(element.asType()));
+    }
+
+    public Option<String> getPackageName(Element type) {
+        try {
+            return Option.of(elementUtils.getPackageOf(type).getQualifiedName().toString());
+        }catch (NullPointerException e) {
+            return Option.absent();
+        }
     }
 
     public boolean isAccessible(Element element) {
@@ -226,8 +234,23 @@ public class ElementUtils {
     public String getTypeName(Element element) {
         TypeMirror fieldType = element.asType();
         TypeElement typeElement = typeUtils.asTypeElement(fieldType);
-        String pack = getPackageName(typeElement);
-        String modelName = stripClassName(fieldType);
-        return (pack + '.' + modelName).replaceAll("<.*>", "");
+        Option<String> packOpt = getPackageName(typeElement);
+        final String modelName = stripClassName(fieldType).replaceAll("<.*>", "");
+        return packOpt.fold(new Option.OptionCB<String, String>() {
+            @Override
+            public String absent() {
+                return modelName;
+            }
+
+            @Override
+            public String present(String pack) {
+                return pack + "." + modelName;
+            }
+        });
+    }
+
+    public String getSimpleName(Element scope) {
+        String name = getFullName(scope);
+        return name.substring(name.lastIndexOf('.') + 1);
     }
 }

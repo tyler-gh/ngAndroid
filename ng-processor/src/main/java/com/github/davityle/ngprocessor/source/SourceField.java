@@ -16,15 +16,20 @@
 
 package com.github.davityle.ngprocessor.source;
 
+import com.github.davityle.ngprocessor.util.PrimitiveUtils;
+
 /**
 * Created by tyler on 3/25/15.
 */
 public final class SourceField {
+
     private final String name, typeName;
+    private final PrimitiveUtils primitiveUtils;
     private String getter, setter;
 
-    public SourceField(String name, String typeName) {
+    public SourceField(String name, String typeName, PrimitiveUtils primitiveUtils) {
         this.name = name;
+        this.primitiveUtils = primitiveUtils;
         this.typeName = typeName.replaceAll("<.*>", "");
     }
 
@@ -36,9 +41,17 @@ public final class SourceField {
         return typeName;
     }
 
+    public String getObjectType(){
+        return primitiveUtils.getObjectType(typeName);
+    }
+
     public String getGetter() { return getter; }
 
     public String getSetter() { return setter; }
+
+    public boolean isPrimitive() {
+        return primitiveUtils.isPrimitive(typeName);
+    }
 
     public void setSetter(String setter) {
         this.setter = setter;

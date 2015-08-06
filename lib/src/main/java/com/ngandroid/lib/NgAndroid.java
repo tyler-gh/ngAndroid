@@ -24,14 +24,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ngandroid.lib.exceptions.NgException;
-import com.ngandroid.lib.ng.ModelObserver;
+import com.ngandroid.lib.ng.CompiledAttr;
 import com.ngandroid.lib.ng.Scope;
 import com.ngandroid.lib.ngattributes.AttrsResolver;
 import com.ngandroid.lib.ngattributes.NgAttribute;
 import com.ngandroid.lib.utils.Blur;
 import com.ngandroid.lib.utils.DefaultBlur;
 import com.ngandroid.lib.utils.DefaultValueFormatter;
-import com.ngandroid.lib.utils.Tuple;
 import com.ngandroid.lib.utils.ValueFormatter;
 
 /**
@@ -154,16 +153,16 @@ public class NgAndroid {
         return inflate(scope, inflater, resourceId, viewGroup, false);
     }
 
-    /**
-     * programmatically add model field observer
-     * @param scope the annotated scope object
-     * @param modelName the name of the annotated {@link com.ngandroid.lib.annotations.NgModel} field
-     * @param field the field within the model that will be observed
-     * @param modelObserver the {@link ModelObserver}
-     */
-    public void observeModelField(Object scope, String modelName, String field, ModelObserver modelObserver){
-        buildScope(scope).getModel(modelName).addObserver(field, modelObserver);
-    }
+//    /**
+//     * programmatically add model field observer
+//     * @param scope the annotated scope object
+//     * @param modelName the name of the annotated {@link com.ngandroid.lib.annotations.NgModel} field
+//     * @param field the field within the model that will be observed
+//     * @param modelObserver the {@link ModelObserver}
+//     */
+//    public void observeModelField(Object scope, String modelName, String field, ModelObserver modelObserver){
+//        buildScope(scope).getModel(modelName).addObserver(field, modelObserver);
+//    }
 
     /**
      * this inflates the view, calls,  {@link #buildScope(Object)}, and then attaches the view
@@ -192,14 +191,21 @@ public class NgAndroid {
         return ScopeBuilder.getScope(scope, this);
     }
 
-    /**
-     * DO NOT USE. This is for generated code to access the NgAttributes
-     */
-    public void attach(int attr, Scope scope, View view, int layoutId, int viewId, Tuple<String,String> ... models) {
+//    /**
+//     * DO NOT USE. This is for generated code to access the NgAttributes
+//     */
+//    public void attach(int attr, Scope scope, View view, int layoutId, int viewId, Tuple<String,String> ... models) {
+//        NgAttribute ngAttribute = attributes.get(attr);
+//        if(ngAttribute == null)
+//            throw new NgException("Unable to find NgAttribute " + Integer.toHexString(attr));
+//        ngAttribute.attach(scope, view, layoutId, viewId, models);
+//    }
+
+    public <T> void attach(int attr, View view, CompiledAttr<T> compiledAttr) {
         NgAttribute ngAttribute = attributes.get(attr);
         if(ngAttribute == null)
             throw new NgException("Unable to find NgAttribute " + Integer.toHexString(attr));
-        ngAttribute.attach(scope, view, layoutId, viewId, models);
+        ngAttribute.attach(view, compiledAttr);
     }
 
     /**

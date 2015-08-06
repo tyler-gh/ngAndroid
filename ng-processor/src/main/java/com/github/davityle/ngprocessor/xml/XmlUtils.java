@@ -16,11 +16,14 @@
 
 package com.github.davityle.ngprocessor.xml;
 
+import com.github.davityle.ngprocessor.attrcompiler.Visitors;
 import com.github.davityle.ngprocessor.attrcompiler.parse.ParseException;
+import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import com.github.davityle.ngprocessor.attributes.Attributes;
 import com.github.davityle.ngprocessor.attributes.ScopeAttrNameResolver;
 import com.github.davityle.ngprocessor.finders.LayoutsFinder;
 import com.github.davityle.ngprocessor.finders.NamespaceFinder;
+import com.github.davityle.ngprocessor.model.Layout;
 import com.github.davityle.ngprocessor.util.CollectionUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.Option;
@@ -55,23 +58,25 @@ public class XmlUtils {
     private final LayoutsFinder layoutsFinder;
     private final NamespaceFinder namespaceFinder;
     private final Attributes attributes;
+    private final Visitors visitors;
     private Pattern attrPattern;
 
     @Inject
-    public XmlUtils(MessageUtils messageUtils, CollectionUtils collectionUtils, ScopeAttrNameResolver scopeAttrNameResolver, LayoutsFinder layoutsFinder, NamespaceFinder namespaceFinder, Attributes attributes){
+    public XmlUtils(MessageUtils messageUtils, CollectionUtils collectionUtils, ScopeAttrNameResolver scopeAttrNameResolver, LayoutsFinder layoutsFinder, NamespaceFinder namespaceFinder, Attributes attributes, Visitors visitors){
         this.messageUtils = messageUtils;
         this.collectionUtils = collectionUtils;
         this.scopeAttrNameResolver = scopeAttrNameResolver;
         this.layoutsFinder = layoutsFinder;
         this.namespaceFinder = namespaceFinder;
         this.attributes = attributes;
+        this.visitors = visitors;
     }
 
     /**
      * maps all of the layouts to their scopes, could be optimized
      * @return
      */
-    public Map<String, Collection<XmlScope>> getXmlScopes() {
+    public Map<Layout, Collection<XmlScope>> getXmlScopes() {
         List<File> layoutDirs = layoutsFinder.findLayoutDirs();
 
         Collection<File> layoutFiles = collectionUtils.flatMap(layoutDirs, new CollectionUtils.Function<File, Collection<File>>() {
@@ -93,14 +98,14 @@ public class XmlUtils {
             }
         });
 
-        return collectionUtils.toMap(collectionUtils.flatMapOpt(docs, new CollectionUtils.Function<Document, Option<Tuple<String, Collection<XmlScope>>>>() {
+        return collectionUtils.toMap(collectionUtils.flatMapOpt(docs, new CollectionUtils.Function<Document, Option<Tuple<Layout, Collection<XmlScope>>>>() {
             @Override
-            public Option<Tuple<String, Collection<XmlScope>>> apply(Document doc) {
+            public Option<Tuple<Layout, Collection<XmlScope>>> apply(Document doc) {
                 Option<String> optNameSpace = namespaceFinder.getNameSpace(doc);
                 if (optNameSpace.isPresent()) {
                     attrPattern = Pattern.compile(String.format(NAMESPACE_ATTRIBUTE_REG, optNameSpace.get()));
                     Collection<XmlScope> scopes = getScopes(doc);
-                    return Option.of(Tuple.of(doc.getDocumentURI(), scopes));
+                    return Option.of(Tuple.of(new Layout(doc.getDocumentURI()), scopes));
                 } else {
                     return Option.absent();
                 }
@@ -185,7 +190,7 @@ public class XmlUtils {
                         String attr = matcher.group(1);
                         String value = matcher.group(2);
                         try {
-                            XmlAttribute xmlAttribute = new XmlAttribute(attr, value, nodeId);
+                            XmlAttribute xmlAttribute = new XmlAttribute(attributes.get(attr), new Source(value, visitors) , nodeId);
                             attributeList.add(xmlAttribute);
                         } catch (ParseException | RuntimeException e) {
                             Object[] params = new Object[]{node.getBaseURI(), attr, nodeId.getOrElse("no id available"), value, e.getMessage()};

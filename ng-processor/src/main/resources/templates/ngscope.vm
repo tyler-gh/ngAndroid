@@ -18,32 +18,6 @@ public class ${simpleClassName}$$NgScope <T extends ${fullName}> implements com.
         #end
 	}
 
-	public void attach(int layoutId, android.view.View __view__){
-	    switch(layoutId){
-            #foreach ($mapEntry in $layouts.entrySet())
-                case ${manifestPackageName}.R.layout.${mapEntry.key}:{
-                    #foreach($v in $mapEntry.value)
-                        ${v.elementType} ${v.id} = (${v.elementType}) __view__.findViewById(${manifestPackageName}.R.id.${v.id});
-                        #foreach($attr in $v.attributes)
-                            #set( $models = $attr.modelSource )
-                            ngandroid_.attach(
-                                ${manifestPackageName}.R.styleable.ngAndroid_${attr.name},
-                                this,
-                                ${v.id},
-                                ${manifestPackageName}.R.layout.${mapEntry.key},
-                                ${manifestPackageName}.R.id.${v.id}
-                                #foreach($model in $models)
-                                    ,com.ngandroid.lib.utils.Tuple.of("${model.modelName}","${model.fieldName}")
-                                #end
-                            );
-                        #end
-                    #end
-                    break;
-                }
-            #end
-        }
-	}
-
 	public Object execute(int layoutId, int viewId, int attr){
 	    switch(layoutId){
             #foreach ($mapEntry in $layouts.entrySet())

@@ -1,4 +1,4 @@
-package com.github.davityle.ngprocessor;
+package com.github.davityle.ngprocessor.model;
 
 public class Model {
 

@@ -39,7 +39,7 @@ public class AttrDependency {
         return dependencies != null ? dependencies : new String[0];
     }
 
-    private static String getResource(String resourcePath){
+    protected static String getResource(String resourcePath){
         return new Scanner(AttrDependency.class.getClassLoader().getResourceAsStream(resourcePath), "UTF-8").useDelimiter("\\A").next();
     }
 }

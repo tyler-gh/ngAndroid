@@ -11,7 +11,7 @@ public class SetExpressionVisitor extends AVisitor {
     private final String value;
     private final StringBuilder result = new StringBuilder();
 
-    private SetExpressionVisitor(String value) {
+    SetExpressionVisitor(String value) {
         this.value = value;
     }
 
@@ -34,9 +34,10 @@ public class SetExpressionVisitor extends AVisitor {
 
     @Override
     public void visit(Identifier node) {
-//        result.append("scope.");
+        result.append("set");
         result.append(node.getToken().getScript());
-        result.append("=");
+        result.append("(");
         result.append(value);
+        result.append(")");
     }
 }

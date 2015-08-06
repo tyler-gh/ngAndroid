@@ -1,4 +1,4 @@
-package com.github.davityle.ngprocessor;
+package com.github.davityle.ngprocessor.model;
 
 import com.github.davityle.ngprocessor.xml.XmlScope;
 import com.github.davityle.ngprocessor.xml.XmlView;
@@ -13,31 +13,36 @@ public class Scope {
 
     private final Element javaElement;
     private final Collection<Model> ngModels;
-    private final String scopeName, scopeType;
-    private final Map<String, XmlScope> xmlScopes;
+    private final String scopeName, scopeType, javaName;
+    private final Map<Layout, XmlScope> xmlScopes;
 
-    public Scope(Element javaElement, Collection<Model> ngModels, String scopeName, String scopeType) {
+    public Scope(Element javaElement, Collection<Model> ngModels, String scopeName, String scopeType, String javaName) {
         this.javaElement = javaElement;
         this.ngModels = ngModels;
         this.scopeName = scopeName;
         this.scopeType = scopeType;
+        this.javaName = javaName;
         this.xmlScopes = new HashMap<>();
     }
 
-    public void addXmlScope(String layout, XmlScope xmlScope) {
+    public void addXmlScope(Layout layout, XmlScope xmlScope) {
         xmlScopes.put(layout, xmlScope);
     }
 
-    public Map<String, XmlScope> getXmlScopes() {
+    public Map<Layout, XmlScope> getXmlScopes() {
         return xmlScopes;
     }
 
     public boolean inLayout(String layout) {
-        return xmlScopes.containsKey(layout);
+        return xmlScopes.containsKey(new Layout(layout));
+    }
+
+    public Collection<Layout> getLayouts() {
+        return xmlScopes.keySet();
     }
 
     public Collection<XmlView> getViews(String layout) {
-        return xmlScopes.get(layout).getViews();
+        return xmlScopes.get(new Layout(layout)).getViews();
     }
 
     public Element getJavaElement() {
@@ -50,6 +55,10 @@ public class Scope {
 
     public String getName() {
         return scopeName;
+    }
+
+    public String getJavaName() {
+        return javaName;
     }
 
     public String getTypeName() {

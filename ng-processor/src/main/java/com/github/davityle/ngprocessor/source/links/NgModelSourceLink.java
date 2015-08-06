@@ -16,8 +16,9 @@
 
 package com.github.davityle.ngprocessor.source.links;
 
-import com.github.davityle.ngprocessor.source.SourceField;
 import com.github.davityle.ngprocessor.map.ModelScopeMapper;
+import com.github.davityle.ngprocessor.source.SourceField;
+import com.github.davityle.ngprocessor.util.Option;
 
 import org.apache.velocity.VelocityContext;
 
@@ -25,19 +26,16 @@ import java.util.List;
 
 import javax.lang.model.element.Element;
 
-/**
- * Created by tyler on 3/30/15.
- */
 public class NgModelSourceLink implements SourceLink {
 
     private final String modelName;
-    private final String packageName;
+    private final Option<String> packageName;
     private final String fullName;
     private final boolean isInterface;
     private final List<SourceField> fields;
     private final Element element;
 
-    public NgModelSourceLink(String modelName, String packageName, String fullName, boolean isInterface, List<SourceField> fields, Element element) {
+    public NgModelSourceLink(String modelName, Option<String> packageName, String fullName, boolean isInterface, List<SourceField> fields, Element element) {
         this.modelName = modelName;
         this.packageName = packageName;
         this.fullName = fullName;
@@ -50,8 +48,17 @@ public class NgModelSourceLink implements SourceLink {
         VelocityContext vc = new VelocityContext();
 
         vc.put("simpleClassName", modelName);
-        vc.put("className", packageName + '.' + modelName);
-        vc.put("packageName", packageName);
+        vc.put("className", packageName.fold(new Option.OptionCB<String, String>() {
+            @Override
+            public String absent() {
+                return modelName;
+            }
+            @Override
+            public String present(String pack) {
+                return pack + '.' + modelName;
+            }
+        }));
+        vc.put("packageName", packageName.getOrElse(""));
         vc.put("fullName", fullName);
         vc.put("isInterface", isInterface);
         vc.put("fields", fields);

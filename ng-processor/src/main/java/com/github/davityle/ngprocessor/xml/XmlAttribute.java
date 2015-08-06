@@ -18,21 +18,21 @@ package com.github.davityle.ngprocessor.xml;
 
 import com.github.davityle.ngprocessor.attrcompiler.parse.ParseException;
 import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
+import com.github.davityle.ngprocessor.attributes.Attribute;
 import com.github.davityle.ngprocessor.util.Option;
 
 /**
 * Created by tyler on 3/25/15.
 */
 public class XmlAttribute {
-    private final String name, value;
+    private final Attribute attr;
     private final Option<String> viewId;
     private Source source;
 
-    XmlAttribute(String name, String value, Option<String> viewId) throws ParseException {
-        this.name = name;
-        this.value = value;
+    XmlAttribute(Attribute attr, Source source, Option<String> viewId) throws ParseException {
+        this.attr = attr;
         this.viewId = viewId;
-        this.source = new Source(value);
+        this.source = source;
     }
 
     public String getId() {
@@ -40,20 +40,28 @@ public class XmlAttribute {
     }
 
     public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
+        return attr.getAttrName();
     }
 
     @Override
     public String toString() {
-        return '(' + name + ',' + value + ')';
+        return '(' + attr.getAttrName() + ',' + source.getGetterSource() + ')';
     }
 
     public Source getSource() {
         return source;
+    }
+
+    public String getClassSource() {
+        return attr.getClassSource();
+    }
+
+    public String getAttachSource() {
+        return attr.getAttachSource();
+    }
+
+    public String getClassName() {
+        return getId() + getName();
     }
 
     public void setSource(Source source) {

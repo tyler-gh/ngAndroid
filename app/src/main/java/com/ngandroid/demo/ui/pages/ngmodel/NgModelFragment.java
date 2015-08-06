@@ -17,7 +17,7 @@ public class NgModelFragment extends Fragment {
     private final NgAndroid ng = NgAndroid.getInstance();
 
     @NgModel
-    public NgMod mod;
+    NgMod mod;
 
     @Nullable
     @Override

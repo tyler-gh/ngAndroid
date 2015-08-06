@@ -22,9 +22,6 @@ import android.widget.CompoundButton;
 import com.ngandroid.lib.ng.Model;
 import com.ngandroid.lib.ng.ModelObserver;
 
-/**
-* Created by tyler on 2/24/15.
-*/
 final class CompoundButtonInteractor implements CompoundButton.OnCheckedChangeListener, ModelObserver {
 
     private final Model model;

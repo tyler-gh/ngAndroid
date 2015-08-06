@@ -19,8 +19,8 @@ package com.ngandroid.lib.ng;
 /**
  * This class is used when observing a field in a model. It will be fired whenever the field is
  * changed. the name and value of the field will be passed in through the
- * {@link #invoke(String, Object)} method
+ * {@link #invoke(T)} method
  */
-public interface ModelObserver {
-    void invoke(String fieldName, Object arg);
+public interface ModelObserver<T> {
+    void invoke(T arg);
 }

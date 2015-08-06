@@ -18,13 +18,12 @@ package com.ngandroid.lib.ngattributes;
 
 import android.view.View;
 
-import com.ngandroid.lib.ng.Scope;
-import com.ngandroid.lib.utils.Tuple;
+import com.ngandroid.lib.ng.CompiledAttr;
 
 /**
  * NgAttributes are mostly useful when used in conjunction with generated code.
  */
 public interface NgAttribute {
-    void attach(Scope scope, View view, int layoutId, int viewId, Tuple<String,String>[] models);
+    <T> void attach(View view, CompiledAttr<T> compiledAttr);
     int getAttribute();
 }

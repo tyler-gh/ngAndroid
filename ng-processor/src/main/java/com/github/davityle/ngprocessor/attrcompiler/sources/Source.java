@@ -16,28 +16,35 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
-import com.github.davityle.ngprocessor.attrcompiler.GetExpressionVisitor;
-import com.github.davityle.ngprocessor.attrcompiler.SetExpressionVisitor;
+import com.github.davityle.ngprocessor.attrcompiler.Visitors;
 import com.github.davityle.ngprocessor.attrcompiler.node.Node;
 import com.github.davityle.ngprocessor.attrcompiler.parse.ParseException;
 import com.github.davityle.ngprocessor.attrcompiler.parse.Parser;
+import com.github.davityle.ngprocessor.model.Scope;
 
-/**
- * Created by davityle on 1/24/15.
- */
 public class Source {
     private final Node node;
+    private final Visitors visitors;
 
-    public Source(String source) throws ParseException {
+    public Source(String source, Visitors visitors) throws ParseException {
+        this.visitors = visitors;
         this.node = Parser.parse(source);
     }
 
     public String getGetterSource() {
-        return GetExpressionVisitor.generateGetExpression(node);
+        return visitors.getGetterSource(node);
     }
 
     public String getSetterSource(String value) {
-        return SetExpressionVisitor.generateSetExpression(node, value);
+        return visitors.getSetterSource(node, value);
+    }
+
+    public String getObserverSource(String value) {
+        return visitors.getObserverSource(node, value);
+    }
+
+    public String getType(Scope scope) {
+        return visitors.getType(node, scope);
     }
 
     public boolean isVoid() {

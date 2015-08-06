@@ -1,12 +1,11 @@
 package com.github.davityle.ngprocessor.source.links;
 
 
-import com.github.davityle.ngprocessor.Scope;
-import com.github.davityle.ngprocessor.source.SourceField;
+import com.github.davityle.ngprocessor.model.Layout;
+import com.github.davityle.ngprocessor.model.Scope;
 
 import org.apache.velocity.VelocityContext;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -19,11 +18,11 @@ public class LayoutSourceLink implements SourceLink {
     private final Collection<Scope> scopes;
     private final String layoutPath, layoutName, className, packageName;
 
-    public LayoutSourceLink(Collection<Scope> scopes, String layoutPath, String packageName) {
+    public LayoutSourceLink(Collection<Scope> scopes, Layout layout, String packageName) {
         this.scopes = scopes;
-        this.layoutPath = layoutPath;
-        this.layoutName = layoutPath.substring(layoutPath.lastIndexOf(File.separatorChar) + 1).replace(".xml", "");
-        this.className = "Ng" + SourceField.capitalize(layoutName);
+        this.layoutPath = layout.getPath();
+        this.layoutName = layout.getFileName();
+        this.className = "Ng" + layout.getJavaName();
         this.packageName = packageName;
     }
 

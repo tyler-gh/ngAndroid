@@ -16,8 +16,9 @@
 
 package com.github.davityle.ngprocessor.util;
 
-import com.github.davityle.ngprocessor.Model;
-import com.github.davityle.ngprocessor.Scope;
+
+import com.github.davityle.ngprocessor.model.Model;
+import com.github.davityle.ngprocessor.model.Scope;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -80,7 +81,7 @@ public class ScopeUtils {
                         if (modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED)) {
                             messageUtils.error(Option.of(scope), "Unable to access Scope '%s'. Must have default or public access", scope.toString());
                         }
-                        return new Scope(scope, getModelsForScope(ngModels, scope), getScopeName(scope), elementUtils.getTypeName(scope));
+                        return new Scope(scope, getModelsForScope(ngModels, scope), getScopeName(scope), elementUtils.getTypeName(scope), elementUtils.getSimpleName(scope));
                     }
                 });
             }

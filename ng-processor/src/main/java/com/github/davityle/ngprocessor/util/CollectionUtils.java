@@ -16,6 +16,10 @@ public class CollectionUtils {
     public CollectionUtils() {
     }
 
+    public static CollectionUtils cl() {
+        return new CollectionUtils();
+    }
+
     public <T> Option<T> find(final Iterable<T> it, final Function<T, Boolean> f) {
         for(T t : it) {
             if(f.apply(t)) {

@@ -16,7 +16,7 @@
 
 package com.github.davityle.ngprocessor.source.linkers;
 
-import com.github.davityle.ngprocessor.Scope;
+import com.github.davityle.ngprocessor.model.Scope;
 import com.github.davityle.ngprocessor.source.links.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.TypeUtils;

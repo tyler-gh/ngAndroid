@@ -21,6 +21,7 @@ import com.github.davityle.ngprocessor.source.links.NgModelSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.Option;
+import com.github.davityle.ngprocessor.util.PrimitiveUtils;
 import com.github.davityle.ngprocessor.util.TypeUtils;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class ModelSourceLinker {
     @Inject ElementUtils elementUtils;
     @Inject MessageUtils messageUtils;
     @Inject TypeUtils typeUtils;
+    @Inject PrimitiveUtils primitiveUtils;
 
     public ModelSourceLinker(Collection<Element> ngModels) {
         this.ngModels = ngModels;
@@ -60,7 +62,7 @@ public class ModelSourceLinker {
 
         TypeMirror fieldType = element.asType();
         TypeElement typeElement = typeUtils.asTypeElement(fieldType);
-        String packageName = elementUtils.getPackageName(typeElement);
+        Option<String> packageName = elementUtils.getPackageName(typeElement);
         String fullName = elementUtils.getFullName(typeElement);
 
         List<SourceField> fields = new ArrayList<>();
@@ -95,7 +97,7 @@ public class ModelSourceLinker {
 
                 TypeMirror typeMirror = setter.getParameters().get(0).asType();
                 String type = typeMirror.toString();
-                SourceField sourceField = new SourceField(fName, type);
+                SourceField sourceField = new SourceField(fName, type, primitiveUtils);
                 sourceField.setSetter(setter.getSimpleName().toString());
                 // TODO O(n^2) is the best
                 boolean getterFound = false;

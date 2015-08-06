@@ -22,12 +22,16 @@ import com.github.davityle.ngprocessor.deps.DependencyComponent;
 import com.github.davityle.ngprocessor.deps.LayoutModule;
 import com.github.davityle.ngprocessor.finders.DefaultLayoutDirProvider;
 import com.github.davityle.ngprocessor.map.LayoutScopeMapper;
+import com.github.davityle.ngprocessor.model.Layout;
+import com.github.davityle.ngprocessor.model.Scope;
 import com.github.davityle.ngprocessor.source.SourceCreator;
 import com.github.davityle.ngprocessor.source.linkers.ModelSourceLinker;
 import com.github.davityle.ngprocessor.source.links.LayoutSourceLink;
 import com.github.davityle.ngprocessor.source.links.NgModelSourceLink;
+import com.github.davityle.ngprocessor.source.links.ScopeSourceLink;
 import com.github.davityle.ngprocessor.util.AttrDependencyUtils;
 import com.github.davityle.ngprocessor.util.CollectionUtils;
+import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.ManifestPackageUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.Option;
@@ -116,17 +120,19 @@ public class NgProcessor extends AbstractProcessor {
             }
 
             Set<Scope> scopes = getScopeSet(annotations);
-            Map<String, Collection<XmlScope>> xmlScopes = getXmlScopes();
+            Map<Layout, Collection<XmlScope>> xmlScopes = getXmlScopes();
 
             if (messageUtils.hasErrors())
                 return false;
 
-            Map<String, Collection<Scope>> layoutsWScopes = mapLayoutsToScopes(scopes, xmlScopes);
-            Collection<LayoutSourceLink> scopeSourceLinks = getLayoutSourceLinks(layoutsWScopes, manifestPackageName.get());
+            Map<Layout, Collection<Scope>> layoutsWScopes = mapLayoutsToScopes(scopes, xmlScopes);
+            Collection<LayoutSourceLink> layoutSourceLinks = getLayoutSourceLinks(layoutsWScopes, manifestPackageName.get());
+
+            Collection<ScopeSourceLink> scopeSourceLinks = getScopeSourceLinks(scopes, manifestPackageName.get());
 
             Set<AttrDependency> dependencySet = getDependencySet(xmlScopes);
             List<NgModelSourceLink> modelSourceLinks = getModelSourceLinks(getModels(annotations));
-            createSourceFiles(modelSourceLinks, scopeSourceLinks, dependencySet);
+            createSourceFiles(modelSourceLinks, layoutSourceLinks, scopeSourceLinks, dependencySet);
 
             messageUtils.note(Option.<Element>absent(), ":NgAndroid:finished");
             return true;
@@ -138,7 +144,7 @@ public class NgProcessor extends AbstractProcessor {
         }
     }
 
-    private Map<String, Collection<Scope>> mapLayoutsToScopes(Set<Scope> scopes, Map<String, Collection<XmlScope>> xmlScopes){
+    private Map<Layout, Collection<Scope>> mapLayoutsToScopes(Set<Scope> scopes, Map<Layout, Collection<XmlScope>> xmlScopes){
         LayoutScopeMapper layoutScopeMapper = new LayoutScopeMapper(scopes, xmlScopes);
         dependencyComponent.inject(layoutScopeMapper);
         return layoutScopeMapper.mapLayoutsToScopes();
@@ -154,22 +160,32 @@ public class NgProcessor extends AbstractProcessor {
         return sourceLinker.getSourceLinks();
     }
 
-    private Collection<LayoutSourceLink> getLayoutSourceLinks(final Map<String, Collection<Scope>> scopeMap, final String packageName){
-        return dependencyComponent.createCollectionUtils().mapToCollection(scopeMap, new CollectionUtils.Function<Tuple<String, Collection<Scope>>, LayoutSourceLink>() {
+    private Collection<ScopeSourceLink> getScopeSourceLinks(final Set<Scope> scopes, final String packageName){
+        return dependencyComponent.createCollectionUtils().map(scopes, new CollectionUtils.Function<Scope, ScopeSourceLink>() {
             @Override
-            public LayoutSourceLink apply(Tuple<String, Collection<Scope>> layout) {
+            public ScopeSourceLink apply(Scope scope) {
+                ElementUtils el = dependencyComponent.elementUtils();
+                return new ScopeSourceLink(scope, el.getFullName(scope.getJavaElement()), packageName);
+            }
+        });
+    }
+
+    private Collection<LayoutSourceLink> getLayoutSourceLinks(final Map<Layout, Collection<Scope>> scopeMap, final String packageName){
+        return dependencyComponent.createCollectionUtils().mapToCollection(scopeMap, new CollectionUtils.Function<Tuple<Layout, Collection<Scope>>, LayoutSourceLink>() {
+            @Override
+            public LayoutSourceLink apply(Tuple<Layout, Collection<Scope>> layout) {
                 return new LayoutSourceLink(layout.getSecond(), layout.getFirst(), packageName);
             }
         });
     }
 
-    private void createSourceFiles(List<NgModelSourceLink> modelSourceLinks, Collection<LayoutSourceLink> scopeSourceLinks, Set<AttrDependency> dependencySet) {
-        SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, scopeSourceLinks, dependencySet);
+    private void createSourceFiles(List<NgModelSourceLink> modelSourceLinks, Collection<LayoutSourceLink> layoutSourceLinks, Collection<ScopeSourceLink> scopeSourceLinks, Set<AttrDependency> dependencySet) {
+        SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, layoutSourceLinks, scopeSourceLinks, dependencySet);
         dependencyComponent.inject(sourceCreator);
         sourceCreator.createSourceFiles();
     }
 
-    private Set<AttrDependency> getDependencySet(Map<String, Collection<XmlScope>> xmlScopes) {
+    private Set<AttrDependency> getDependencySet(Map<Layout, Collection<XmlScope>> xmlScopes) {
         AttrDependencyUtils attrDependencyUtils = dependencyComponent.createAttrDependencyUtils();
         XmlNodeUtils xmlNodeUtils = dependencyComponent.createXmlNodeUtils();
         return attrDependencyUtils.getDependencies(xmlNodeUtils.getAttributes(xmlScopes));
@@ -185,7 +201,7 @@ public class NgProcessor extends AbstractProcessor {
         return dependencyComponent.createScopeUtils().getScopes(annotations);
     }
 
-    private Map<String, Collection<XmlScope>> getXmlScopes() {
+    private Map<Layout, Collection<XmlScope>> getXmlScopes() {
        return dependencyComponent.createXmlUtils().getXmlScopes();
     }
 
