@@ -22,7 +22,7 @@
         <TextView
             android:id="@+id/tvStr"
             style="@style/TextStyle"
-            ng:ngModel="mod.str" />
+            ng:ngText="mod.str" />
 
         <EditText
             android:id="@+id/etStr"
@@ -38,7 +38,7 @@
         <TextView
             android:id="@+id/tvInteger"
             style="@style/TextStyle"
-            ng:ngModel="mod.integer" />
+            ng:ngText="mod.integer" />
 
         <EditText
             android:id="@+id/etInteger"
@@ -55,7 +55,7 @@
         <TextView
             android:id="@+id/tvDub"
             style="@style/TextStyle"
-            ng:ngModel="mod.dub" />
+            ng:ngText="mod.dub" />
 
         <EditText
             android:id="@+id/etDub"
@@ -72,7 +72,7 @@
         <TextView
             android:id="@+id/tvFlt"
             style="@style/TextStyle"
-            ng:ngModel="mod.flt" />
+            ng:ngText="mod.flt" />
 
         <EditText
             android:id="@+id/etFlt"
@@ -89,7 +89,7 @@
         <TextView
             android:id="@+id/tvLon"
             style="@style/TextStyle"
-            ng:ngModel="mod.lon" />
+            ng:ngText="mod.lon" />
 
         <EditText
             android:id="@+id/etLon"
@@ -106,7 +106,7 @@
         <TextView
             android:id="@+id/tvBool"
             style="@style/TextStyle"
-            ng:ngModel="mod.bool" />
+            ng:ngText="mod.bool" />
 
         <CheckBox
             android:id="@+id/cdBool"

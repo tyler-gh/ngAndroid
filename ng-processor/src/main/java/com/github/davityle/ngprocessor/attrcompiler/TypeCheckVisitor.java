@@ -56,8 +56,7 @@ public class TypeCheckVisitor extends AVisitor {
     }
 
     public void visit(final FunctionCall node)  {
-        Option<Element> match = matchingElement(node.getLHS());
-        System.out.println(match);
+//        Option<Element> match = matchingElement(node.getLHS());
         for(Expression expression : node.getParameters()){
             expression.accept(this);
         }
@@ -67,7 +66,6 @@ public class TypeCheckVisitor extends AVisitor {
         Option<Element> match = matchingElement(node);
         if(match.isPresent()) {
             elementStack.push(typeUtils.asTypeElement(match.get().asType()));
-//            System.out.println(match);
         }
     }
 
@@ -77,11 +75,6 @@ public class TypeCheckVisitor extends AVisitor {
         Option<Element> match = matchingElement(node);
         if(match.isPresent()) {
             type = elementUtils.getTypeName(match.get());
-            System.out.println("object field: " + match);
-        } else {
-//            System.out.println(elementStack.peek());
-//            System.out.println(elementStack.peek().getEnclosedElements());
-            System.out.println(node);
         }
     }
 

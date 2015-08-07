@@ -6,10 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.ngandroid.demo.R;
 import com.ngandroid.demo.model.DemoItem;
 import com.ngandroid.demo.scope.DemoScope;
-import com.ngandroid.lib.NgAndroid;
 
 import java.util.List;
 
@@ -18,7 +16,7 @@ import java.util.List;
  */
 class DemoAdapter extends BaseAdapter {
 
-    private final NgAndroid ngAndroid = NgAndroid.getInstance();
+//    private final NgAndroid ngAndroid = NgAndroid.getInstance();
     private final LayoutInflater inflater;
     private final DemoScope.FragmentSelectedListener fragmentSelectedListener;
     private final List<DemoItem> items;
@@ -47,11 +45,12 @@ class DemoAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if(convertView == null) {
-            DemoScope demoScope = new DemoScope(fragmentSelectedListener);
-            convertView = ngAndroid.inflate(demoScope, inflater, R.layout.view_demo_item, parent, false);
-            convertView.setTag(demoScope);
+//            DemoScope demoScope = new DemoScope(fragmentSelectedListener);
+            convertView = new View(parent.getContext());
+//            convertView = ngAndroid.inflate(demoScope, inflater, R.layout.view_demo_item, parent, false);
+//            convertView.setTag(demoScope);
         }
-        ((DemoScope)convertView.getTag()).setItem(items.get(position));
+//        ((DemoScope)convertView.getTag()).setItem(items.get(position));
         return convertView;
     }
 }

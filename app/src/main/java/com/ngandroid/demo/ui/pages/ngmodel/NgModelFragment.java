@@ -9,20 +9,23 @@ import android.view.ViewGroup;
 
 import com.ngandroid.demo.R;
 import com.ngandroid.demo.model.NgMod;
-import com.ngandroid.lib.NgAndroid;
+import com.ngandroid.lib.NgOptions;
 import com.ngandroid.lib.annotations.NgModel;
 import com.ngandroid.lib.annotations.NgScope;
+
+import ng.layout.NgActivityNgModel;
+
 @NgScope(name="ModelFragment")
 public class NgModelFragment extends Fragment {
-    private final NgAndroid ng = NgAndroid.getInstance();
-
     @NgModel
     NgMod mod;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return ng.inflate(this, inflater, R.layout.activity_ng_model, container, false);
+        View v = inflater.inflate(R.layout.activity_ng_model, container, false);
+        new NgActivityNgModel(new NgOptions.Builder().build(), this).attach(v);
+        return v;
     }
 }
 

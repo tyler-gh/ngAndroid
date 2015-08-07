@@ -12,44 +12,46 @@ public abstract class ValueFormatter {
     /**
      * This translates a string into a value. It must translate the String into the class that is
      * passed in
-     * @param intType the integer representation of the class
      * @param type the class that the value should be converted to
      * @param value the String representation of the type
      * @param previousValue the previous String representation
      * @return the translated value
      * @throws Exception generally a syntax exception
      */
-    public final Object toValue(int intType, Class<?> type, String value, String previousValue) throws Exception{
-        switch (intType){
-            case TypeUtils.STRING:
-                return toString(value, previousValue);
-            case TypeUtils.DOUBLE:
-                return toDouble(value, previousValue);
-            case TypeUtils.INTEGER:
-                return toInt(value, previousValue);
-            case TypeUtils.LONG:
-                return toLong(value, previousValue);
-            case TypeUtils.FLOAT:
-                return toFloat(value, previousValue);
-            case TypeUtils.OBJECT:
-            default:
-                return toObject(type, value, previousValue);
+    public <T> T getValue(Class<T> type, String value, String previousValue) {
+        try {
+            if (int.class.equals(type) || Integer.class.equals(type))
+                return (T) toInt(value, previousValue);
+            if (long.class.equals(type) || Long.class.equals(type))
+                return (T) toLong(value, previousValue);
+            if (String.class.equals(type))
+                return (T) toString(value, previousValue);
+            if (double.class.equals(type) || Double.class.equals(type))
+                return (T) toDouble(value, previousValue);
+            if (float.class.equals(type) || Float.class.equals(type))
+                return (T) toFloat(value, previousValue);
+            if (boolean.class.equals(type) || Boolean.class.equals(type))
+                return (T) toBoolean(value, previousValue);
+        } catch (NumberFormatException ex) {
+            if(previousValue != null) {
+                return getValue(type, previousValue, null);
+            } else {
+                return null;
+            }
         }
+
+        return (T) toObject(type, value, previousValue);
     }
 
+    protected abstract Boolean toBoolean(String value, String previousValue);
+
     /**
-     * used to 'filter' representations of objects that you wouldn't want displayed to the user. The
-     * default function removes the display of '0' or '0.0' if the user has erased the text. This is
-     * to prevent a number being shown when the user tries to erase it.
+     * used to 'filter' representations of objects that you wouldn't want displayed to the user.
      * @param value the value that is being filtered
      * @param previousValue the previous value
      * @return the filtered String
      */
-    public String filter(String value, String previousValue){
-        if(value.length() > previousValue.length())
-            return value;
-        return value.equals("0") || value.equals("0.0") ? "" : value;
-    }
+    public abstract String filter(String value, String previousValue);
 
     /**
      * converts a String into a double
@@ -57,7 +59,7 @@ public abstract class ValueFormatter {
      * @param previousValue the last successfully converted value
      * @return the converted value
      */
-    protected abstract double toDouble(String value, String previousValue);
+    protected abstract Double toDouble(String value, String previousValue);
 
     /**
      * converts a String into a integer
@@ -65,7 +67,7 @@ public abstract class ValueFormatter {
      * @param previousValue the last successfully converted value
      * @return the converted value
      */
-    protected abstract int toInt(String value, String previousValue);
+    protected abstract Integer toInt(String value, String previousValue);
 
     /**
      * converts a String into a long
@@ -73,7 +75,7 @@ public abstract class ValueFormatter {
      * @param previousValue the last successfully converted value
      * @return the converted value
      */
-    protected abstract long toLong(String value, String previousValue);
+    protected abstract Long toLong(String value, String previousValue);
 
     /**
      * converts a String into a double
@@ -81,7 +83,7 @@ public abstract class ValueFormatter {
      * @param previousValue the last successfully converted value
      * @return the converted value
      */
-    protected abstract float toFloat(String value, String previousValue);
+    protected abstract Float toFloat(String value, String previousValue);
 
     /**
      * converts a String into a String, generally not useful...
@@ -106,7 +108,17 @@ public abstract class ValueFormatter {
      * @param value
      * @return
      */
-    public final String format(Object value){
+    public String format(Object value){
+        return format(value, null);
+    }
+
+    public String format(Object value, String currentValue){
+        if(value == null)
+            return "";
+        return filter(performFormat(value), currentValue);
+    }
+
+    protected String performFormat(Object value) {
         if(value instanceof Double){
             return formatDouble((Double) value);
         }
@@ -122,8 +134,13 @@ public abstract class ValueFormatter {
         if(value instanceof String){
             return formatString((String) value);
         }
+        if(value instanceof Boolean){
+            return formatBoolean((Boolean) value);
+        }
         return formatObject(value);
     }
+
+    protected abstract String formatBoolean(Boolean value);
 
     /**
      * formats a double to a String
