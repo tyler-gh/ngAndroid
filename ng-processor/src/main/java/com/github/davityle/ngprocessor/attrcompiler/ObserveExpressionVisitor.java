@@ -1,5 +1,6 @@
 package com.github.davityle.ngprocessor.attrcompiler;
 
+import com.github.davityle.ngprocessor.attrcompiler.node.Identifier;
 import com.github.davityle.ngprocessor.attrcompiler.node.Node;
 import com.github.davityle.ngprocessor.attrcompiler.node.ObjectField;
 
@@ -15,6 +16,13 @@ public class ObserveExpressionVisitor extends GetExpressionVisitor {
         ObserveExpressionVisitor visitor = new ObserveExpressionVisitor(value);
         target.accept(visitor);
         return visitor.result.toString();
+    }
+
+    @Override
+    public void visit(Identifier node) {
+        result.append("get");
+        result.append(node.getToken().getScript());
+        result.append("()");
     }
 
     @Override

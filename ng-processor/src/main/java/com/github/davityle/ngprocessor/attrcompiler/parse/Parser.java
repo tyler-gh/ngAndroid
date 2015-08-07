@@ -1,10 +1,16 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.parse;
 
-import com.github.davityle.ngprocessor.attrcompiler.GetExpressionVisitor;
-import com.github.davityle.ngprocessor.attrcompiler.node.*;
-
-import org.apache.velocity.runtime.directive.Parse;
+import com.github.davityle.ngprocessor.attrcompiler.node.BinaryOperator;
+import com.github.davityle.ngprocessor.attrcompiler.node.Expression;
+import com.github.davityle.ngprocessor.attrcompiler.node.FunctionCall;
+import com.github.davityle.ngprocessor.attrcompiler.node.Identifier;
+import com.github.davityle.ngprocessor.attrcompiler.node.Node;
+import com.github.davityle.ngprocessor.attrcompiler.node.NumberConstant;
+import com.github.davityle.ngprocessor.attrcompiler.node.ObjectField;
+import com.github.davityle.ngprocessor.attrcompiler.node.StringLiteral;
+import com.github.davityle.ngprocessor.attrcompiler.node.TernaryOperator;
+import com.github.davityle.ngprocessor.attrcompiler.node.UnaryOperator;
 
 import java.util.ArrayList;
 

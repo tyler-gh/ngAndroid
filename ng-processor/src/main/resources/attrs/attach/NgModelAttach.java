@@ -1,4 +1,4 @@
-$attrClassName $attrClassName = new $attrClassName($viewName);
+${scope.javaName}$$NgScope.${javaName}.${attrClassName} $attrClassName = ${scope.name}.${javaName}.get${attrClassName}($viewName);
 #if($isBoolType)
 ${viewName}.setOnCheckedChangeListener(${attrClassName});
 #else

@@ -59,7 +59,7 @@ public class DemoActivity extends Activity implements DemoScope.FragmentSelected
         listView.setAdapter(new DemoAdapter(this, this, items));
 
         if(savedInstanceState == null){
-            fragmentManager.beginTransaction().replace(R.id.fragmentLayout, new NgModelFragment(), "frag").commit();
+            fragmentManager.beginTransaction().replace(R.id.fragmentLayout, new NgClickFragment(), "frag").commit();
         }
     }
 

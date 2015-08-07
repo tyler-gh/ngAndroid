@@ -1,13 +1,18 @@
 package ${package};
 
+import android.view.View;
+import android.widget.*;
+
 public class ${className} {
 
     private ${scope.javaName} scope;
+    private final com.ngandroid.lib.NgOptions ngOptions_;
 
-	public ${className}(${scope.javaName} scope){
+	public ${className}(${scope.javaName} scope, com.ngandroid.lib.NgOptions ngOptions_){
         this.scope = scope;
+        this.ngOptions_ = ngOptions_;
     #foreach($model in $scope.ngModels)
-        if(this.scope.${model.name} == null || !(this.scope.${model.name} instanceof com.ngandroid.lib.ng.Model)){
+        if(this.scope.${model.name} == null || !(this.scope.${model.name} instanceof ${model.typeName}$$NgModel)){
             this.scope.${model.name} = new ${model.typeName}$$NgModel();
         }
     #end
@@ -19,34 +24,28 @@ public class ${className} {
 	}
     #end
 
-    #foreach ($layout in $scope.layouts)
-    public Object ${layout.javaName}Execute(int viewId_, int attr_) {
-        switch(viewId_){
-            #foreach($view in $scope.getViews($layout))
-                case ${packageName}.R.id.${view.id}:
-                    #foreach($attr in $view.attributes)
-                        #if( $foreach.count == 1)
-                        if(attr == ${packageName}.R.styleable.ngAndroid_${attr.name}){
-                        #else
-                        else if(attr == ${packageName}.R.styleable.ngAndroid_${attr.name}){
-                        #end
-                            #if($attr.source.void)
-                                ${attr.source.getterSource};
-                                return null;
-                            #else
-                                return ${attr.source.setterSource};
-                            #end
-                        }
-                    #end
-                        else{
-                            android.util.Log.w("${simpleClassName}", "view ${v.id} in layout ${mapEntry.key} does not have attribute " + attr);
-                            return null;
-                        }
+    #foreach($layout in $scope.layouts)
+        public $layout.javaName $layout.javaName = new ${layout.javaName}();
+    #end
+
+    #foreach($layout in $scope.layouts)
+        public class $layout.javaName {
+        #foreach($view in $scope.getViews($layout.path))
+            #foreach($attr in $view.attributes)
+                public ${attr.className} get${attr.className}($view.elementType view) {
+                    return new ${layout.javaName}.${attr.className}(view);
+                }
             #end
-            default:
-               android.util.Log.w("${simpleClassName}", "View " + Integer.toHexString(viewId_) + " in layout '${layout.name}' does not have any ngAttributes");
-               return null;
+
+            #foreach($attr in $view.attributes)
+                #set($attrSource=$attr.source)
+                #set($attrClassName=$attr.className)
+                #set($viewType=$view.elementType)
+                #set($type=${attr.source.getType($scope)})
+                #set($isBoolType=$type.equals("Boolean"))
+                #evaluate(${attr.classSource})
+            #end
+        #end
         }
-    }
     #end
 }

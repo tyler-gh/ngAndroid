@@ -34,7 +34,7 @@ public class SetExpressionVisitor extends AVisitor {
 
     @Override
     public void visit(Identifier node) {
-        result.append(GetExpressionVisitor.generateGetExpression(node));
+//        result.append(GetExpressionVisitor.generateGetExpression(node));
         result.append("set");
         result.append(node.getToken().getScript());
         result.append("(");

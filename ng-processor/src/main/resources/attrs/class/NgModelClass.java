@@ -1,4 +1,4 @@
-private final class $attrClassName implements#if(!$isBoolType) android.text.TextWatcher, #else android.widget.CompoundButton.OnCheckedChangeListener, #end com.ngandroid.lib.ng.ModelObserver<$type> {
+public final class $attrClassName implements#if(!$isBoolType) android.text.TextWatcher, #else android.widget.CompoundButton.OnCheckedChangeListener, #end com.ngandroid.lib.ng.ModelObserver<$type> {
 
     private final $viewType view_;
     private boolean fromSelf = false;
@@ -22,7 +22,7 @@ private final class $attrClassName implements#if(!$isBoolType) android.text.Text
     @Override public void onCheckedChanged(android.widget.CompoundButton compoundButton, boolean b) {
         if(!fromSelf){
             fromSelf = true;
-            ${scope.name}.${attrSource.getSetterSource("b")};
+            ${scope.javaName}$$NgScope.this.scope.${attrSource.getSetterSource("b")};
         }
         fromSelf = false;
     }
@@ -33,7 +33,7 @@ private final class $attrClassName implements#if(!$isBoolType) android.text.Text
     @Override public void afterTextChanged(android.text.Editable editable) {
         if(!fromSelf){
             fromSelf = true;
-            ${scope.name}.${attrSource.getSetterSource("ngOptions_.getValueFormatter().getValue(${type}.class, editable.toString(), ngOptions_.getValueFormatter().format(${scope.name}.${attrSource.getterSource}))")};
+            ${scope.javaName}$$NgScope.this.scope.${attrSource.getSetterSource("ngOptions_.getValueFormatter().getValue(${type}.class, editable.toString(), ngOptions_.getValueFormatter().format(${scope.javaName}$$NgScope.this.scope.${attrSource.getterSource}))")};
         }
         fromSelf = false;
     }

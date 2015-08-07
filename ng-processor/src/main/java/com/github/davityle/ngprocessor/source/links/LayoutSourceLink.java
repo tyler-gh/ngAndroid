@@ -16,12 +16,13 @@ public class LayoutSourceLink implements SourceLink {
     private final static String PACKAGE = "ng.layout";
 
     private final Collection<Scope> scopes;
-    private final String layoutPath, layoutName, className, packageName;
+    private final String layoutPath, layoutName, className, packageName, javaName;
 
     public LayoutSourceLink(Collection<Scope> scopes, Layout layout, String packageName) {
         this.scopes = scopes;
         this.layoutPath = layout.getPath();
         this.layoutName = layout.getFileName();
+        this.javaName = layout.getJavaName();
         this.className = "Ng" + layout.getJavaName();
         this.packageName = packageName;
     }
@@ -32,6 +33,7 @@ public class LayoutSourceLink implements SourceLink {
 
         vc.put("layoutName", layoutName);
         vc.put("className", className);
+        vc.put("javaName", javaName);
         vc.put("scopes", scopes);
         vc.put("layoutPath", layoutPath);
         vc.put("package", PACKAGE);

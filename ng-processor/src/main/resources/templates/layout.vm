@@ -2,18 +2,21 @@ package ${package};
 
 import android.view.View;
 import android.widget.*;
+#foreach($scope in $scopes)
+import ${scope.typeName}$$NgScope;
+#end
 
 public class ${className} implements com.ngandroid.lib.ng.Layout {
 
     private final com.ngandroid.lib.NgOptions ngOptions_;
 	#foreach($scope in $scopes)
-	    private final ${scope.typeName}$$NgScope $scope.name;
+	    private final ${scope.javaName}$$NgScope $scope.name;
 	#end
 
 	public ${className}(com.ngandroid.lib.NgOptions ngOptions#foreach($scope in $scopes), $scope.typeName $scope.name #end){
 		this.ngOptions_ = ngOptions;
 		#foreach($scope in $scopes)
-            this.$scope.name = new ${scope.typeName}$$NgScope($scope.name);
+            this.$scope.name = new ${scope.javaName}$$NgScope($scope.name, ngOptions_);
         #end
 	}
 
@@ -37,16 +40,16 @@ public class ${className} implements com.ngandroid.lib.ng.Layout {
         #end
 	}
 
-	#foreach($scope in $scopes)
-        #foreach($view in $scope.getViews($layoutPath))
-            #foreach($attr in $view.attributes)
-                #set ($attrSource = $attr.source)
-                #set ($attrClassName = $attr.className)
-                #set ($viewType = $view.elementType)
-                #set ($type = ${attr.source.getType($scope)})
-                #set ($isBoolType = $type.equals("Boolean"))
-                #evaluate ( ${attr.classSource} )
-            #end
-        #end
-    #end
+    ###foreach($scope in $scopes)
+    ###foreach($view in $scope.getViews($layoutPath))
+    ###foreach($attr in $view.attributes)
+    ###set ($attrSource = $attr.source)
+    ###set ($attrClassName = $attr.className)
+    ###set ($viewType = $view.elementType)
+    ###set ($type = ${attr.source.getType($scope)})
+    ###set ($isBoolType = $type.equals("Boolean"))
+    ###evaluate ( ${attr.classSource} )
+    ###end
+    ###end
+    ###end
 }

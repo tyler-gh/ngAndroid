@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:ignore="MissingPrefix"
-    tools:context="com.ngandroid.demo.ui.pages.ngclick.NgClickFragment">
+    tools:context="com.ngandroid.demo.ui.pages.ngclick.NgClickFragment"
+    ng:ngScope="ClickFragment">
 
     <Button
         android:id="@+id/bt_mt"
