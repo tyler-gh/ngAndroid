@@ -13,7 +13,7 @@ import com.ngandroid.lib.NgOptions;
 import com.ngandroid.lib.annotations.NgModel;
 import com.ngandroid.lib.annotations.NgScope;
 
-import ng.layout.NgActivityNgModel;
+import ng.layout.ActivityNgModelController;
 
 @NgScope(name="ModelFragment")
 public class NgModelFragment extends Fragment {
@@ -24,7 +24,7 @@ public class NgModelFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_ng_model, container, false);
-        new NgActivityNgModel(new NgOptions.Builder().build(), this).attach(v);
+        new ActivityNgModelController(new NgOptions.Builder().build(), this).attach(v);
         return v;
     }
 }

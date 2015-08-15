@@ -16,9 +16,6 @@
 
 package com.github.davityle.ngprocessor.source;
 
-import com.github.davityle.ngprocessor.attributes.AttrDependency;
-import com.github.davityle.ngprocessor.attributes.AttrPackageResolver;
-import com.github.davityle.ngprocessor.attributes.Attribute;
 import com.github.davityle.ngprocessor.source.links.LayoutSourceLink;
 import com.github.davityle.ngprocessor.source.links.NgModelSourceLink;
 import com.github.davityle.ngprocessor.source.links.ScopeSourceLink;
@@ -26,41 +23,32 @@ import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.Option;
 
 import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.annotation.processing.Filer;
 import javax.inject.Inject;
 import javax.lang.model.element.Element;
 import javax.tools.JavaFileObject;
 
-/**
- * Created by tyler on 3/30/15.
- */
 public class SourceCreator {
 
     private final List<NgModelSourceLink> modelSourceLinks;
     private final Collection<LayoutSourceLink> layoutSourceLinks;
     private final Collection<ScopeSourceLink> scopeSourceLinks;
-    private final Set<AttrDependency> attrDependencies;
 
     @Inject MessageUtils messageUtils;
     @Inject Filer filer;
-    @Inject AttrPackageResolver attrPackageResolver;
 
-    public SourceCreator(List<NgModelSourceLink> modelSourceLinks, Collection<LayoutSourceLink> layoutSourceLinks, Collection<ScopeSourceLink> scopeSourceLinks, Set<AttrDependency> attrDependencies) {
+    public SourceCreator(List<NgModelSourceLink> modelSourceLinks, Collection<LayoutSourceLink> layoutSourceLinks, Collection<ScopeSourceLink> scopeSourceLinks) {
         this.modelSourceLinks = modelSourceLinks;
         this.layoutSourceLinks = layoutSourceLinks;
         this.scopeSourceLinks = scopeSourceLinks;
-        this.attrDependencies = attrDependencies;
     }
 
     public void createSourceFiles(){
@@ -76,21 +64,6 @@ public class SourceCreator {
         Template vtModel = ve.getTemplate("templates/ngmodel.vm");
         Template vtScope = ve.getTemplate("templates/scope.vm");
         Template vtLayout = ve.getTemplate("templates/layout.vm");
-//        Template vtAttrs = ve.getTemplate("templates/attrs.vm");
-
-//        for(AttrDependency attrDependency : attrDependencies) {
-//            if(attrDependency.getSourceCode().isPresent()) {
-//                try {
-//                    JavaFileObject jfo = filer.createSourceFile(attrPackageResolver.getPackage() + "." + attrDependency.getClassName());
-//                    Writer writer = jfo.openWriter();
-//                    writer.write(attrDependency.getSourceCode().get());
-//                    writer.flush();
-//                    writer.close();
-//                } catch (IOException e) {
-//                    messageUtils.error(Option.<Element>absent(), e.getMessage());
-//                }
-//            }
-//        }
 
         for (NgModelSourceLink ms : modelSourceLinks){
             try {
@@ -105,7 +78,6 @@ public class SourceCreator {
         }
 
         for (ScopeSourceLink ss : scopeSourceLinks){
-            System.out.println(ss);
             try {
                 JavaFileObject jfo = filer.createSourceFile(ss.getSourceFileName(), ss.getElements());
                 Writer writer = jfo.openWriter();
@@ -127,36 +99,6 @@ public class SourceCreator {
             }catch (IOException e){
                 messageUtils.error(Option.<Element>absent(), e.getMessage());
             }
-
-
         }
-
-//        createAttributesClass(vtAttrs);
-    }
-
-
-    private void createAttributesClass(Template vtAttrs){
-        Set<Attribute> attributes = new HashSet<>();
-        for(AttrDependency attrDependency : attrDependencies) {
-            if(attrDependency instanceof  Attribute){
-                attributes.add((Attribute) attrDependency);
-            }
-        }
-
-        VelocityContext context = new VelocityContext();
-
-        context.put("attributes", attributes);
-
-        try {
-            JavaFileObject jfo = filer.createSourceFile(attrPackageResolver.getPackage() + "." + attrPackageResolver.getAttrClassName());
-            Writer writer = jfo.openWriter();
-            vtAttrs.merge(context, writer);
-            writer.flush();
-            writer.close();
-        }catch (IOException e){
-            messageUtils.error(Option.<Element>absent(), e.getMessage());
-        }
-
-
     }
 }

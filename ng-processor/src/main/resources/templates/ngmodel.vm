@@ -1,6 +1,6 @@
 package ${packageName};
 
-public class ${simpleClassName}$$NgModel #if($isInterface) implements ${fullName}, #else extends ${fullName} implements #end com.ngandroid.lib.ng.Model {
+public class ${simpleClassName}$$NgModel #if($isInterface) implements ${fullName}#else extends ${fullName}#end {
 
     #if($isInterface)
         #foreach($field in $fields)

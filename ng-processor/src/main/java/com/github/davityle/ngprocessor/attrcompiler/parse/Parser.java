@@ -4,6 +4,7 @@ package com.github.davityle.ngprocessor.attrcompiler.parse;
 import com.github.davityle.ngprocessor.attrcompiler.node.BinaryOperator;
 import com.github.davityle.ngprocessor.attrcompiler.node.Expression;
 import com.github.davityle.ngprocessor.attrcompiler.node.FunctionCall;
+import com.github.davityle.ngprocessor.attrcompiler.node.FunctionName;
 import com.github.davityle.ngprocessor.attrcompiler.node.Identifier;
 import com.github.davityle.ngprocessor.attrcompiler.node.Node;
 import com.github.davityle.ngprocessor.attrcompiler.node.NumberConstant;
@@ -11,6 +12,7 @@ import com.github.davityle.ngprocessor.attrcompiler.node.ObjectField;
 import com.github.davityle.ngprocessor.attrcompiler.node.StringLiteral;
 import com.github.davityle.ngprocessor.attrcompiler.node.TernaryOperator;
 import com.github.davityle.ngprocessor.attrcompiler.node.UnaryOperator;
+import com.github.davityle.ngprocessor.util.Option;
 
 import java.util.ArrayList;
 
@@ -118,7 +120,11 @@ public class Parser {
                 lhs = new FunctionCall(peek(0), lhs, parseParameterList());
             } else if (peek(0).getTokenType() == TokenType.PERIOD) {
                 advance();
-                lhs = new ObjectField(lhs, require(TokenType.IDENTIFIER));
+                if(peek(1).getTokenType() == TokenType.OPEN_PARENTHESIS) {
+                    lhs = new FunctionName(lhs, require(TokenType.IDENTIFIER));
+                } else {
+                    lhs = new ObjectField(lhs, require(TokenType.IDENTIFIER));
+                }
             } else {
                 throw new ParseException(peek(0));
             }
@@ -171,11 +177,11 @@ public class Parser {
         return parser.parse();
     }
 
-    public static Node tryParse(String source) {
+    public static Option<Node> tryParse(String source) {
         try {
-            return parse(source);
+            return Option.of(parse(source));
         } catch (ParseException e) {
-            return null;
+            return Option.absent();
         }
     }
 }

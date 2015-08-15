@@ -6,7 +6,7 @@ import android.widget.*;
 import ${scope.typeName}$$NgScope;
 #end
 
-public class ${className} implements com.ngandroid.lib.ng.Layout {
+public class ${className} implements com.ngandroid.lib.ng.Controller {
 
     private final com.ngandroid.lib.NgOptions ngOptions_;
 	#foreach($scope in $scopes)
@@ -39,17 +39,4 @@ public class ${className} implements com.ngandroid.lib.ng.Layout {
             #end
         #end
 	}
-
-    ###foreach($scope in $scopes)
-    ###foreach($view in $scope.getViews($layoutPath))
-    ###foreach($attr in $view.attributes)
-    ###set ($attrSource = $attr.source)
-    ###set ($attrClassName = $attr.className)
-    ###set ($viewType = $view.elementType)
-    ###set ($type = ${attr.source.getType($scope)})
-    ###set ($isBoolType = $type.equals("Boolean"))
-    ###evaluate ( ${attr.classSource} )
-    ###end
-    ###end
-    ###end
 }

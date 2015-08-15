@@ -23,7 +23,7 @@ public class LayoutSourceLink implements SourceLink {
         this.layoutPath = layout.getPath();
         this.layoutName = layout.getFileName();
         this.javaName = layout.getJavaName();
-        this.className = "Ng" + layout.getJavaName();
+        this.className = layout.getJavaName() + "Controller";
         this.packageName = packageName;
     }
 

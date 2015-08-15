@@ -31,16 +31,16 @@ public class Source {
         this.node = Parser.parse(source);
     }
 
-    public String getGetterSource() {
-        return visitors.getGetterSource(node);
+    public String getGetterSource(String value) {
+        return visitors.getGetterSource(node, value);
     }
 
     public String getSetterSource(String value) {
         return visitors.getSetterSource(node, value);
     }
 
-    public String getObserverSource(String value) {
-        return visitors.getObserverSource(node, value);
+    public String getObserverSource(String value, String prependage) {
+        return visitors.getObserverSource(node, value, prependage);
     }
 
     public String getType(Scope scope) {

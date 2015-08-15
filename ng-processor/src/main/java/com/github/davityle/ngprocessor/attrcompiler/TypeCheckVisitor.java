@@ -27,7 +27,6 @@ public class TypeCheckVisitor extends AVisitor {
     private final PrimitiveUtils primitiveUtils;
     private final Element element;
     private final Stack<Element> elementStack = new Stack<>();
-//    private final StringBuilder result = new StringBuilder();
     private String type = "";
 
 
@@ -84,14 +83,11 @@ public class TypeCheckVisitor extends AVisitor {
         node.getIfFalse().accept(this);
     }
 
+    @Override
+    public void visit(Node node) {}
+
     public void visit(UnaryOperator node)  {
         node.getRHS().accept(this);
-    }
-
-    public enum MatchType {
-        MATCH,
-        PARTIAL,
-        NOT
     }
 
     public Option<Element> matchingElement(final Node node) {

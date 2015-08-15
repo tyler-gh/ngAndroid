@@ -22,16 +22,16 @@ public class Visitors {
         this.primitiveUtils = primitiveUtils;
     }
 
-    public String getGetterSource(Node node) {
-        return GetExpressionVisitor.generateGetExpression(node);
+    public String getGetterSource(Node node, String value) {
+        return GetExpressionVisitor.generateGetExpression(node, value);
     }
 
     public String getSetterSource(Node node, String value) {
         return SetExpressionVisitor.generateSetExpression(node, value);
     }
 
-    public String getObserverSource(Node node, String value) {
-        return ObserveExpressionVisitor.generateObserveExpression(node, value);
+    public String getObserverSource(Node node, String value, String prependage) {
+        return ObserveExpressionVisitor.generateObserveExpression(node, value, prependage);
     }
 
     public String getType(Node node, Scope scope) {

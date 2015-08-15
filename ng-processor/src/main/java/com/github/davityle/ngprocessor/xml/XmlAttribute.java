@@ -45,7 +45,7 @@ public class XmlAttribute {
 
     @Override
     public String toString() {
-        return '(' + attr.getAttrName() + ',' + source.getGetterSource() + ')';
+        return '(' + attr.getAttrName() + ',' + source.getGetterSource("") + ')';
     }
 
     public Source getSource() {

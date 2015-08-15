@@ -19,6 +19,7 @@ package com.github.davityle.ngprocessor.attrcompiler;
 
 import com.github.davityle.ngprocessor.attrcompiler.node.Node;
 import com.github.davityle.ngprocessor.attrcompiler.parse.Parser;
+import com.github.davityle.ngprocessor.util.Option;
 
 import javax.inject.Inject;
 
@@ -28,23 +29,23 @@ public class AttributeCompiler {
     @Inject
     public AttributeCompiler(){}
 
-    public static String translateToJavaGetter(String source) {
-        Node expression = Parser.tryParse(source);
+    public static Option<String> translateToJavaGetter(String source) {
+        Option<Node> expression = Parser.tryParse(source);
 
-        if (expression == null) {
-            return null;
+        if (expression.isAbsent()) {
+            return Option.absent();
         } else {
-            return GetExpressionVisitor.generateGetExpression(expression);
+            return Option.of(GetExpressionVisitor.generateGetExpression(expression.get(), ""));
         }
     }
 
-    public static String translateToJavaSetter(String source, String value) {
-        Node expression = Parser.tryParse(source);
+    public static Option<String> translateToJavaSetter(String source, String value) {
+        Option<Node> expression = Parser.tryParse(source);
 
-        if (expression == null) {
-            return null;
+        if (expression.isAbsent()) {
+            return Option.absent();
         } else {
-            return SetExpressionVisitor.generateSetExpression(expression, value);
+            return Option.of(SetExpressionVisitor.generateSetExpression(expression.get(), value));
         }
     }
 }

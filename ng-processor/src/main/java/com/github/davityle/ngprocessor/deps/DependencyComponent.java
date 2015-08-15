@@ -6,13 +6,11 @@ import com.github.davityle.ngprocessor.map.ModelScopeMapper;
 import com.github.davityle.ngprocessor.source.SourceCreator;
 import com.github.davityle.ngprocessor.source.linkers.ModelSourceLinker;
 import com.github.davityle.ngprocessor.source.linkers.ScopeSourceLinker;
-import com.github.davityle.ngprocessor.util.AttrDependencyUtils;
 import com.github.davityle.ngprocessor.util.CollectionUtils;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.ManifestPackageUtils;
 import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.ScopeUtils;
-import com.github.davityle.ngprocessor.util.XmlNodeUtils;
 import com.github.davityle.ngprocessor.xml.XmlUtils;
 
 import javax.inject.Singleton;
@@ -31,8 +29,6 @@ public interface DependencyComponent {
     ScopeUtils createScopeUtils();
     MessageUtils createMessageUtils();
     XmlUtils createXmlUtils();
-    AttrDependencyUtils createAttrDependencyUtils();
-    XmlNodeUtils createXmlNodeUtils();
     CollectionUtils createCollectionUtils();
     ElementUtils elementUtils();
 

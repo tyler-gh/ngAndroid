@@ -1,8 +1,6 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.node;
 
-import org.apache.velocity.util.TemplateNumber;
-
 public interface IVisitor {
     void visit(Node node);
     void visit(Expression node);
@@ -14,4 +12,5 @@ public interface IVisitor {
     void visit(ObjectField node);
     void visit(TernaryOperator node);
     void visit(UnaryOperator node);
+    void visit(FunctionName node);
 }

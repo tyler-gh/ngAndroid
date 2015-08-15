@@ -5,13 +5,15 @@ import com.github.davityle.ngprocessor.source.SourceField;
 
 public class GetExpressionVisitor extends AVisitor {
     protected StringBuilder result;
+    private final String prependage;
 
-    GetExpressionVisitor() {
-        result = new StringBuilder();
+    GetExpressionVisitor(String prependage) {
+        this.result = new StringBuilder();
+        this.prependage = prependage;
     }
 
-    public static String generateGetExpression(Node node) {
-        GetExpressionVisitor visitor = new GetExpressionVisitor();
+    public static String generateGetExpression(Node node, String value) {
+        GetExpressionVisitor visitor = new GetExpressionVisitor(value);
         node.accept(visitor);
         return visitor.result.toString();
     }
@@ -44,6 +46,12 @@ public class GetExpressionVisitor extends AVisitor {
         result.append("()");
     }
 
+    public void visit(FunctionName node) {
+        node.getLHS().accept(this);
+        result.append('.');
+        result.append(node.getToken().getScript());
+    }
+
     @Override
     public void visit(FunctionCall node) {
         node.getLHS().accept(this);
@@ -66,6 +74,7 @@ public class GetExpressionVisitor extends AVisitor {
 
     @Override
     public void visit(Identifier node) {
+        result.append(prependage != null ? prependage : "");
         result.append(node.getToken().getScript());
     }
 

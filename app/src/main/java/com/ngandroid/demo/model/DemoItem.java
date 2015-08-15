@@ -2,9 +2,6 @@ package com.ngandroid.demo.model;
 
 import android.app.Fragment;
 
-/**
- * Created by tyler on 4/23/15.
- */
 public class DemoItem {
     private String text;
     private Class<? extends Fragment> fragment;

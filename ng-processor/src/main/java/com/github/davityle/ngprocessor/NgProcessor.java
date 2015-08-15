@@ -16,7 +16,6 @@
 
 package com.github.davityle.ngprocessor;
 
-import com.github.davityle.ngprocessor.attributes.AttrDependency;
 import com.github.davityle.ngprocessor.deps.DaggerDependencyComponent;
 import com.github.davityle.ngprocessor.deps.DependencyComponent;
 import com.github.davityle.ngprocessor.deps.LayoutModule;
@@ -29,7 +28,6 @@ import com.github.davityle.ngprocessor.source.linkers.ModelSourceLinker;
 import com.github.davityle.ngprocessor.source.links.LayoutSourceLink;
 import com.github.davityle.ngprocessor.source.links.NgModelSourceLink;
 import com.github.davityle.ngprocessor.source.links.ScopeSourceLink;
-import com.github.davityle.ngprocessor.util.AttrDependencyUtils;
 import com.github.davityle.ngprocessor.util.CollectionUtils;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.ManifestPackageUtils;
@@ -37,7 +35,6 @@ import com.github.davityle.ngprocessor.util.MessageUtils;
 import com.github.davityle.ngprocessor.util.Option;
 import com.github.davityle.ngprocessor.util.ScopeUtils;
 import com.github.davityle.ngprocessor.util.Tuple;
-import com.github.davityle.ngprocessor.util.XmlNodeUtils;
 import com.github.davityle.ngprocessor.xml.XmlScope;
 
 import java.io.PrintWriter;
@@ -129,10 +126,9 @@ public class NgProcessor extends AbstractProcessor {
             Collection<LayoutSourceLink> layoutSourceLinks = getLayoutSourceLinks(layoutsWScopes, manifestPackageName.get());
 
             Collection<ScopeSourceLink> scopeSourceLinks = getScopeSourceLinks(scopes, manifestPackageName.get());
-
-            Set<AttrDependency> dependencySet = getDependencySet(xmlScopes);
             List<NgModelSourceLink> modelSourceLinks = getModelSourceLinks(getModels(annotations));
-            createSourceFiles(modelSourceLinks, layoutSourceLinks, scopeSourceLinks, dependencySet);
+
+            createSourceFiles(modelSourceLinks, layoutSourceLinks, scopeSourceLinks);
 
             messageUtils.note(Option.<Element>absent(), ":NgAndroid:finished");
             return true;
@@ -179,16 +175,10 @@ public class NgProcessor extends AbstractProcessor {
         });
     }
 
-    private void createSourceFiles(List<NgModelSourceLink> modelSourceLinks, Collection<LayoutSourceLink> layoutSourceLinks, Collection<ScopeSourceLink> scopeSourceLinks, Set<AttrDependency> dependencySet) {
-        SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, layoutSourceLinks, scopeSourceLinks, dependencySet);
+    private void createSourceFiles(List<NgModelSourceLink> modelSourceLinks, Collection<LayoutSourceLink> layoutSourceLinks, Collection<ScopeSourceLink> scopeSourceLinks) {
+        SourceCreator sourceCreator = new SourceCreator(modelSourceLinks, layoutSourceLinks, scopeSourceLinks);
         dependencyComponent.inject(sourceCreator);
         sourceCreator.createSourceFiles();
-    }
-
-    private Set<AttrDependency> getDependencySet(Map<Layout, Collection<XmlScope>> xmlScopes) {
-        AttrDependencyUtils attrDependencyUtils = dependencyComponent.createAttrDependencyUtils();
-        XmlNodeUtils xmlNodeUtils = dependencyComponent.createXmlNodeUtils();
-        return attrDependencyUtils.getDependencies(xmlNodeUtils.getAttributes(xmlScopes));
     }
 
 

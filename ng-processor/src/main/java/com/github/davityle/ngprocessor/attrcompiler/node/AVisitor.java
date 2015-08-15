@@ -33,4 +33,7 @@ public abstract class AVisitor implements IVisitor {
     public void visit(UnaryOperator node)  {
         visit((Expression)node);
     }
+    public void visit(FunctionName node) {
+        visit((Expression) node);
+    }
 }

@@ -5,6 +5,9 @@ import com.ngandroid.lib.utils.DefaultBlur;
 import com.ngandroid.lib.utils.DefaultValueFormatter;
 import com.ngandroid.lib.utils.ValueFormatter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class NgOptions {
 
     private final ValueFormatter valueFormatter;
@@ -29,6 +32,7 @@ public class NgOptions {
     public static final class Builder {
 
         private ValueFormatter valueFormatter;
+        private Map<Class<?>, DefaultValueFormatter.Formatter<?>> formatters;
         private Blur blur;
         private float scaleRatio = 5;
         private float blurRadius = 5;
@@ -76,13 +80,27 @@ public class NgOptions {
         }
 
         /**
+         * adds a formatter to the {@link DefaultValueFormatter} only works if {@link #setValueFormatter(ValueFormatter)}
+         * is not called
+         * @param clss
+         * @param formatter
+         * @param <T>
+         */
+        public <T> void addFormatter(Class<T> clss, DefaultValueFormatter.Formatter<T> formatter) {
+            if(formatters == null) {
+                formatters = new HashMap<>();
+            }
+            formatters.put(clss, formatter);
+        }
+
+        /**
          * builds the NgOptions instance
          * @return NgOptions
          */
         public NgOptions build(){
 
             if(valueFormatter == null)
-                valueFormatter = new DefaultValueFormatter();
+                valueFormatter = new DefaultValueFormatter(formatters);
 
             if(blur == null)
                 blur = new DefaultBlur(scaleRatio, blurRadius);

@@ -4,4 +4,4 @@ ${viewName}.setOnCheckedChangeListener(${attrClassName});
 #else
 ${viewName}.addTextChangedListener(${attrClassName});
 #end
-${scope.name}.${attrSource.getObserverSource($attrClassName)};
+$attrSource.getObserverSource($attrClassName, "${scope.name}.");
