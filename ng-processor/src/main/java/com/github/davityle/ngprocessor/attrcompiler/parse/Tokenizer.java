@@ -4,39 +4,31 @@ package com.github.davityle.ngprocessor.attrcompiler.parse;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Tokenizer
-{
+public class Tokenizer {
     private String source;
     private int currentTokenStart;
     private int currentPosition;
     private State state;
 
-    public Tokenizer(String source)
-    {
+    public Tokenizer(String source) {
         this.source = source;
         this.currentTokenStart = 0;
         this.currentPosition = 0;
         this.state = State.StartState;
     }
 
-    public List<Token> tokenize() throws ParseException
-    {
+    public List<Token> tokenize() throws ParseException {
         List<Token> result = new ArrayList<Token>();
 
-        if (source != null && source.length() != 0)
-        {
+        if (source != null && source.length() != 0) {
             State currentState = State.StartState;
 
-            while (currentState != State.Done && currentPosition <= source.length())
-            {
+            while (currentState != State.Done && currentPosition <= source.length()) {
                 char currentChar;
 
-                if (currentPosition == source.length())
-                {
+                if (currentPosition == source.length()) {
                     currentChar = '\0';
-                }
-                else
-                {
+                } else {
                     currentChar = source.charAt(currentPosition);
                 }
 
@@ -44,15 +36,11 @@ public class Tokenizer
                 TokenType tokenType = stepResult.getTokenType();
                 currentState = stepResult.getState();
 
-                if (tokenType != TokenType.NONE)
-                {
-                    if (tokenType == TokenType.RUBBISH)
-                    {
+                if (tokenType != TokenType.NONE) {
+                    if (tokenType == TokenType.RUBBISH) {
                         String tokenValue = source.substring(currentTokenStart, currentPosition);
                         throw new ParseException(new Token(tokenType, tokenValue, currentTokenStart), "Unexpected character '" + currentChar + "' at col " + currentTokenStart);
-                    }
-                    else if (tokenType != TokenType.WHITESPACE)
-                    {
+                    } else if (tokenType != TokenType.WHITESPACE) {
                         String tokenValue = source.substring(currentTokenStart, currentPosition);
                         result.add(new Token(tokenType, tokenValue, currentTokenStart));
                     }

@@ -32,6 +32,9 @@ public class ObserveExpressionVisitor extends AVisitor {
 
     @Override
     public void visit(Identifier node) {
+        if(result.length() > 0) {
+            result.append(";\n");
+        }
         result.append(prependage != null ? prependage : "");
         result.append("get");
         result.append(node.getToken().getScript());

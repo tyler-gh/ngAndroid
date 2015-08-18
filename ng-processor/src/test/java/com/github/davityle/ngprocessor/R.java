@@ -8,6 +8,7 @@ public class R {
     public static final class layout {
         public static final int ng_proc_test_layout = 0;
         public static final int case_test = 1;
+        public static final int login = 2;
     }
 
     public static final class id {
@@ -22,6 +23,10 @@ public class R {
         public static final int xkd = 8;
         public static final int caseId = 9;
         public static final int pBool = 10;
+        public static final int username = 11;
+        public static final int password = 12;
+        public static final int submit = 13;
+        public static final int testAnd = 14;
     }
 
     public static final class styleable {

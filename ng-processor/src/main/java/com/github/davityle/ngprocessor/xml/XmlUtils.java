@@ -34,6 +34,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -193,7 +195,9 @@ public class XmlUtils {
                             XmlAttribute xmlAttribute = new XmlAttribute(attributes.get(attr), new Source(value, visitors) , nodeId);
                             attributeList.add(xmlAttribute);
                         } catch (ParseException | RuntimeException e) {
-                            Object[] params = new Object[]{node.getBaseURI(), attr, nodeId.getOrElse("no id available"), value, e.getMessage()};
+                            StringWriter sw = new StringWriter();
+                            e.printStackTrace(new PrintWriter(sw));
+                            Object[] params = new Object[]{node.getBaseURI(), attr, nodeId.getOrElse("no id available"), value, sw.toString()};
                             messageUtils.error(Option.<Element>absent(), "Layout file '%s' has an invalid attribute '%s' in view '%s' with value '%s' because '%s'", params);
                         }
                     }

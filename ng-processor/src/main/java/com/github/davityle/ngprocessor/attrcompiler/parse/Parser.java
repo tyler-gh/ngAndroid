@@ -22,7 +22,7 @@ public class Parser {
 
     private Parser(String source) throws ParseException {
         Tokenizer tok = new Tokenizer(source);
-        tokens = new ArrayList<Token>(tok.tokenize());
+        tokens = new ArrayList<>(tok.tokenize());
         currentIndex = 0;
     }
 
@@ -74,7 +74,6 @@ public class Parser {
 
         while (peek(0).getTokenType() == TokenType.BINARY_OPERATOR || peek(0).getTokenType() == TokenType.TERNARY_QUESTION_MARK) {
             Token binaryOp = peek(0);
-
             if (binaryOp.getTokenType() == TokenType.TERNARY_QUESTION_MARK) {
                 if (TokenType.TERNARY_PRECEDENCE >= minPrecedence) {
                     require(TokenType.TERNARY_QUESTION_MARK);

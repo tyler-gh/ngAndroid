@@ -60,7 +60,9 @@ public enum TokenType {
         LESS_THAN("<", 2),
         GREATER_THAN(">", 2),
         LESS_EQUAL_THAN("<=", 2),
-        GREATER_EQUAL_THAN(">=", 2);
+        GREATER_EQUAL_THAN(">=", 2),
+        AND("&&", 1),
+        OR("||", 1);
 
         final String source;
         final int precedence;

@@ -4,7 +4,7 @@ import com.github.davityle.ngprocessor.attrcompiler.node.*;
 import com.github.davityle.ngprocessor.source.SourceField;
 
 public class GetExpressionVisitor extends AVisitor {
-    protected StringBuilder result;
+    private StringBuilder result;
     private final String prependage;
 
     GetExpressionVisitor(String prependage) {

@@ -52,7 +52,7 @@ public class NgProcessorTest {
                 .generatesFileNamed(SOURCE_OUTPUT, "com.github.davityle.ngprocessor", "TestPoint$$NgModel.java");
     }
 
-    @NgModel
+//    @NgModel TODO potential recreation problem
     TestPoint point1, point2;
 
     void doSomething(Double x, Double y){
