@@ -16,52 +16,38 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
-import com.github.davityle.ngprocessor.util.TypeUtils;
+import com.github.davityle.ngprocessor.attrcompiler.Visitors;
+import com.github.davityle.ngprocessor.attrcompiler.node.Node;
+import com.github.davityle.ngprocessor.attrcompiler.parse.ParseException;
+import com.github.davityle.ngprocessor.attrcompiler.parse.Parser;
+import com.github.davityle.ngprocessor.model.Scope;
 
-import java.util.List;
+public class Source {
+    private final Node node;
+    private final Visitors visitors;
 
-import javax.lang.model.type.TypeMirror;
-
-/**
- * Created by davityle on 1/24/15.
- */
-public abstract class Source <T extends Source> {
-
-    protected final TypeUtils typeUtils;
-    private TypeMirror typeMirror;
-
-    protected Source(TypeUtils typeUtils, TypeMirror typeMirror) {
-        this.typeUtils = typeUtils;
-        this.typeMirror = typeMirror;
+    public Source(String source, Visitors visitors) throws ParseException {
+        this.visitors = visitors;
+        this.node = Parser.parse(source);
     }
 
-    public abstract String getSource();
-    public abstract void getModelSource(List<ModelSource> models);
-    public abstract void getMethodSource(List<MethodSource> methods);
-    public abstract boolean isVoid();
-    protected abstract T cp(TypeMirror typeMirror) throws IllegalArgumentException;
-
-    public T copy(TypeMirror typeMirror) throws IllegalArgumentException{
-        TypeMirror current = getTypeMirror();
-        if(current != null && !typeUtils.match(current, typeMirror))
-            throw new IllegalArgumentException(current + " cannot be assigned to " + typeMirror);
-        return cp(typeMirror);
+    public String getGetterSource(String value) {
+        return visitors.getGetterSource(node, value);
     }
 
-    public T copy() throws IllegalArgumentException{
-        return copy(getTypeMirror());
-    }
-    public String toString(){
-        return getSource();
+    public String getSetterSource(String value) {
+        return visitors.getSetterSource(node, value);
     }
 
-    public void setTypeMirror(TypeMirror typeMirror){
-        this.typeMirror = typeMirror;
+    public String getObserverSource(String value, String prependage) {
+        return visitors.getObserverSource(node, value, prependage);
     }
 
-    public TypeMirror getTypeMirror(){
-//        if(typeMirror == null)
-//            throw new IllegalStateException("TypeMirror is null for source '" + this + "'");
-        return typeMirror;
+    public String getType(Scope scope) {
+        return visitors.getType(node, scope);
+    }
+
+    public boolean isVoid() {
+        return false;
     }
 }

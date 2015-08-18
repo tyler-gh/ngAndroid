@@ -16,22 +16,19 @@
 
 package com.github.davityle.ngprocessor.util;
 
-import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
-
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
@@ -44,44 +41,14 @@ public class ElementUtils {
     private final Elements elementUtils;
     private final MessageUtils messageUtils;
     private final TypeUtils typeUtils;
+    private final CollectionUtils collectionUtils;
 
     @Inject
-    public ElementUtils(Elements elementUtils, MessageUtils messageUtils, TypeUtils typeUtils){
+    public ElementUtils(Elements elementUtils, MessageUtils messageUtils, TypeUtils typeUtils, CollectionUtils collectionUtils){
         this.elementUtils = elementUtils;
         this.messageUtils = messageUtils;
         this.typeUtils = typeUtils;
-    }
-
-    public boolean methodsMatch(Element elem, MethodSource source, Map<ModelSource,ModelSource> typedModels){
-        if(elem == null || !(elem instanceof ExecutableElement) || elem.getKind() != ElementKind.METHOD)
-            return false;
-        if(!elem.getSimpleName().toString().equals(source.getMethodName()))
-            return false;
-
-        ExecutableElement method = (ExecutableElement) elem;
-
-        List<Source> parameters = source.getParameters();
-        List<? extends VariableElement> methodParameters = method.getParameters();
-        if(methodParameters.size() != parameters.size())
-            return false;
-
-        for(int i = 0; i < parameters.size(); i++){
-            Source parameter = parameters.get(i);
-            if(parameter instanceof ModelSource)
-                parameter = typedModels.get(parameter);
-            TypeMirror typeMirror = parameter.getTypeMirror();
-
-            if(typeMirror != null){
-                VariableElement element = methodParameters.get(i);
-                TypeMirror eleType = element.asType();
-                if (!typeUtils.matchFirstPrecedence(eleType, typeMirror)) {
-                    messageUtils.warning(element, "Method element matches scripted method except parameter types do not match. '%s' - '%s'", eleType, typeMirror);
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        this.collectionUtils = collectionUtils;
     }
 
     public boolean isSetter(Element elem){
@@ -144,7 +111,7 @@ public class ElementUtils {
 
     private void checkMatch(TypeElement model, String field, TypeMirror typeMirror, TypeMirror t){
         if(!typeUtils.isSameType(typeMirror, t))
-            messageUtils.error(model, "Getter and Setter for field '%s' do not match", field);
+            messageUtils.error(Option.of(model), "Getter and Setter for field '%s' do not match", field);
     }
 
     public boolean hasGetterAndSetter(TypeElement model, String field){
@@ -216,12 +183,74 @@ public class ElementUtils {
         return type.getQualifiedName().toString();
     }
 
-    public String getPackageName(Element type) {
-        return elementUtils.getPackageOf(type).getQualifiedName().toString();
+    public String getFullName(Element element) {
+        return getFullName(typeUtils.asTypeElement(element.asType()));
+    }
+
+    public Option<String> getPackageName(Element type) {
+        try {
+            return Option.of(elementUtils.getPackageOf(type).getQualifiedName().toString());
+        }catch (NullPointerException e) {
+            return Option.absent();
+        }
     }
 
     public boolean isAccessible(Element element) {
         Set<Modifier> modifiers = element.getModifiers();
         return !(modifiers.contains(Modifier.PRIVATE) || modifiers.contains(Modifier.PROTECTED));
+    }
+
+    public <T> Option<T> getAnnotationValue(final Element element, final String annotationClass, final String valueName, final Class<T> expectedType) {
+        return collectionUtils.find(new ArrayList<>(element.getAnnotationMirrors()), new CollectionUtils.Function<AnnotationMirror, Boolean>() {
+            @Override
+            public Boolean apply(AnnotationMirror annotationMirror) {
+                TypeElement annotationElement = (TypeElement) annotationMirror.getAnnotationType().asElement();
+                return annotationElement.getQualifiedName().contentEquals(annotationClass);
+            }
+        }).map(new Option.Map<AnnotationMirror, T>() {
+            @Override
+            public T map(AnnotationMirror annotationMirror) {
+                return extractValue(annotationMirror, valueName, expectedType).getOrElse(null);
+            }
+        });
+    }
+
+    private <T> Option<T> extractValue(final AnnotationMirror annotationMirror, final String valueName, final Class<T> expectedType) {
+        Map<ExecutableElement, AnnotationValue> elementValues = new HashMap<>(annotationMirror.getElementValues());
+        return collectionUtils.find(elementValues.entrySet(), new CollectionUtils.Function<Map.Entry<ExecutableElement, AnnotationValue>, Boolean>() {
+            @Override
+            public Boolean apply(Map.Entry<ExecutableElement, AnnotationValue> entry) {
+                return entry.getKey().getSimpleName().contentEquals(valueName);
+            }
+        }).map(new Option.Map<Map.Entry<ExecutableElement,AnnotationValue>, T>() {
+           @Override
+           public T map(Map.Entry<ExecutableElement, AnnotationValue> entry) {
+               Object value = entry.getValue().getValue();
+               return expectedType.cast(value);
+           }
+        });
+    }
+
+    public String getTypeName(Element element) {
+        TypeMirror fieldType = element.asType();
+        TypeElement typeElement = typeUtils.asTypeElement(fieldType);
+        Option<String> packOpt = getPackageName(typeElement);
+        final String modelName = stripClassName(fieldType).replaceAll("<.*>", "");
+        return packOpt.fold(new Option.OptionCB<String, String>() {
+            @Override
+            public String absent() {
+                return modelName;
+            }
+
+            @Override
+            public String present(String pack) {
+                return pack + "." + modelName;
+            }
+        });
+    }
+
+    public String getSimpleName(Element scope) {
+        String name = getFullName(scope);
+        return name.substring(name.lastIndexOf('.') + 1);
     }
 }

@@ -1,0 +1,42 @@
+package ${package};
+
+import android.view.View;
+import android.widget.*;
+#foreach($scope in $scopes)
+import ${scope.typeName}$$NgScope;
+#end
+
+public class ${className} implements com.ngandroid.lib.ng.Controller {
+
+    private final com.ngandroid.lib.NgOptions ngOptions_;
+	#foreach($scope in $scopes)
+	    private final ${scope.javaName}$$NgScope $scope.name;
+	#end
+
+	public ${className}(com.ngandroid.lib.NgOptions ngOptions#foreach($scope in $scopes), $scope.typeName $scope.name #end){
+		this.ngOptions_ = ngOptions;
+		#foreach($scope in $scopes)
+            this.$scope.name = new ${scope.javaName}$$NgScope($scope.name, ngOptions_);
+        #end
+	}
+
+	public int getId() {
+	    return ${packageName}.R.layout.${layoutName};
+	}
+
+	public void attach(android.view.View __view__){
+        #foreach($scope in $scopes)
+            #foreach($view in $scope.getViews($layoutPath))
+
+                $view.elementType $view.id = ($view.elementType) __view__.findViewById(${packageName}.R.id.${view.id});
+                #foreach($attr in $view.attributes)
+                    #set ($isBoolType = $attr.source.getType($scope).equals("Boolean"))
+                    #set ($attrSource = $attr.source)
+                    #set ($attrClassName = $attr.className)
+                    #set ($viewName = $view.id)
+                    #evaluate ( ${attr.attachSource} )
+                #end
+            #end
+        #end
+	}
+}

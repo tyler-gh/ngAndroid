@@ -16,30 +16,12 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.sources;
 
-import com.github.davityle.ngprocessor.attrcompiler.AttributeCompiler;
-import com.github.davityle.ngprocessor.util.TypeUtils;
-
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 
 public class SourceTest {
 
     @Test
     public void testGetModelSource() throws Exception {
-        AttributeCompiler builder = new AttributeCompiler(mock(TypeUtils.class));
-        Source source = builder.compile("(modelName.num - (2*(7-1))) - 10/(modelName.num-3)");
-        List<ModelSource> modelSourceList = new ArrayList<>();
-        source.getModelSource(modelSourceList);
-        assertEquals(2, modelSourceList.size());
-        for(ModelSource modelSource : modelSourceList){
-            assertEquals("modelName", modelSource.getModelName());
-            assertEquals("num", modelSource.getFieldName());
-        }
     }
 
     @Test

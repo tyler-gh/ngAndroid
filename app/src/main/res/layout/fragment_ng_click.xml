@@ -5,13 +5,61 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:ignore="MissingPrefix"
-    tools:context="com.ngandroid.demo.ui.pages.ngclick.NgClickFragment">
+    tools:context="com.ngandroid.demo.ui.pages.ngclick.NgClickFragment"
+    ng:ngScope="ClickFragment">
 
     <Button
-        android:id="@+id/bt_mt"
+        android:id="@+id/shortClick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        ng:ngClick="makeToast()"
+        ng:ngClick="makeToast('Short Click Event')"
+        ng:ngLongClick="makeToast('Long Click Event')"
+        ng:ngInvisible="inv.invisible"
+        ng:ngGone="inv.gone"
+        ng:ngDisabled="inv.disabled"
         android:text="@string/make_toast"/>
+
+    <CheckBox
+        android:id="@+id/invToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ng:ngModel="inv.invisible"/>
+
+    <CheckBox
+        android:id="@+id/goneToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ng:ngModel="inv.gone"/>
+
+    <CheckBox
+        android:id="@+id/disToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ng:ngModel="inv.disabled"/>
+
+    <EditText
+        android:id="@+id/focusEt1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ng:ngFocus="inv.focus1"/>
+
+    <CheckBox
+        android:id="@+id/focusToggle1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ng:ngModel="inv.focus1"/>
+
+    <EditText
+        android:id="@+id/focusEt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ng:ngFocus="inv.focus"/>
+
+    <CheckBox
+        android:id="@+id/focusToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ng:ngModel="inv.focus"/>
+
 
 </LinearLayout>

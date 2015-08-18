@@ -35,24 +35,24 @@ public class MessageUtils {
         this.processingEnv = processingEnv;
     }
 
-    public void error(Element element, String message, Object... args) {
+    public void error(Option<? extends Element> element, String message, Object... args) {
         printMessage(Kind.ERROR, element, message, args);
         hasErrors = true;
     }
 
-    public void note(Element element, String message, Object... args){
+    public void note(Option<? extends Element> element, String message, Object... args){
         printMessage(Kind.NOTE, element, message, args);
     }
 
-    public void warning(Element element, String message, Object... args) {
+    public void warning(Option<? extends Element> element, String message, Object... args) {
         printMessage(Kind.WARNING, element, message, args);
     }
 
-    private void printMessage(Kind kind, Element element, String message, Object... args){
+    private void printMessage(Kind kind, Option<? extends Element> element, String message, Object... args){
         if (args.length > 0) {
             message = String.format(message, args);
         }
-        processingEnv.getMessager().printMessage(kind, message, element);
+        processingEnv.getMessager().printMessage(kind, message, element.getOrElse(null));
     }
 
     public boolean hasErrors() {

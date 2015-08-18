@@ -23,10 +23,12 @@ package com.github.davityle.ngprocessor.attrcompiler.parse;
 public final class Token {
     private final TokenType tokenType;
     private final String script;
+    private final int tokenLocation;
 
-    Token(TokenType tokenType, String script) {
+    Token(TokenType tokenType, String script, int tokenLocation) {
         this.tokenType = tokenType;
         this.script = script;
+        this.tokenLocation = tokenLocation;
     }
 
     @Override

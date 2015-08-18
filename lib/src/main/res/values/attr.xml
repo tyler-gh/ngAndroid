@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ngAndroid">
+        <attr name="ngScope" format="string"/>
         <!--https://docs.angularjs.org/api/ng/directive/ngModel-->
         <attr name="ngModel" format="string"/>
         <!--https://docs.angularjs.org/api/ng/directive/ngClick-->

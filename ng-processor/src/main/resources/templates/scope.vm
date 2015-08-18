@@ -1,0 +1,51 @@
+package ${package};
+
+import android.view.View;
+import android.widget.*;
+
+public class ${className} {
+
+    private ${scope.javaName} scope;
+    private final com.ngandroid.lib.NgOptions ngOptions_;
+
+	public ${className}(${scope.javaName} scope, com.ngandroid.lib.NgOptions ngOptions_){
+        this.scope = scope;
+        this.ngOptions_ = ngOptions_;
+    #foreach($model in $scope.ngModels)
+        if(this.scope.${model.name} == null || !(this.scope.${model.name} instanceof ${model.typeName}$$NgModel)){
+            this.scope.${model.name} = new ${model.typeName}$$NgModel();
+        }
+    #end
+	}
+
+	#foreach($model in $scope.ngModels)
+	public ${model.typeName}$$NgModel get${model.name}() {
+	    return (${model.typeName}$$NgModel) this.scope.${model.name};
+	}
+    #end
+
+    #foreach($layout in $scope.layouts)
+        public $layout.javaName $layout.javaName = new ${layout.javaName}();
+    #end
+
+    #foreach($layout in $scope.layouts)
+        public class $layout.javaName {
+        #foreach($view in $scope.getViews($layout.path))
+            #foreach($attr in $view.attributes)
+                public ${attr.className} get${attr.className}($view.elementType view) {
+                    return new ${layout.javaName}.${attr.className}(view);
+                }
+            #end
+
+            #foreach($attr in $view.attributes)
+                #set($attrSource=$attr.source)
+                #set($attrClassName=$attr.className)
+                #set($viewType=$view.elementType)
+                #set($type=${attr.source.getType($scope)})
+                #set($isBoolType=$type.equals("Boolean"))
+                #evaluate(${attr.classSource})
+            #end
+        #end
+        }
+    #end
+}

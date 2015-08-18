@@ -33,7 +33,7 @@ import static com.google.common.truth.Truth.ASSERT;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 
-@NgScope
+@NgScope(name = "TypeScope")
 public class NgProcessorTest {
 
     @Test
@@ -52,7 +52,7 @@ public class NgProcessorTest {
                 .generatesFileNamed(SOURCE_OUTPUT, "com.github.davityle.ngprocessor", "TestPoint$$NgModel.java");
     }
 
-    @NgModel
+//    @NgModel TODO potential recreation problem
     TestPoint point1, point2;
 
     void doSomething(Double x, Double y){
@@ -103,6 +103,8 @@ class TestPoint {
     private Character cx;
 
     private String str;
+
+    private boolean bool;
 
     public Double getX() {
         return x;
@@ -206,5 +208,13 @@ class TestPoint {
 
     public void setStr(String str) {
         this.str = str;
+    }
+
+    public boolean getBool() {
+        return bool;
+    }
+
+    public void setBool(boolean bool) {
+        this.bool = bool;
     }
 }

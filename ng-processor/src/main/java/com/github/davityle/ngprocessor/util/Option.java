@@ -24,7 +24,7 @@ public class Option<T> {
 	private static final Option<?> ABSENT = new Option<Object>(null, false);
 
 	public static <T> Option<T> of(T value) {
-		return new Option<T>(value, true);
+		return new Option<>(value, value != null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -64,7 +64,24 @@ public class Option<T> {
 		}
 	}
 
-	public interface OptionCB<T,R> {
+	@Override
+	public String toString() {
+		return isPresent() ? get().toString() : "absent";
+	}
+
+	public T getOrElse(T no_id) {
+		return isPresent() ? get() : no_id;
+	}
+
+	public <R> Option<R> map(Map<T, R> map) {
+		return isPresent() ? Option.of(map.map(get())) : Option.<R>absent();
+	}
+
+	public interface Map<T, R> {
+		R map(T t);
+	}
+
+	public interface OptionCB<T, R> {
 		R absent();
 		R present(T t);
 	}

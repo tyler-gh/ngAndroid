@@ -14,6 +14,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.ngandroid.demo.R;
+import com.ngandroid.demo.model.DemoItem;
+import com.ngandroid.demo.scope.DemoScope;
 import com.ngandroid.demo.ui.pages.ngclick.NgClickFragment;
 import com.ngandroid.demo.ui.pages.ngmodel.NgModelFragment;
 
@@ -57,7 +59,7 @@ public class DemoActivity extends Activity implements DemoScope.FragmentSelected
         listView.setAdapter(new DemoAdapter(this, this, items));
 
         if(savedInstanceState == null){
-            fragmentManager.beginTransaction().replace(R.id.fragmentLayout, new NgModelFragment(), "frag").commit();
+            fragmentManager.beginTransaction().replace(R.id.fragmentLayout, new NgClickFragment(), "frag").commit();
         }
     }
 

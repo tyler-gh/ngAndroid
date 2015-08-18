@@ -15,7 +15,8 @@
   -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ng="http://schemas.android.com/apk/res-auto">
+    xmlns:ng="http://schemas.android.com/apk/res-auto"
+    ng:ngScope="test">
     <LinearLayout>
 
         <View
@@ -53,6 +54,10 @@
         <View
             android:id="@+id/xkd"
             ng:ngClick="floatPlusChar(point1.cx + point2.fx)"/>
+
+        <View
+            android:id="@+id/pBool"
+            ng:ngBlur="point1.bool"/>
 
 
     </LinearLayout>

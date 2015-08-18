@@ -16,17 +16,11 @@
 
 package com.github.davityle.ngprocessor.attrcompiler;
 
-import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
-import com.github.davityle.ngprocessor.util.TypeUtils;
+import com.github.davityle.ngprocessor.util.Option;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class AttributeCompilerTest {
 
@@ -42,58 +36,49 @@ public class AttributeCompilerTest {
 
     @Test
     public void testNestedExpressions(){
-        AttributeCompiler builder = new AttributeCompiler(mock(TypeUtils.class));
-
-        Source source = builder.compile("(3 + (2)) - 10/5");
-        assertEquals("((3+2)-(10/5))", source.getSource());
+        Option<String> source = AttributeCompiler.translateToJavaGetter("(3 + (2)) - 10/5");
+        assertEquals("((3+2)-(10/5))", source.get());
         assertEquals((3 + (2)) - 10/5, ((3+2)-(10/5)));
 
-
-        source = builder.compile("(3 - (2)) - 10/5");
-        assertEquals("((3-2)-(10/5))", source.getSource());
+        source = AttributeCompiler.translateToJavaGetter("(3 - (2)) - 10/5");
+        assertEquals("((3-2)-(10/5))", source.get());
         assertEquals((3 - (2)) - 10/5, ((3-2)-(10/5)));
 
-        source = builder.compile("(3 - (2+7)) - 10/5");
-        assertEquals("((3-(2+7))-(10/5))", source.getSource());
+        source = AttributeCompiler.translateToJavaGetter("(3 - (2+7)) - 10/5");
+        assertEquals("((3-(2+7))-(10/5))", source.get());
         assertEquals((3 - (2+7)) - 10/5, ((3-(2+7))-(10/5)));
         assertEquals(-8, ((3-(2+7))-(10/5)));
 
-        source = builder.compile("(3 - (2+7)) - 10/(5-3)");
-        assertEquals("((3-(2+7))-(10/(5-3)))", source.getSource());
+        source = AttributeCompiler.translateToJavaGetter("(3 - (2+7)) - 10/(5-3)");
+        assertEquals("((3-(2+7))-(10/(5-3)))", source.get());
         assertEquals((3 - (2+7)) - 10/(5-3), ((3-(2+7))-(10/(5-3))));
 
-        source = builder.compile("(modelName.num - (2*(7-1))) - 10/(modelName.num-3)");
-        List<ModelSource> modelSourceList = new ArrayList<>();
-        source.getModelSource(modelSourceList);
-        for(ModelSource modelSource : modelSourceList)
-            modelSource.setGetter("getNum");
-        assertEquals("((scope.modelName.getNum()-(2*(7-1)))-(10/(scope.modelName.getNum()-3)))", source.getSource());
+        source = AttributeCompiler.translateToJavaGetter("(modelName.num - (2*(7-1))) - 10/(modelName.num-3)");
+        assertEquals("((scope.modelName.getNum()-(2*(7-1)))-(10/(scope.modelName.getNum()-3)))", source.get());
     }
 
     @Test
     public void testStringCompilation(){
-        AttributeCompiler builder = new AttributeCompiler(mock(TypeUtils.class));
+        assertEquals("\"Martin Luther King Jr.\"", AttributeCompiler.translateToJavaGetter("'Martin Luther King Jr.'").get());
 
-        Source getter = builder.compile("xyz('Martin Luther King Jr.')");
-        assertEquals("scope.xyz(\"Martin Luther King Jr.\")", getter.getSource());
+        Option<String> getter = AttributeCompiler.translateToJavaGetter("xyz('Martin Luther King Jr.')");
+        assertEquals("scope.xyz(\"Martin Luther King Jr.\")", getter.get());
 
-        getter = builder.compile("xyz('Martin Luther King\\'s Jr.')");
-        assertEquals("scope.xyz(\"Martin Luther King's Jr.\")", getter.getSource());
+        getter = AttributeCompiler.translateToJavaGetter("xyz('Martin Luther King\\'s Jr.')");
+        assertEquals("scope.xyz(\"Martin Luther King\\'s Jr.\")", getter.get());
 
-        getter = builder.compile("xyz('Martin \"Luther\" King\\'s Jr.')");
-        assertEquals("scope.xyz(\"Martin \\\"Luther\\\" King's Jr.\")", getter.getSource());
 
+        getter = AttributeCompiler.translateToJavaGetter("xyz('Martin \"Luther\" King\\'s Jr.')");
+        assertEquals("scope.xyz(\"Martin \\\"Luther\\\" King\\'s Jr.\")", getter.get());
     }
 
     @Test
     public void testStringAdditionCompilation(){
-        AttributeCompiler builder = new AttributeCompiler(mock(TypeUtils.class));
+        Option<String> getter = AttributeCompiler.translateToJavaGetter("getStringValue() + 'orange ' + getIntValue()");
+        assertEquals("((scope.getStringValue()+\"orange \")+scope.getIntValue())", getter.get());
 
-        Source getter = builder.compile("getStringValue() + 'orange ' + getIntValue()");
-        assertEquals("((scope.getStringValue()+\"orange \")+scope.getIntValue())", getter.getSource());
-
-        getter = builder.compile("isTrue() ? 'abcdefg ' + getIntValue() : getStringValue()");
-        assertEquals("scope.isTrue()?(\"abcdefg \"+scope.getIntValue()):scope.getStringValue()", getter.getSource());
+        getter = AttributeCompiler.translateToJavaGetter("isTrue() ? 'abcdefg ' + getIntValue() : getStringValue()");
+        assertEquals("(scope.isTrue())?((\"abcdefg \"+scope.getIntValue())):(scope.getStringValue())", getter.get());
     }
 
 }

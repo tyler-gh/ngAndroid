@@ -17,243 +17,35 @@
 package com.github.davityle.ngprocessor.attrcompiler;
 
 
-import com.github.davityle.ngprocessor.attrcompiler.parse.SyntaxParser;
-import com.github.davityle.ngprocessor.attrcompiler.parse.Token;
-import com.github.davityle.ngprocessor.attrcompiler.parse.TokenType;
-import com.github.davityle.ngprocessor.attrcompiler.sources.BinaryOperatorSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.KnotSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.MethodSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.ModelSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
-import com.github.davityle.ngprocessor.attrcompiler.sources.StaticSource;
-import com.github.davityle.ngprocessor.attrcompiler.sources.TernarySource;
-import com.github.davityle.ngprocessor.util.Tuple;
-import com.github.davityle.ngprocessor.util.TypeUtils;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
+import com.github.davityle.ngprocessor.attrcompiler.node.Node;
+import com.github.davityle.ngprocessor.attrcompiler.parse.Parser;
+import com.github.davityle.ngprocessor.util.Option;
 
 import javax.inject.Inject;
 
 public class AttributeCompiler {
 
 
-    private final TypeUtils typeUtils;
-
     @Inject
-    public AttributeCompiler(TypeUtils typeUtils){
-        this.typeUtils = typeUtils;
+    public AttributeCompiler(){}
+
+    public static Option<String> translateToJavaGetter(String source) {
+        Option<Node> expression = Parser.tryParse(source);
+
+        if (expression.isAbsent()) {
+            return Option.absent();
+        } else {
+            return Option.of(GetExpressionVisitor.generateGetExpression(expression.get(), ""));
+        }
     }
 
-    public Source compile(String expression){
-        Token[] tokens = new SyntaxParser(expression).parseScript();
-        return createSource(0, tokens.length - 1, tokens).getFirst();
+    public static Option<String> translateToJavaSetter(String source, String value) {
+        Option<Node> expression = Parser.tryParse(source);
+
+        if (expression.isAbsent()) {
+            return Option.absent();
+        } else {
+            return Option.of(SetExpressionVisitor.generateSetExpression(expression.get(), value));
+        }
     }
-
-    private int findEndOfFunction(Token[] tokens, int startIndex){
-        for(int index = startIndex; index < tokens.length; index++){
-            if(tokens[index].getTokenType() == TokenType.CLOSE_PARENTHESIS)
-                return index;
-        }
-        throw new RuntimeException("Function is not closed properly");
-    }
-
-    private int findCloseParenthesis(int startIndex, Token[] tokens) {
-        int openCount = 1;
-        for(int index = startIndex; index < tokens.length; index++){
-            Token token = tokens[index];
-            if(token.getTokenType() == TokenType.OPEN_PARENTHESIS_EXP || token.getTokenType() == TokenType.OPEN_PARENTHESIS){
-                openCount++;
-            }else if(token.getTokenType() == TokenType.CLOSE_PARENTHESIS) {
-                if(--openCount == 0)
-                    return index;
-            }
-        }
-        throw new RuntimeException("Nested expression is not closed properly " + openCount);
-    }
-
-    private int findEndOfParameter(Token[] tokens, int startIndex){
-        for(int index = startIndex; index < tokens.length; index++){
-            Token token = tokens[index];
-            if(token.getTokenType() == TokenType.CLOSE_PARENTHESIS || token.getTokenType() == TokenType.COMMA)
-                return index;
-        }
-        throw new RuntimeException("Function is not closed properly");
-    }
-
-    private int findColon(Token[] tokens, int startIndex){
-        for(int index = startIndex; index < tokens.length; index++){
-            if(tokens[index].getTokenType() == TokenType.TERNARY_COLON)
-                return index;
-        }
-        throw new RuntimeException("Ternary is not formed properly");
-    }
-
-    public Tuple<Source, Integer> createSource(int startIndex, int endIndex, Token[] tokens){
-        List<Source> sourceList = new ArrayList<>();
-        List<TokenType.BinaryOperator> operatorList = new ArrayList<>();
-        int index = startIndex;
-        while (index < endIndex){
-            Token token = tokens[index];
-            switch(token.getTokenType()){
-                case FUNCTION_NAME:{
-                    index += 2;
-                    int end = findEndOfFunction(tokens, index);
-                    List<Source> parameters = new ArrayList<>();
-                    while(index < end) {
-                        int nextIndex = findEndOfParameter(tokens, index);
-                        Tuple<Source, Integer> values = createSource(index, nextIndex, tokens);
-                        parameters.add(values.getFirst());
-                        index = values.getSecond() + 1;
-                    }
-                    String methodName = token.getScript();
-                    sourceList.add(new MethodSource(typeUtils, methodName, parameters));
-                    break;
-                }
-                case KNOT:{
-                    // TODO take a closer look at whether or not this can trail off and grab multiple getters
-                    Tuple<Source, Integer> value = createSource(index + 1, endIndex, tokens);
-                    KnotSource getter = new KnotSource(typeUtils, value.getFirst());
-                    index = value.getSecond();
-                    sourceList.add(getter);
-                    break;
-                }
-                case INTEGER_CONSTANT: {
-                    sourceList.add(new StaticSource(typeUtils, token.getScript(), typeUtils.getIntegerType()));
-                    index++;
-                    break;
-                }
-                case LONG_CONSTANT: {
-                    sourceList.add(new StaticSource(typeUtils, token.getScript(), typeUtils.getLongType()));
-                    index++;
-                    break;
-                }
-                case FLOAT_CONSTANT: {
-                    // TODO test all the number constants
-                    String script = token.getScript();
-                    if(!script.endsWith("f") && !script.endsWith("F"))
-                        script += "f";
-                    sourceList.add(new StaticSource(typeUtils, script, typeUtils.getFloatType()));
-                    index++;
-                    break;
-                }
-                case DOUBLE_CONSTANT: {
-                    sourceList.add(new StaticSource(typeUtils, token.getScript(), typeUtils.getDoubleType()));
-                    index++;
-                    break;
-                }
-                case MODEL_NAME: {
-                    String modelName = token.getScript();
-                    String fieldName = tokens[index + 2].getScript();
-                    sourceList.add(new ModelSource(typeUtils, modelName, fieldName));
-                    index += 3;
-                    break;
-                }
-                case STRING: {
-                    String script = token.getScript().replace("\"", "\\\"").replace("\\'","'");
-                    sourceList.add(new StaticSource(typeUtils, '"' + script.substring(1, script.length() - 1) + '"', typeUtils.getStringType()));
-                    index++;
-                    break;
-                }
-                case OPEN_PARENTHESIS_EXP:{
-                    index++;
-                    int end = findCloseParenthesis(index, tokens);
-                    Tuple<Source, Integer> values = createSource(index, end, tokens);
-                    sourceList.add(values.getFirst());
-                    index = values.getSecond();
-                    break;
-                }
-                case CLOSE_PARENTHESIS:
-                case COMMA:{
-                    index++;
-                    break;
-                }
-                case TERNARY_QUESTION_MARK: {
-                    Source source =  getMostRecentGetter(sourceList, "Ternary Question mark cannot be the first expression.");
-                    int ternaryColonIndex = findColon(tokens, index);
-                    Tuple<Source, Integer> values = createSource(index + 1, ternaryColonIndex, tokens);
-                    Source trueSource = values.getFirst();
-                    values = createSource(ternaryColonIndex + 1, endIndex, tokens);
-                    Source falseSource = values.getFirst();
-                    index = values.getSecond();
-                    sourceList.add(new TernarySource(typeUtils, source, trueSource, falseSource));
-                    break;
-                }
-                case BINARY_OPERATOR: {
-
-                    TokenType.BinaryOperator operator = TokenType.BinaryOperator.getOperator(token.getScript());
-
-                    if(operator.equals(TokenType.BinaryOperator.EQUALS_EQUALS) || operator.equals(TokenType.BinaryOperator.KNOT_EQUALS)){
-                        Source leftgetter = getMostRecentGetter(sourceList, "Binary Operator cannot be the first expression.");
-                        Tuple<Source, Integer> values = createSource(index + 1, endIndex, tokens);
-                        Source rightgetter = values.getFirst();
-                        index = values.getSecond();
-                        sourceList.add(compareGetters(leftgetter, rightgetter, operator));
-                    }else{
-                        operatorList.add(operator);
-                        index ++;
-                    }
-                    break;
-                }
-                default:
-                    throw new RuntimeException("Invalid token in expression: " + token.getTokenType());
-            }
-        }
-
-        if(operatorList.size() > 0){
-            return Tuple.of(evaluatePostFixExpression(PostfixConverter.convertToPostfix(convertToInfix(sourceList, operatorList))), index);
-        }
-
-        if(sourceList.size() != 1){
-            throw new RuntimeException("Each expression can only return one value instead found "+ sourceList.size());
-        }
-
-        return Tuple.of(sourceList.get(0), index);
-    }
-
-    private Source compareGetters(Source leftgetter, Source rightgetter, TokenType.BinaryOperator operator){
-        return BinaryOperatorSource.getOperator(typeUtils, leftgetter, rightgetter, operator);
-    }
-
-    private Source getMostRecentGetter(List<Source> sources, String error){
-        if(sources.size() == 0){
-            throw new RuntimeException(error);
-        }
-        Source source =  sources.get(sources.size() - 1);
-        sources.remove(source);
-        return source;
-    }
-
-    public Source evaluatePostFixExpression(Object[] postfixExpression){
-        Stack<Source> stack = new Stack<>();
-        for (Object obj : postfixExpression){
-            if (obj instanceof Source){
-                stack.push((Source) obj);
-            }else{
-                Source rightSource = stack.pop();
-                Source leftSource = stack.pop();
-                stack.push(compareGetters(leftSource, rightSource, (TokenType.BinaryOperator) obj));
-            }
-        }
-        if(stack.size() != 1){
-            throw new RuntimeException("Unequal distribution of binary operators");
-        }
-
-        return stack.pop();
-    }
-
-    private List<Object> convertToInfix(List<Source> sources, List<TokenType.BinaryOperator> operators){
-        List<Object> infixExpression = new ArrayList<>();
-        Iterator<Source> getterListIterator = sources.listIterator();
-        Iterator<TokenType.BinaryOperator> operatorIterator = operators.listIterator();
-        infixExpression.add(getterListIterator.next());
-        while(getterListIterator.hasNext()){
-            infixExpression.add(operatorIterator.next());
-            infixExpression.add(getterListIterator.next());
-        }
-        return infixExpression;
-    }
-
 }
