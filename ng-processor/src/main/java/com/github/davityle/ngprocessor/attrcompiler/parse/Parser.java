@@ -12,6 +12,7 @@ import com.github.davityle.ngprocessor.attrcompiler.node.ObjectField;
 import com.github.davityle.ngprocessor.attrcompiler.node.StringLiteral;
 import com.github.davityle.ngprocessor.attrcompiler.node.TernaryOperator;
 import com.github.davityle.ngprocessor.attrcompiler.node.UnaryOperator;
+import com.github.davityle.ngprocessor.attrcompiler.node.SpecialIdentifier;
 import com.github.davityle.ngprocessor.util.Option;
 
 import java.util.ArrayList;
@@ -132,8 +133,8 @@ public class Parser {
         return lhs;
     }
 
-    private ArrayList<Expression> parseParameterList() throws ParseException {
-        ArrayList<Expression> result = new ArrayList<Expression>();
+    private ArrayList<? extends Expression> parseParameterList() throws ParseException {
+        ArrayList<Expression> result = new ArrayList<>();
 
         require(TokenType.OPEN_PARENTHESIS);
 
@@ -155,6 +156,8 @@ public class Parser {
             return parseParenthesis();
         } else if (TokenType.isNumberConstant(next.getTokenType())) {
             return new NumberConstant(advance());
+        } else if (next.getTokenType() == TokenType.SPECIAL_IDENTIFIER) {
+            return SpecialIdentifier.getSpecialIdentifier(advance());
         } else if (next.getTokenType() == TokenType.IDENTIFIER) {
             return new Identifier(advance());
         } else if (next.getTokenType() == TokenType.STRING) {

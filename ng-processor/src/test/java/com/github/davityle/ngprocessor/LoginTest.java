@@ -27,6 +27,9 @@ public class LoginTest {
                 "    @NgModel\n" +
                 "    User user;\n" +
                 "\n" +
+                "    void onSubmit(android.view.View view){\n" +
+                "    }\n" +
+                "\n" +
                 "}\n" +
                 "class User {\n" +
                 "\n" +

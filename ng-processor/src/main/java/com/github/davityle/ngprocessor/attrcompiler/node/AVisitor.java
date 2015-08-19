@@ -36,4 +36,10 @@ public abstract class AVisitor implements IVisitor {
     public void visit(FunctionName node) {
         visit((Expression) node);
     }
+    public void visit(SpecialIdentifier node) {
+        visit((Expression) node);
+    }
+    public void visit(ViewIdentifier node) {
+        visit((Expression) node);
+    }
 }

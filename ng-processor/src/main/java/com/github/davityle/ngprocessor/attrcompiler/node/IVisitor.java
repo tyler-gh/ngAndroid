@@ -13,4 +13,6 @@ public interface IVisitor {
     void visit(TernaryOperator node);
     void visit(UnaryOperator node);
     void visit(FunctionName node);
+    void visit(SpecialIdentifier node);
+    void visit(ViewIdentifier node);
 }

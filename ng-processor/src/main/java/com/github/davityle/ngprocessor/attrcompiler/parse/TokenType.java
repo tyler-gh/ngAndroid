@@ -16,10 +16,6 @@
 
 package com.github.davityle.ngprocessor.attrcompiler.parse;
 
-
-/**
-* Created by davityle on 1/15/15.
-*/
 public enum TokenType {
     NONE,
     IDENTIFIER,
@@ -38,7 +34,8 @@ public enum TokenType {
     LONG_CONSTANT,
     FLOAT_CONSTANT,
     DOUBLE_CONSTANT,
-    WHITESPACE;
+    WHITESPACE,
+    SPECIAL_IDENTIFIER;
 
     public static final int TERNARY_PRECEDENCE = 1;
 

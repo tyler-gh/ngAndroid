@@ -173,10 +173,20 @@ public enum State {
 
     IdentifierState {
         StepResult step(char currentChar) {
-            if (Character.isLetterOrDigit(currentChar)) {
+            if (Character.isLetterOrDigit(currentChar) || currentChar == '_' || currentChar == '$') {
                 return new StepResult(State.IdentifierState);
             } else {
                 return new StepResult(DefaultState(currentChar), TokenType.IDENTIFIER);
+            }
+        }
+    },
+
+    SpecialIdentifierState {
+        StepResult step(char currentChar) {
+            if (Character.isLetterOrDigit(currentChar) || currentChar == '_' || currentChar == '$') {
+                return new StepResult(State.SpecialIdentifierState);
+            } else {
+                return new StepResult(DefaultState(currentChar), TokenType.SPECIAL_IDENTIFIER);
             }
         }
     },
@@ -212,6 +222,8 @@ public enum State {
             return State.IdentifierState;
         } else if (Character.isWhitespace(currentChar)) {
             return State.WhitespaceState;
+        } else if (currentChar == '$') {
+            return State.SpecialIdentifierState;
         } else if (currentChar == '(') {
             return State.OpOpenPState;
         } else if (currentChar == ')') {

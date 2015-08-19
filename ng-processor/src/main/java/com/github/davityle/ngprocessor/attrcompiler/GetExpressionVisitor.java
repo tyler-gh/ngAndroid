@@ -1,7 +1,22 @@
 package com.github.davityle.ngprocessor.attrcompiler;
 
-import com.github.davityle.ngprocessor.attrcompiler.node.*;
+import com.github.davityle.ngprocessor.attrcompiler.node.AVisitor;
+import com.github.davityle.ngprocessor.attrcompiler.node.BinaryOperator;
+import com.github.davityle.ngprocessor.attrcompiler.node.Expression;
+import com.github.davityle.ngprocessor.attrcompiler.node.FunctionCall;
+import com.github.davityle.ngprocessor.attrcompiler.node.FunctionName;
+import com.github.davityle.ngprocessor.attrcompiler.node.Identifier;
+import com.github.davityle.ngprocessor.attrcompiler.node.Node;
+import com.github.davityle.ngprocessor.attrcompiler.node.ObjectField;
+import com.github.davityle.ngprocessor.attrcompiler.node.StringLiteral;
+import com.github.davityle.ngprocessor.attrcompiler.node.TernaryOperator;
+import com.github.davityle.ngprocessor.attrcompiler.node.UnaryOperator;
+import com.github.davityle.ngprocessor.attrcompiler.node.SpecialIdentifier;
+import com.github.davityle.ngprocessor.attrcompiler.node.ViewIdentifier;
 import com.github.davityle.ngprocessor.source.SourceField;
+
+import java.util.Collection;
+import java.util.function.Consumer;
 
 public class GetExpressionVisitor extends AVisitor {
     private StringBuilder result;
@@ -20,6 +35,9 @@ public class GetExpressionVisitor extends AVisitor {
 
     @Override
     public void visit(Node node) {
+        if(node instanceof SpecialIdentifier) {
+            throw new RuntimeException();
+        }
         result.append(node.getToken().getScript());
     }
 
@@ -56,20 +74,24 @@ public class GetExpressionVisitor extends AVisitor {
     public void visit(FunctionCall node) {
         node.getLHS().accept(this);
         result.append('(');
-
-        boolean isFirst = true;
-
-        for (Expression parameter : node.getParameters()) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                result.append(',');
-            }
-
-            parameter.accept(this);
-        }
-
+        parseFunctionParameters(node.getParameters());
         result.append(')');
+    }
+
+    private <T extends Expression> void parseFunctionParameters(Collection<T> parameters) {
+        parameters.forEach(new Consumer<T>() {
+            boolean isFirst = true;
+
+            @Override
+            public void accept(T parameter) {
+                if (isFirst) {
+                    isFirst = false;
+                } else {
+                    result.append(',');
+                }
+                parameter.accept(GetExpressionVisitor.this);
+            }
+        });
     }
 
     @Override
@@ -97,5 +119,15 @@ public class GetExpressionVisitor extends AVisitor {
     public void visit(UnaryOperator node) {
         result.append(node.getToken().getScript());
         node.getRHS().accept(this);
+    }
+
+    @Override
+    public void visit(SpecialIdentifier node) {
+//        result.append(node.getCompiledSource());
+    }
+
+    @Override
+    public void visit(ViewIdentifier node) {
+        result.append(node.getCompiledSource());
     }
 }

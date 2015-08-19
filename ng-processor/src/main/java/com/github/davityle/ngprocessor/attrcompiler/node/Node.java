@@ -3,7 +3,7 @@ package com.github.davityle.ngprocessor.attrcompiler.node;
 
 import com.github.davityle.ngprocessor.attrcompiler.parse.Token;
 
-public class Node {
+public abstract class Node {
 
     private final Token token;
 
@@ -11,9 +11,7 @@ public class Node {
         this.token = token;
     }
 
-    public void accept(IVisitor visitor) {
-        visitor.visit(this);
-    }
+    public abstract void accept(IVisitor visitor);
 
     public Token getToken() {
         return token;

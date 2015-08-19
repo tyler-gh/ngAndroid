@@ -8,9 +8,9 @@ import java.util.List;
 public class FunctionCall extends Expression {
 
     private final Expression lhs;
-    private List<Expression> parameters;
+    private List<? extends Expression> parameters;
 
-    public FunctionCall(Token token, Expression lhs, List<Expression> parameters) {
+    public FunctionCall(Token token, Expression lhs, List<? extends Expression> parameters) {
         super(token);
         this.lhs = lhs;
         this.parameters = parameters;
@@ -25,7 +25,7 @@ public class FunctionCall extends Expression {
         return lhs;
     }
 
-    public List<Expression> getParameters() {
+    public List<? extends Expression> getParameters() {
         return parameters;
     }
 }

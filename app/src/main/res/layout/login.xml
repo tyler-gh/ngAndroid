@@ -30,7 +30,8 @@
         android:layout_height="wrap_content"
         android:text="@string/submit"
         android:layout_centerInParent="true"
-        x:ngDisabled="user.username.length() &lt; 6 || user.password.length() &lt; 6"/>
+        x:ngDisabled="user.username.length() &lt; 6 || user.password.length() &lt; 6"
+        x:ngClick="onSubmit($view.context)"/>
 
 
 
