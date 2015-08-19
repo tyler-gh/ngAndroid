@@ -8,11 +8,10 @@ import com.github.davityle.ngprocessor.attrcompiler.node.FunctionName;
 import com.github.davityle.ngprocessor.attrcompiler.node.Identifier;
 import com.github.davityle.ngprocessor.attrcompiler.node.Node;
 import com.github.davityle.ngprocessor.attrcompiler.node.ObjectField;
+import com.github.davityle.ngprocessor.attrcompiler.node.SpecialIdentifier;
 import com.github.davityle.ngprocessor.attrcompiler.node.StringLiteral;
 import com.github.davityle.ngprocessor.attrcompiler.node.TernaryOperator;
 import com.github.davityle.ngprocessor.attrcompiler.node.UnaryOperator;
-import com.github.davityle.ngprocessor.attrcompiler.node.SpecialIdentifier;
-import com.github.davityle.ngprocessor.attrcompiler.node.ViewIdentifier;
 import com.github.davityle.ngprocessor.source.SourceField;
 
 import java.util.Collection;
@@ -35,9 +34,6 @@ public class GetExpressionVisitor extends AVisitor {
 
     @Override
     public void visit(Node node) {
-        if(node instanceof SpecialIdentifier) {
-            throw new RuntimeException();
-        }
         result.append(node.getToken().getScript());
     }
 
@@ -123,11 +119,6 @@ public class GetExpressionVisitor extends AVisitor {
 
     @Override
     public void visit(SpecialIdentifier node) {
-//        result.append(node.getCompiledSource());
-    }
-
-    @Override
-    public void visit(ViewIdentifier node) {
         result.append(node.getCompiledSource());
     }
 }

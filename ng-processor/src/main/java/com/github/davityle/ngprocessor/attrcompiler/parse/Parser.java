@@ -13,6 +13,8 @@ import com.github.davityle.ngprocessor.attrcompiler.node.StringLiteral;
 import com.github.davityle.ngprocessor.attrcompiler.node.TernaryOperator;
 import com.github.davityle.ngprocessor.attrcompiler.node.UnaryOperator;
 import com.github.davityle.ngprocessor.attrcompiler.node.SpecialIdentifier;
+import com.github.davityle.ngprocessor.attrcompiler.node.XmlValue;
+import com.github.davityle.ngprocessor.attrcompiler.node.XmlValueKey;
 import com.github.davityle.ngprocessor.util.Option;
 
 import java.util.ArrayList;
@@ -158,6 +160,10 @@ public class Parser {
             return new NumberConstant(advance());
         } else if (next.getTokenType() == TokenType.SPECIAL_IDENTIFIER) {
             return SpecialIdentifier.getSpecialIdentifier(advance());
+        } else if (next.getTokenType() == TokenType.XML_VALUE) {
+            return XmlValue.getXmlValue(advance());
+        } else if (next.getTokenType() == TokenType.XML_VALUE_KEY) {
+            return new XmlValueKey(advance());
         } else if (next.getTokenType() == TokenType.IDENTIFIER) {
             return new Identifier(advance());
         } else if (next.getTokenType() == TokenType.STRING) {

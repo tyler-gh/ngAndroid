@@ -191,6 +191,28 @@ public enum State {
         }
     },
 
+    XmlValueState {
+        StepResult step(char currentChar) {
+            if (Character.isLetter(currentChar)) {
+                return new StepResult(State.XmlValueState);
+            } else if(currentChar == '/'){
+                return new StepResult(State.XmlValueKeyState, TokenType.XML_VALUE);
+            } else {
+                return new StepResult(State.ErrorState, TokenType.RUBBISH);
+            }
+        }
+    },
+
+    XmlValueKeyState {
+        StepResult step(char currentChar) {
+            if (Character.isLetter(currentChar)) {
+                return new StepResult(State.XmlValueKeyState);
+            } else {
+                return new StepResult(DefaultState(currentChar), TokenType.XML_VALUE_KEY);
+            }
+        }
+    },
+
     ErrorState {
         StepResult step(char currentChar) {
             if (currentChar == '\0') {
@@ -224,6 +246,8 @@ public enum State {
             return State.WhitespaceState;
         } else if (currentChar == '$') {
             return State.SpecialIdentifierState;
+        } else if (currentChar == '@') {
+            return State.XmlValueState;
         } else if (currentChar == '(') {
             return State.OpOpenPState;
         } else if (currentChar == ')') {

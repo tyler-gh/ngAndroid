@@ -35,7 +35,9 @@ public enum TokenType {
     FLOAT_CONSTANT,
     DOUBLE_CONSTANT,
     WHITESPACE,
-    SPECIAL_IDENTIFIER;
+    SPECIAL_IDENTIFIER,
+    XML_VALUE_KEY,
+    XML_VALUE;
 
     public static final int TERNARY_PRECEDENCE = 1;
 

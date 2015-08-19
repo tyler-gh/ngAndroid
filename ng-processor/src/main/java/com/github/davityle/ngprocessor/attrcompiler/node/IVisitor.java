@@ -13,6 +13,18 @@ public interface IVisitor {
     void visit(TernaryOperator node);
     void visit(UnaryOperator node);
     void visit(FunctionName node);
+
+    /** xml values **/
+    void visit(XmlValue node);
+    void visit(XmlValue.BoolXmlValue node);
+    void visit(XmlValue.ColorXmlValue node);
+    void visit(XmlValue.DimenXmlValue node);
+    void visit(XmlValue.IdXmlValue node);
+    void visit(XmlValue.IntegerXmlValue node);
+    void visit(XmlValue.StringXmlValue node);
+    void visit(XmlValueKey node);
+
+    /** special identifiers **/
     void visit(SpecialIdentifier node);
     void visit(ViewIdentifier node);
 }

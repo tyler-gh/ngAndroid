@@ -40,6 +40,30 @@ public abstract class AVisitor implements IVisitor {
         visit((Expression) node);
     }
     public void visit(ViewIdentifier node) {
+        visit((SpecialIdentifier) node);
+    }
+    public void visit(XmlValue node) {
+        visit((Expression) node);
+    }
+    public void visit(XmlValue.BoolXmlValue node){
+        visit((XmlValue) node);
+    }
+    public void visit(XmlValue.ColorXmlValue node){
+        visit((XmlValue) node);
+    }
+    public void visit(XmlValue.DimenXmlValue node){
+        visit((XmlValue) node);
+    }
+    public void visit(XmlValue.IdXmlValue node){
+        visit((XmlValue) node);
+    }
+    public void visit(XmlValue.IntegerXmlValue node){
+        visit((XmlValue) node);
+    }
+    public void visit(XmlValue.StringXmlValue node){
+        visit((XmlValue) node);
+    }
+    public void visit(XmlValueKey node){
         visit((Expression) node);
     }
 }
