@@ -63,7 +63,4 @@ public abstract class AVisitor implements IVisitor {
     public void visit(XmlValue.StringXmlValue node){
         visit((XmlValue) node);
     }
-    public void visit(XmlValueKey node){
-        visit((Expression) node);
-    }
 }

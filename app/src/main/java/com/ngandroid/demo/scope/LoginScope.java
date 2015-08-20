@@ -47,4 +47,8 @@ public class LoginScope {
             });
     }
 
+    void intArg(int i) {
+        
+    }
+
 }

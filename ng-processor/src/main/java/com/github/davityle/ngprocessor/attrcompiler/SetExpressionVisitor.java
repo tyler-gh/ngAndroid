@@ -23,7 +23,7 @@ public class SetExpressionVisitor extends AVisitor {
 
     @Override
     public void visit(ObjectField node) {
-        result.append(GetExpressionVisitor.generateGetExpression(node.getLHS(), ""));
+        result.append(GetExpressionVisitor.generateGetExpression(node.getLHS(), "", ""));
         result.append('.');
         result.append("set");
         result.append(SourceField.capitalize(node.getToken().getScript()));

@@ -33,6 +33,13 @@
         x:ngDisabled="user.username.length() &lt; 6 || user.password.length() &lt; 6"
         x:ngClick="onSubmit($view.context)"/>
 
+    <Button
+        android:id="@+id/hidden"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        x:ngClick="intArg(@id/submit)"/>
+
 
 
 </RelativeLayout>

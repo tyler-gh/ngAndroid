@@ -21,9 +21,6 @@ import com.github.davityle.ngprocessor.attrcompiler.sources.Source;
 import com.github.davityle.ngprocessor.attributes.Attribute;
 import com.github.davityle.ngprocessor.util.Option;
 
-/**
-* Created by tyler on 3/25/15.
-*/
 public class XmlAttribute {
     private final Attribute attr;
     private final Option<String> viewId;
@@ -45,7 +42,7 @@ public class XmlAttribute {
 
     @Override
     public String toString() {
-        return '(' + attr.getAttrName() + ',' + source.getGetterSource("") + ')';
+        return '(' + attr.getAttrName() + ',' + source.getGetterSource("", "") + ')';
     }
 
     public Source getSource() {

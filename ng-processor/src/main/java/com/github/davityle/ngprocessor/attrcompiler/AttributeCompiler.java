@@ -35,7 +35,7 @@ public class AttributeCompiler {
         if (expression.isAbsent()) {
             return Option.absent();
         } else {
-            return Option.of(GetExpressionVisitor.generateGetExpression(expression.get(), ""));
+            return Option.of(GetExpressionVisitor.generateGetExpression(expression.get(), "", ""));
         }
     }
 

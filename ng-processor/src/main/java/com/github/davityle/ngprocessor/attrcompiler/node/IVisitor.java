@@ -22,7 +22,6 @@ public interface IVisitor {
     void visit(XmlValue.IdXmlValue node);
     void visit(XmlValue.IntegerXmlValue node);
     void visit(XmlValue.StringXmlValue node);
-    void visit(XmlValueKey node);
 
     /** special identifiers **/
     void visit(SpecialIdentifier node);

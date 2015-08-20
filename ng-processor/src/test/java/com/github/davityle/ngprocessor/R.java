@@ -27,6 +27,7 @@ public class R {
         public static final int password = 12;
         public static final int submit = 13;
         public static final int testAnd = 14;
+        public static final int testAnd2 = 15;
     }
 
     public static final class styleable {

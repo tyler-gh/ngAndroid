@@ -12,6 +12,7 @@ import com.github.davityle.ngprocessor.attrcompiler.node.SpecialIdentifier;
 import com.github.davityle.ngprocessor.attrcompiler.node.StringLiteral;
 import com.github.davityle.ngprocessor.attrcompiler.node.TernaryOperator;
 import com.github.davityle.ngprocessor.attrcompiler.node.UnaryOperator;
+import com.github.davityle.ngprocessor.attrcompiler.node.XmlValue;
 import com.github.davityle.ngprocessor.source.SourceField;
 
 import java.util.Collection;
@@ -19,15 +20,16 @@ import java.util.function.Consumer;
 
 public class GetExpressionVisitor extends AVisitor {
     private StringBuilder result;
-    private final String prependage;
+    private final String prependage, xmlValuePrependage;
 
-    GetExpressionVisitor(String prependage) {
+    GetExpressionVisitor(String prependage, String xmlValuePrependage) {
+        this.xmlValuePrependage = xmlValuePrependage;
         this.result = new StringBuilder();
         this.prependage = prependage;
     }
 
-    public static String generateGetExpression(Node node, String value) {
-        GetExpressionVisitor visitor = new GetExpressionVisitor(value);
+    public static String generateGetExpression(Node node, String value, String xmlValuePrependage) {
+        GetExpressionVisitor visitor = new GetExpressionVisitor(value, xmlValuePrependage);
         node.accept(visitor);
         return visitor.result.toString();
     }
@@ -121,4 +123,10 @@ public class GetExpressionVisitor extends AVisitor {
     public void visit(SpecialIdentifier node) {
         result.append(node.getCompiledSource());
     }
+
+    @Override
+    public void visit(XmlValue xmlValue) {
+        result.append(xmlValue.getSource(xmlValuePrependage));
+    }
+
 }

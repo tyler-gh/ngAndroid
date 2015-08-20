@@ -12,6 +12,6 @@ public final class $attrClassName implements com.ngandroid.lib.ng.ModelObserver 
     }
 
     @Override public void invoke(Object val) {
-        view_.setEnabled(!$attrSource.getGetterSource("${scope.javaName}$$NgScope.this.scope."));
+        view_.setEnabled(!$attrSource.getGetterSource("${scope.javaName}$$NgScope.this.scope.", "${packageName}."));
     }
 }

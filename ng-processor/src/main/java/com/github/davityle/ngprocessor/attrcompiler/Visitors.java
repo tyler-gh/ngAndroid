@@ -22,8 +22,8 @@ public class Visitors {
         this.primitiveUtils = primitiveUtils;
     }
 
-    public String getGetterSource(Node node, String value) {
-        return GetExpressionVisitor.generateGetExpression(node, value);
+    public String getGetterSource(Node node, String value, String xmlValuePrependage) {
+        return GetExpressionVisitor.generateGetExpression(node, value, xmlValuePrependage);
     }
 
     public String getSetterSource(Node node, String value) {

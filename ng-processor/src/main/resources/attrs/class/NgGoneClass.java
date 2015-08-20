@@ -12,7 +12,7 @@ public final class $attrClassName implements com.ngandroid.lib.ng.ModelObserver 
     }
 
     @Override public void invoke(Object hide) {
-        if($attrSource.getGetterSource("${scope.javaName}$$NgScope.this.scope.")) {
+        if($attrSource.getGetterSource("${scope.javaName}$$NgScope.this.scope.", "${packageName}.")) {
             view_.setVisibility(android.view.View.GONE);
         } else {
             view_.setVisibility(android.view.View.VISIBLE);

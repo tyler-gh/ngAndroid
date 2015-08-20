@@ -5,7 +5,7 @@ public final class $attrClassName implements com.ngandroid.lib.ng.ModelObserver<
     private $attrClassName($viewType view_) {
         this.view_ = view_;
         try {
-            this.invoke($attrSource.getGetterSource("${scope.javaName}$$NgScope.this.scope."));
+            this.invoke($attrSource.getGetterSource("${scope.javaName}$$NgScope.this.scope.", "${packageName}."));
         } catch(NullPointerException ignored){
             android.util.Log.w("NgAndroid", "Unable to get initial value for view '${view.id}' because of null pointer");
         }

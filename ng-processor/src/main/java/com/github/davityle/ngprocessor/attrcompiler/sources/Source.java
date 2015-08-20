@@ -31,8 +31,8 @@ public class Source {
         this.node = Parser.parse(source);
     }
 
-    public String getGetterSource(String value) {
-        return visitors.getGetterSource(node, value);
+    public String getGetterSource(String value, String xmlValuePrependage) {
+        return visitors.getGetterSource(node, value, xmlValuePrependage);
     }
 
     public String getSetterSource(String value) {
