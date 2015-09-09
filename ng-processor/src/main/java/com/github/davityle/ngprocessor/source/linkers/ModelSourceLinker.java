@@ -72,6 +72,10 @@ public class ModelSourceLinker {
         List<? extends Element> enclosedElements = typeElement.getEnclosedElements();
         boolean isInterface = typeElement.getKind().isInterface();
 
+        if(isInterface) {
+            messageUtils.error(Option.of(typeElement), "Model must be a class");
+        }
+
         Set<String> duplicateCheck = new HashSet<>();
 
         for(int index = 0; index < enclosedElements.size(); index++){

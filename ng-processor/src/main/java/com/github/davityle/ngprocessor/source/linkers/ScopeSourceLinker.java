@@ -17,13 +17,10 @@
 package com.github.davityle.ngprocessor.source.linkers;
 
 import com.github.davityle.ngprocessor.model.Scope;
-import com.github.davityle.ngprocessor.source.links.NgScopeSourceLink;
 import com.github.davityle.ngprocessor.util.ElementUtils;
 import com.github.davityle.ngprocessor.util.TypeUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -48,19 +45,6 @@ public class ScopeSourceLinker {
         this.scopeMap = scopeMap;
 //        this.elementNodeMap = elementNodeMap;
         this.manifestPackageName = manifestPackageName;
-    }
-
-    public List<NgScopeSourceLink> getSourceLinks(){
-
-        List<NgScopeSourceLink> scopeSourceLinks = new ArrayList<>();
-
-
-
-//        for(Scope scope : scopes){
-//            scopeSourceLinks.add(getSourceLink(scope.getJavaElement()));
-//        }
-
-        return scopeSourceLinks;
     }
 
 //    private NgScopeSourceLink getSourceLink(Element scopeClass){

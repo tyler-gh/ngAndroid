@@ -22,15 +22,16 @@ public class CaseTest {
                 "package com.yella;\n" +
                 "import com.ngandroid.lib.annotations.NgModel;\n" +
                 "import com.ngandroid.lib.annotations.NgScope;\n\n" +
-                "@NgScope\n" +
+                "@NgScope(name=\"CaseTest\")\n" +
                 "public class CaseTest {\n" +
                 "    @NgModel\n" +
                 "    CaseMatters cafe;        \n" +
                 "}\n" +
                 "\n" +
-                "interface CaseMatters {\n" +
-                "    void setCase_DoesntMATTER(int x);\n" +
-                "    int getCase_DOESntMatteR();\n" +
+                "class CaseMatters {\n" +
+                "    private int case_doesntmatter;\n" +
+                "    void setCase_DoesntMATTER(int x){}\n" +
+                "    int getCase_DOESntMatteR(){return case_doesntmatter;}\n" +
                 "}";
         ASSERT.about(javaSource())
                 .that(JavaFileObjects.forSourceString("com.yella.CaseTest", content))

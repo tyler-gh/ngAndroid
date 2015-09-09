@@ -16,18 +16,51 @@
 
 package com.ngandroid.demo.model.test;
 
-/**
-* Created by tyler on 3/23/15.
-*/
-public interface Note {
-    public long getTime();
-    public void setTime(long time);
-    public int getId();
-    public void setId(int id);
-    public String getTimeString();
-    public void setTimeString(String timeString);
-    public String getTitle();
-    public void setTitle(String title);
-    public String getText();
-    public void setText(String text);
+public class Note {
+
+    private long time;
+    private int id;
+    private String timeString;
+    private String title;
+    private String text;
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getTimeString() {
+        return timeString;
+    }
+
+    public void setTimeString(String timeString) {
+        this.timeString = timeString;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 }

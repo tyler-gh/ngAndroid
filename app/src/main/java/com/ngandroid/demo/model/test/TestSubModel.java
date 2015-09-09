@@ -16,10 +16,14 @@
 
 package com.ngandroid.demo.model.test;
 
-/**
-* Created by tyler on 3/23/15.
-*/
-public interface TestSubModel {
-    public void setJsonModel(TestJsonModel tsm);
-    public TestJsonModel getJsonModel();
+public class TestSubModel {
+    public TestJsonModel jsonModel;
+
+    public TestJsonModel getJsonModel() {
+        return jsonModel;
+    }
+
+    public void setJsonModel(TestJsonModel jsonModel) {
+        this.jsonModel = jsonModel;
+    }
 }

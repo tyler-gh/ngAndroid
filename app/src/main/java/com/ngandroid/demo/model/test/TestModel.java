@@ -16,14 +16,33 @@
 
 package com.ngandroid.demo.model.test;
 
-/**
-* Created by tyler on 3/23/15.
-*/
-public interface TestModel {
-    public String getJoe();
-    public void setJoe(String joe);
-    public boolean getIsInvisible();
-    public void setIsInvisible(boolean isVisible);
-    public int getNum();
-    public void setNum(int num);
+public class TestModel {
+
+    private String joe;
+    private boolean isInvisible;
+    private int num;
+
+    public String getJoe() {
+        return joe;
+    }
+
+    public void setJoe(String joe) {
+        this.joe = joe;
+    }
+
+    public boolean getIsInvisible() {
+        return isInvisible;
+    }
+
+    public void setIsInvisible(boolean isInvisible) {
+        this.isInvisible = isInvisible;
+    }
+
+    public int getNum() {
+        return num;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
+    }
 }

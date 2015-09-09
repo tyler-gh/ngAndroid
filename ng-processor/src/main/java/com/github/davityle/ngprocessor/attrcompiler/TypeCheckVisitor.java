@@ -94,7 +94,7 @@ public class TypeCheckVisitor extends AVisitor {
         return CollectionUtils.cl().find(new ArrayList<>(elementStack.peek().getEnclosedElements()), new CollectionUtils.Function<Element, Boolean>() {
             @Override
             public Boolean apply(Element o) {
-                return o.getSimpleName().toString().equals(node.getToken().getScript());
+                return o.getSimpleName().toString().toLowerCase().equals(node.getToken().getScript().toLowerCase());
             }
         });
     }

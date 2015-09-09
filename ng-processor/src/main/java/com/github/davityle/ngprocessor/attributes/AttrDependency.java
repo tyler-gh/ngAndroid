@@ -16,6 +16,10 @@ public class AttrDependency {
     }
 
     protected static String getResource(String resourcePath){
-        return new Scanner(AttrDependency.class.getClassLoader().getResourceAsStream(resourcePath), "UTF-8").useDelimiter("\\A").next();
+        try {
+            return new Scanner(AttrDependency.class.getClassLoader().getResourceAsStream(resourcePath), "UTF-8").useDelimiter("\\A").next();
+        } catch (NullPointerException e) {
+            return new Scanner(AttrDependency.class.getResourceAsStream(resourcePath), "UTF-8").useDelimiter("\\A").next();
+        }
     }
 }
