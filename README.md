@@ -1,61 +1,188 @@
 ![Android + Angular](/../pictures/images/ngandroid.png?raw=true "Android + Angular")
 
-# ngAndroid
+#NgAndroid
 
 [![Join the chat at https://gitter.im/davityle/ngAndroid](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/davityle/ngAndroid?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-ngAndroid-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1724)
 
-ngAndroid brings some of the angular directives to android xml attributes. 
+NgAndroid provides two-way data binding and MVC to Android. It accomplishes this using compile time annotation processing and Java source generation which makes the bindings type safe and effecient.
 
-The current version is based on reflection. This library will soon use compile time annotations with no reflection. The API will change slightly when this is completed. Including allowing any class to be used, along with interfaces, to declare a model. You can try out the reflection version using.
+the latest version NgAndroid is in an unstable beta and is subject to API changes. The readme to a more stable version can be found [here](https://github.com/davityle/ngAndroid/blob/master/README-OLD.md)
 
-`compile 'com.github.davityle:ngandroid:0.0.4'`
+NgAndroid can be added as a gradle dependency:
+```groovy
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+    }
+}
 
-Read more about the compile time version that is in beta here [NgAndroid](http://davityle.github.io/ngAndroid)
+allprojects {
+    repositories {
+        maven {
+            url 'http://oss.sonatype.org/content/repositories/snapshots'
+        }
+    }
+}
+apply plugin: 'com.neenbedankt.android-apt'
 
-Feedback and contributions are encouraged
+dependencies {
+    compile 'com.github.davityle:ngandroid:1.0.10-SNAPSHOT'
+    apt 'com.github.davityle:ng-processor:1.0.10-SNAPSHOT'
+}
+```
 
-Also there are known issues with adding custom attributes to Android views while using the AppCompat libraries such as FragmentActivity. Please report any other issues and we'll work to figure them out
+#Usage
 
-Currently supported angular directives.
+NgAndoid works by generating a controller class and event binding models using two annotations (subject to change) `@NgModel` and `@NgScope`. You can read more about them below. After you have annotated a class with `@NgScope` and referenced it in your xml file a controller will be generated for that xml file. If I created a scope class `MyScope` and referenced it in an xml layout `login.xml` a controller called `LoginController` would be created for the xml layout. To bind your scope to your layout you would instaniate the controller, passing in the scope, and call `LoginController#attach(android.view.View view)` passing in the view. For example 
 
-[NgModel](#ngmodel)<br>
-[NgClick](#ngclick)<br>
-[NgLongClick](#nglongclick)<br>
-[NgChange](#ngchange)<br>
-[NgDisabled](#ngdisabled)<br>
-[NgInvisible](#nginvisible)<br>
-[NgGone](#nggone)<br>
-[NgBlur](#ngblur)<br>
-[NgFocus](#ngfocus)<br>
+```java
+View v = inflater.inflate(R.layout.login, container, false);
+MyScope scope = new MyScope();
+LoginController controller = new LoginController(new NgOptions.Builder().build(), scope)
+controller.attach(v);
+```
+
+##@NgModel
+
+`@NgModel` marks a field within a scope as a model that can be bound to views. Any field that is marked as a model will be injected into the scope automatically. This is imporant because ngAndroid will create a subclass of the Model that triggers events when it is changed and somthing is listening to those changes.
+
+The type of any field marked with `@NgModel` should have getters and setters declared for each of it's fields.
+
+##@NgScope
+
+`@NgScope` marks a class as a scope. A scope is the base reference for any data binding reference. 
+
+```java
+@NgScope(name="Login")
+public class LoginScope {
+
+    @NgModel
+    User user;
+
+    void onSubmit(/*any paramaters*/) {
+        // submission code
+    }
+
+}
+
+```
+To use a scope you set the ngScope attribute in your xml to the name of the scope. For example if I were to use the above scope I would add
+
+```xml
+<RelativeLayout ...
+    xmlns:x="http://schemas.android.com/apk/res-auto"
+    x:ngScope="Login">
+```
+
+to my layout. I could then reference any methods or models declared in the scope in my xml bindings.
+
+```xml
+<EditText ...
+    x:ngModel="user.username" />
+
+<EditText
+    x:ngModel="user.password"/>
+
+<Button ...
+    x:ngDisabled="user.username.length() &lt; 6 || user.password.length() &lt; 6"
+    x:ngClick="onSubmit($view.context)"/>
+```
+
+##Attributes
+
+[NgModel](#ngmodel) Two way data binding<br>
+[NgText](#ngmodel) One way data to text view binding<br>
+[NgClick](#ngclick) Click event binding<br>
+[NgLongClick](#nglongclick) Long click event binding<br>
+[NgDisabled](#ngdisabled) Two way boolean data binding to view disabled state<br>
+[NgInvisible](#nginvisible) Two way boolean data binding to view invisible state<br>
+[NgGone](#nggone) Two way boolean data binding to view gone state<br>
+[NgFocus](#ngfocus) Two way boolean data binding to view focus state<br>
 <br>
-[Common Gotchas](#a-couple-of-gotchas)<br>
+[Common Gotchas](#gotchas)<br>
 
-Directives that are on the road map
+##Coming Soon
 ```
 ngRepeat
-ngSrc
-ngJsonSrc
+ngChange
+deep integration with injection of scopes and models using Dagger 2
 ```
+
 --------
 ![NgAndroid Demonstration](/../pictures/images/screencast.gif?raw=true "ngAndroid at work")
 --------
 
 <b>All examples are using this model</b>
 ```java
-// create model
-public interface Input {
-    public String getInput();
-    public void setInput(String input);
-    public int getInteger();
-    public void setInteger(int input);
-    public boolean getDisabled();
-    public void setDisabled(boolean disabled);
-    public boolean getGone();
-    public void setGone(boolean disabled);
-    public boolean getInvisible();
-    public void setInvisible(boolean disabled);
+public class Input {
+    private String input;
+    private int integer;
+    private boolean disabled;
+    private boolean gone;
+    private boolean invisible;
+    private boolean blur;
+    private boolean focus;
+
+    public String getInput() {
+        return input;
+    }
+
+    public void setInput(String input) {
+        this.input = input;
+    }
+
+    public int getInteger() {
+        return integer;
+    }
+
+    public void setInteger(int integer) {
+        this.integer = integer;
+    }
+
+    public boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public boolean getGone() {
+        return gone;
+    }
+
+    public void setGone(boolean gone) {
+        this.gone = gone;
+    }
+
+    public boolean getInvisible() {
+        return invisible;
+    }
+
+    public void setInvisible(boolean invisible) {
+        this.invisible = invisible;
+    }
+
+    public boolean getBlur() {
+        return blur;
+    }
+
+    public void setBlur(boolean blur) {
+        this.blur = blur;
+    }
+
+    public boolean getFocus() {
+        return focus;
+    }
+
+    public void setFocus(boolean focus) {
+        this.focus = focus;
+    }
 }
 ```
 
@@ -65,33 +192,15 @@ public interface Input {
 <!-- add xml attributes -->
 
 <EditText
-    android:id="@+id/editText"
-    ngAndroid:ngModel="input.input"
+    android:id="@+id/edit_text"
+    x:ngModel="input.input"
     ... />
     
 <TextView
-    android:id="@+id/textView"
-    ngAndroid:ngModel="input.input"
+    android:id="@+id/text_view"
+    x:ngModel="input.input"
     .../>
 ```
-```java
-// create a field with your model (no need to instantiate it)
-private Input input;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // Use NgAndroid to inflate your view 
-        NgAndroid.setContentView(this, R.layout.activity_demo);
-
-        input.setInput("Hello world");
-        
-        ....
-    }
-
-```
-
-With those lines of code, your view is now bound to your data model and vice versa.
 
 --------
 
@@ -99,14 +208,14 @@ With those lines of code, your view is now bound to your data model and vice ver
 
 ```xml
 <Button
-    android:id="@+id/stringClickEvent"
-    ngAndroid:ngClick="stringClickEvent()"
+    android:id="@+id/click_event"
+    x:ngClick="onClickEvent()"
     .../>
 ```
 ```java
-private void stringClickEvent(){
-    stringClickEvent.setText(input.getInput());
-}
+    void onClickEvent(){
+        // do something
+    }
 ```
 
 --------
@@ -115,29 +224,15 @@ private void stringClickEvent(){
 ```xml
 <Button
     android:id="@+id/multiplyButton"
-    ngAndroid:ngClick="multiply(input.integer,2)"
-    ngAndroid:ngLongClick="multiply(3,input.integer)"
+    x:ngClick="multiply(input.integer,2)"
+    x:ngLongClick="multiply(3,input.integer)"
     .../>
 
 ```
 ```java
-private void multiply(int num1, int num2){
-    Toast.makeText(this, String.valueOf(num1 * num2), Toast.LENGTH_SHORT).show();
-}
-```
---------
-
-##ngChange
-```xml
-<EditText
-    android:id="@+id/ngChangeEditText"
-    ngAndroid:ngChange="onChange()"
-    .../>
-```
-```java
-private void onChange(){
-    Toast.makeText(this, "Text Changed", Toast.LENGTH_SHORT).show();
-}
+    void multiply(int num1, int num2){
+        // do something
+    }
 ```
 
 --------
@@ -146,12 +241,12 @@ private void onChange(){
 ```xml
 <CheckBox
     android:id="@+id/ngdisabledcheckbox"
-    ngAndroid:ngModel="input.disabled"
+    x:ngModel="input.disabled"
     ... />
 
 <Button
-    android:id="@+id/ineedthisid"
-    ngAndroid:ngDisabled="input.disabled"
+    android:id="@+id/an_id_is_required_for_any_ng_android_binding"
+    x:ngDisabled="input.disabled"
     .../>
 ```
 ![NgDisabled Demonstration](/../pictures/images/ngdisable.gif?raw=true "ngdisabled demonstration")
@@ -161,12 +256,12 @@ private void onChange(){
 ```xml
 <Button
     android:id="@+id/nginvisible"
-    ngAndroid:ngInvisible="input.invisible"
+    x:ngInvisible="input.invisible"
     .../>
 
 <CheckBox
     android:id="@+id/ngvisiblecb"
-    ngAndroid:ngModel="input.invisible"
+    x:ngModel="input.invisible"
     .../>
 ```
 ![NgInvisible Demonstration](/../pictures/images/nginvisible.gif?raw=true "nginvisible demonstration")
@@ -176,62 +271,25 @@ private void onChange(){
 ```xml
 <Button
     android:id="@+id/nggone"
-    ngAndroid:ngGone="input.gone"
+    x:ngGone="input.gone"
     .../>
 
 <CheckBox
     android:id="@+id/nggonedb"
-    ngAndroid:ngModel="input.gone"
+    x:ngModel="input.gone"
     ... />
 ```
 ![NgGone Demonstration](/../pictures/images/nggone.gif?raw=true "nggone demonstration")
---------
-##Other Functionality
-
-####Build a model from Json
-```java
-ngAndroid.modelFromJson(json, TestJsonModel.class)
-```
-####Build a model without a view
-```java
-ngAndroid.buildModel(TestSubModel.class);
-```
-###Pre-Build a scope
-```java
-ngAndroid.buildScope(TestScope.class);
-```
 
 --------
 
-##A couple of gotchas:
+##Gotchas:
 
 Each view that has an ngangular attribute must also have an id
 
-Your model must be declared using an iterface.
-```java
-public interface Model{
-    public void setField(String field);
-    public String getField();
-}
-```
-You would then reference it in your xml attribute as `{name of model in scope}.field`
+--------
 
-Your scope is the parent or container of your models and methods and can be as broad as the Application or contained in a single view or even a single Scope class. To declare the above model in a scope you would use do something like this.
-
-```java
-public class Scope{
-    private Model model;
-    private void onClickMethod(String modelField){
-    }
-}
-```
-
-With that scope, you could reference the model and the method like this: `model.field` `onClickMethod(model.field)`
-
-Your scope is usually just your activity. As it is in the examples above. If you use a seperate scope class than you must use `NgAndroid.setContentView(Object scope, Activity activity, int resourceId)` instead of `NgAndroid.setContentView(Activity activity, int resourceId)` which is shown in the examples
-
-The models in your scope will automatically be built if they are referenced in your xml file.
-
+Feedback and contributions are encouraged
 
 --------
 
