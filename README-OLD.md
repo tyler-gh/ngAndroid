@@ -10,7 +10,7 @@ ngAndroid brings some of the angular directives to android xml attributes.
 
 The current version is based on reflection. This library will soon use compile time annotations with no reflection. The API will change slightly when this is completed. Including allowing any class to be used, along with interfaces, to declare a model. You can try out the reflection version using.
 
-`compile 'com.github.davityle:ngandroid:0.0.4'`
+`compile 'com.github.davityle:ngandroid:0.0.6'`
 
 Read more about the compile time version that is in beta here [NgAndroid](http://davityle.github.io/ngAndroid)
 
