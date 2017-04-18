@@ -1,6 +1,6 @@
 ![Android + Angular](/../pictures/images/ngandroid.png?raw=true "Android + Angular")
 
-#NgAndroid
+# NgAndroid
 
 [![Join the chat at https://gitter.im/davityle/ngAndroid](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/davityle/ngAndroid?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -36,7 +36,7 @@ dependencies {
 }
 ```
 
-#Usage
+# Usage
 
 NgAndoid works by generating a controller class and event binding models using two annotations (subject to change) `@NgModel` and `@NgScope`. You can read more about them below. After you have annotated a class with `@NgScope` and referenced it in your xml file a controller will be generated for that xml file. If I created a scope class `MyScope` and referenced it in an xml layout `login.xml` a controller called `LoginController` would be created for the xml layout. To bind your scope to your layout you would instaniate the controller, passing in the scope, and call `LoginController#attach(android.view.View view)` passing in the view. For example 
 
@@ -47,13 +47,13 @@ LoginController controller = new LoginController(new NgOptions.Builder().build()
 controller.attach(v);
 ```
 
-##@NgModel
+## @NgModel
 
 `@NgModel` marks a field within a scope as a model that can be bound to views. Any field that is marked as a model will be injected into the scope automatically. This is imporant because ngAndroid will create a subclass of the Model that triggers events when it is changed and somthing is listening to those changes.
 
 The type of any field marked with `@NgModel` should have getters and setters declared for each of it's fields.
 
-##@NgScope
+## @NgScope
 
 `@NgScope` marks a class as a scope. A scope is the base reference for any data binding reference. 
 
@@ -93,7 +93,7 @@ to my layout. I could then reference any methods or models declared in the scope
     x:ngClick="onSubmit($view.context)"/>
 ```
 
-##Attributes
+## Attributes
 
 [NgModel](#ngmodel) Two way data binding<br>
 [NgText](#ngmodel) One way data to text view binding<br>
@@ -106,7 +106,7 @@ to my layout. I could then reference any methods or models declared in the scope
 <br>
 [Common Gotchas](#gotchas)<br>
 
-##Coming Soon
+## Coming Soon
 ```
 ngRepeat
 ngChange
@@ -186,7 +186,7 @@ public class Input {
 }
 ```
 
-##ngModel
+## ngModel
 
 ```xml
 <!-- add xml attributes -->
@@ -204,7 +204,7 @@ public class Input {
 
 --------
 
-##ngClick
+## ngClick
 
 ```xml
 <Button
@@ -220,7 +220,7 @@ public class Input {
 
 --------
 
-##ngLongClick
+## ngLongClick
 ```xml
 <Button
     android:id="@+id/multiplyButton"
@@ -237,7 +237,7 @@ public class Input {
 
 --------
 
-##ngDisabled
+## ngDisabled
 ```xml
 <CheckBox
     android:id="@+id/ngdisabledcheckbox"
@@ -252,7 +252,7 @@ public class Input {
 ![NgDisabled Demonstration](/../pictures/images/ngdisable.gif?raw=true "ngdisabled demonstration")
 --------
 
-##ngInvisible
+## ngInvisible
 ```xml
 <Button
     android:id="@+id/nginvisible"
@@ -267,7 +267,7 @@ public class Input {
 ![NgInvisible Demonstration](/../pictures/images/nginvisible.gif?raw=true "nginvisible demonstration")
 --------
 
-##ngGone
+## ngGone
 ```xml
 <Button
     android:id="@+id/nggone"
@@ -283,7 +283,7 @@ public class Input {
 
 --------
 
-##Gotchas:
+## Gotchas:
 
 Each view that has an ngangular attribute must also have an id
 
