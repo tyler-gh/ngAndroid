@@ -59,7 +59,7 @@ public interface Input {
 }
 ```
 
-##ngModel
+## ngModel
 
 ```xml
 <!-- add xml attributes -->
@@ -95,7 +95,7 @@ With those lines of code, your view is now bound to your data model and vice ver
 
 --------
 
-##ngClick
+## ngClick
 
 ```xml
 <Button
@@ -111,7 +111,7 @@ private void stringClickEvent(){
 
 --------
 
-##ngLongClick
+## ngLongClick
 ```xml
 <Button
     android:id="@+id/multiplyButton"
@@ -127,7 +127,7 @@ private void multiply(int num1, int num2){
 ```
 --------
 
-##ngChange
+## ngChange
 ```xml
 <EditText
     android:id="@+id/ngChangeEditText"
@@ -142,7 +142,7 @@ private void onChange(){
 
 --------
 
-##ngDisabled
+## ngDisabled
 ```xml
 <CheckBox
     android:id="@+id/ngdisabledcheckbox"
@@ -157,7 +157,7 @@ private void onChange(){
 ![NgDisabled Demonstration](/../pictures/images/ngdisable.gif?raw=true "ngdisabled demonstration")
 --------
 
-##ngInvisible
+## ngInvisible
 ```xml
 <Button
     android:id="@+id/nginvisible"
@@ -172,7 +172,7 @@ private void onChange(){
 ![NgInvisible Demonstration](/../pictures/images/nginvisible.gif?raw=true "nginvisible demonstration")
 --------
 
-##ngGone
+## ngGone
 ```xml
 <Button
     android:id="@+id/nggone"
@@ -186,24 +186,24 @@ private void onChange(){
 ```
 ![NgGone Demonstration](/../pictures/images/nggone.gif?raw=true "nggone demonstration")
 --------
-##Other Functionality
+## Other Functionality
 
-####Build a model from Json
+#### Build a model from Json
 ```java
 ngAndroid.modelFromJson(json, TestJsonModel.class)
 ```
-####Build a model without a view
+#### Build a model without a view
 ```java
 ngAndroid.buildModel(TestSubModel.class);
 ```
-###Pre-Build a scope
+### Pre-Build a scope
 ```java
 ngAndroid.buildScope(TestScope.class);
 ```
 
 --------
 
-##A couple of gotchas:
+## A couple of gotchas:
 
 Each view that has an ngangular attribute must also have an id
 
